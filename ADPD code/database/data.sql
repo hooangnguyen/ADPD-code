@@ -22,7 +22,7 @@ CREATE TABLE Major (
 CREATE TABLE Class (
     ClassID INT IDENTITY PRIMARY KEY,
     ClassName NVARCHAR(100) NOT NULL,
-    StudyTime Datetime(20),
+    StudyTime Datetime,
     MajorID INT,
     FOREIGN KEY (MajorID) REFERENCES Major(MajorID)
 );
@@ -41,6 +41,7 @@ CREATE TABLE Lecturer (
 
 -- =====================================
 -- 5. TABLE: Student (Sinh viên)
+-- *** ĐÃ BỎ ClassID để thiết lập quan hệ N:M ***
 -- =====================================
 CREATE TABLE Student (
     StudentID INT IDENTITY PRIMARY KEY,
@@ -50,9 +51,8 @@ CREATE TABLE Student (
     Email NVARCHAR(100),
     Phone NVARCHAR(20),
     Address NVARCHAR(255),
-    Status NVARCHAR(50),
-    ClassID INT,
-    FOREIGN KEY (ClassID) REFERENCES Class(ClassID)
+    Status NVARCHAR(50)
+    -- ClassID đã được loại bỏ
 );
 
 -- =====================================
@@ -101,7 +101,7 @@ CREATE TABLE Account (
     UserID INT IDENTITY PRIMARY KEY,
     Username NVARCHAR(50) UNIQUE NOT NULL,
     PasswordHash NVARCHAR(255) NOT NULL,
-    Role NVARCHAR(20) NOT NULL,    -- Admin / Student / Lecturer
+    Role NVARCHAR(20) NOT NULL,  -- Admin / Student / Lecturer
     StudentID INT NULL,
     LecturerID INT NULL,
     FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
@@ -118,7 +118,7 @@ CREATE TABLE Assignment (
     Title NVARCHAR(200) NOT NULL,
     Description NVARCHAR(MAX),
     StartDate DATETIME NOT NULL,
-    DueDate DATETIME NOT NULL,
+    EndDate DATETIME NOT NULL,
     FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
     FOREIGN KEY (LecturerID) REFERENCES Lecturer(LecturerID)
 );
@@ -147,4 +147,17 @@ CREATE TABLE AssignmentSubmission (
     Feedback NVARCHAR(MAX),
     FOREIGN KEY (AssignmentID) REFERENCES Assignment(AssignmentID),
     FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
+);
+
+-- =====================================
+-- 13. TABLE: StudentClass (Sinh viên - Lớp học)
+-- *** BẢNG TRUNG GIAN MỚI cho quan hệ N:M ***
+-- =====================================
+CREATE TABLE StudentClass (
+    StudentClassID INT IDENTITY PRIMARY KEY,
+    StudentID INT NOT NULL,
+    ClassID INT NOT NULL,
+    FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
+    FOREIGN KEY (ClassID) REFERENCES Class(ClassID),
+    UNIQUE (StudentID, ClassID) -- Đảm bảo cặp (SV, Lớp) là duy nhất
 );

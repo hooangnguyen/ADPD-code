@@ -1,32 +1,38 @@
-using System.Diagnostics;
-using ADPD_code.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace ADPD_code.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IConfiguration _config;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IConfiguration config)
         {
-            _logger = logger;
+            _config = config;
         }
 
         public IActionResult Index()
         {
-            return View();
-        }
+            string connectionString = _config.GetConnectionString("DefaultConnection");
+            string message;
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();  // Nếu mở được → kết nối thành công
+                    message = "Kết nối CSDL thành công!";
+                }
+            }
+            catch (Exception ex)
+            {
+                message = "Kết nối CSDL thất bại: " + ex.Message;
+            }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            ViewBag.DbMessage = message;
+            return View();
         }
     }
 }
