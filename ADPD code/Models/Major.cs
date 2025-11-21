@@ -12,7 +12,6 @@ namespace ADPD_code.Models
         [Required]
         [DataType(DataType.Text)]
         public string MajorName { get; set; }
-
         [Required]
         [DataType(DataType.Text)]
         public string Description { get; set; }

@@ -1,38 +1,38 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
+﻿using ADPD_code.Data;
+using ADPD_code.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
-namespace ADPD_code.Controllers
+namespace AuthApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IConfiguration _config;
+        private readonly ILogger<HomeController> _logger;
+        private bool isConnected = false;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(IConfiguration config)
+        public HomeController(ApplicationDbContext context)
         {
-            _config = config;
+            _context = context;
         }
 
         public IActionResult Index()
         {
-            string connectionString = _config.GetConnectionString("DefaultConnection");
-            string message;
-
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();  // Nếu mở được → kết nối thành công
-                    message = "Kết nối CSDL thành công!";
-                }
-            }
-            catch (Exception ex)
-            {
-                message = "Kết nối CSDL thất bại: " + ex.Message;
-            }
-
-            ViewBag.DbMessage = message;
+            this.isConnected = _context.Database.CanConnect();
+            ViewBag.IsConnected = isConnected;
+            ViewBag.Username = HttpContext.Session.GetString("Username");
             return View();
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
