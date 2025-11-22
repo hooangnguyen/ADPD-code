@@ -11,8 +11,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>options.UseSqlServ
 
 // If your project is Razor Pages (instead of controllers), use:
 // builder.Services.AddRazorPages();
-
+builder.Services.AddSession();
 var app = builder.Build();
+app.UseSession();
+
 
 // Configure the HTTP request pipeline. 
 if (!app.Environment.IsDevelopment())

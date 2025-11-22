@@ -14,6 +14,7 @@ namespace ADPD_code.Data
         public DbSet<Lecturer> Lecturers { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
+        public DbSet<Account> Accounts { get; set; }
 
         // override OnModelCreating if you need custom mapping
         protected override void OnModelCreating(ModelBuilder modelBuilder)

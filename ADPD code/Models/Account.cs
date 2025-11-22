@@ -15,11 +15,11 @@ namespace ADPD_code.Models
         [DataType(DataType.Text)]
         public string? PasswordHash { get; set; }
         public string? Role { get; set; } // -- Admin / Student / Lecturer   
-        [ForeignKey(nameof(Student))]
-        public int StudentID { get; set; }
+        public int? StudentID { get; set; }
         public Student? Student { get; set; }
-        [ForeignKey(nameof(Lecturer))]
-        public int LecturerID { get;set; }
+
+        public int? LecturerID { get; set; }
         public Lecturer? Lecturer { get; set; }
+
     }
 }

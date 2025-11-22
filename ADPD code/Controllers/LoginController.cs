@@ -47,7 +47,7 @@ namespace ADPD_code.Controllers
             }
             
             // 2. Tìm kiếm tài khoản
-            var account = await _context.Account
+            var account = await _context.Accounts
                                         // ⚠️ LƯU Ý BẢO MẬT: Mật khẩu phải được băm (hashing) trước khi so sánh
                                         // Chúng ta đang so sánh mật khẩu thô (GIẢ ĐỊNH PasswordHash đang chứa mật khẩu thô)
                                         .FirstOrDefaultAsync(u => u.Username == username);
@@ -70,7 +70,6 @@ namespace ADPD_code.Controllers
             
             // Đặt các giá trị vào Session, dùng đúng tên thuộc tính của bảng Account
             HttpContext.Session.SetString("Username", account.Username);
-            HttpContext.Session.SetString("Fullname", account.FullName ?? account.Username); // Dùng FullName
             HttpContext.Session.SetInt32("UserID", account.UserID); // Dùng UserID
             HttpContext.Session.SetString("Role", account.Role); // Lấy Role để phân quyền
 

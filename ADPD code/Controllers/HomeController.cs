@@ -3,7 +3,7 @@ using ADPD_code.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace AuthApp.Controllers
+namespace ADPD_code.Controllers
 {
     public class HomeController : Controller
     {
