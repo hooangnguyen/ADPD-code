@@ -1,28 +1,178 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-xl-4">
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - StudentMS</title>
+    <link rel="stylesheet" href="~/css/Login.css" />
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="icon">📚</div>
+            <h1>Đăng nhập</h1>
+            <p>Hệ thống Quản lý Sinh viên</p>
         </div>
-        <div class="col-xl-4 p-2">
-            <form asp-action="Login" method="post">
-                <div class="mb-3">
-                    <label for="username">Username</label>
-                    <input type="text" name="username" class="form-control w-100" />
+
+        <div class="login-body">
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Tên đăng nhập hoặc Email</label>
+                    <div class="input-wrapper">
+                        <input type="text"
+                               id="username"
+                               name="username"
+                               placeholder="Nhập tên đăng nhập hoặc email"
+                               required>
+                        <span class="input-icon">👤</span>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="password">Password</label>
-                    <input type="password" name="password" class="form-control w-100" />
+
+                <div class="form-group">
+                    <label for="password">Mật khẩu</label>
+                    <div class="input-wrapper">
+                        <input type="password"
+                               id="password"
+                               name="password"
+                               placeholder="Nhập mật khẩu"
+                               required>
+                        <span class="input-icon">🔒</span>
+                    </div>
                 </div>
-                <input type="submit" class="btn btn-success w-100">
-                Login
-                </input>
+
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" name="remember" id="remember">
+                        <span>Ghi nhớ đăng nhập</span>
+                    </label>
+                    <a href="#" class="forgot-password">Quên mật khẩu?</a>
+                </div>
+
+                <button type="submit" class="btn-login">Đăng nhập</button>
             </form>
-        </div>
-        <div class="col-xl-4">
+
+            <div class="divider">
+                <span>Hoặc đăng nhập bằng</span>
+            </div>
+
+            <div class="social-login">
+                <button class="social-btn" title="Đăng nhập với Google">
+                    🔍
+                </button>
+                <button class="social-btn" title="Đăng nhập với Facebook">
+                    📘
+                </button>
+                <button class="social-btn" title="Đăng nhập với Microsoft">
+                    🪟
+                </button>
+            </div>
+
+            <div class="register-link">
+                Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a>
+            </div>
         </div>
     </div>
-</div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+
+            // Validate
+            if (!username || !password) {
+                showError('Vui lòng nhập đầy đủ thông tin!');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('Mật khẩu phải có ít nhất 6 ký tự!');
+                return;
+            }
+
+            // Tạo object dữ liệu
+            const loginData = {
+                username: username,
+                password: password,
+                remember: remember
+            };
+
+            console.log('Đăng nhập với:', loginData);
+
+            // Giả lập đăng nhập thành công
+            showSuccess('Đăng nhập thành công! Đang chuyển hướng...');
+
+            setTimeout(() => {
+                // Redirect đến trang chủ hoặc dashboard
+                window.location.href = 'index.html';
+            }, 1500);
+
+            // KẾT NỐI VỚI ASP.NET API:
+            /*
+            fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(loginData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccess('Đăng nhập thành công!');
+                    localStorage.setItem('token', data.token);
+                    setTimeout(() => {
+                        window.location.href = '/Home/Dashboard';
+                    }, 1500);
+                } else {
+                    showError(data.message || 'Tên đăng nhập hoặc mật khẩu không đúng!');
+                }
+            })
+            .catch(error => {
+                showError('Có lỗi xảy ra. Vui lòng thử lại!');
+                console.error('Error:', error);
+            });
+            */
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+
+            successDiv.style.display = 'none';
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+
+            errorDiv.style.display = 'none';
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+
+        // Social login buttons
+        document.querySelectorAll('.social-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                alert('Tính năng đăng nhập qua mạng xã hội đang được phát triển!');
+            });
+        });
+
+        // Toggle password visibility (optional enhancement)
+        document.getElementById('password').addEventListener('dblclick', function() {
+            this.type = this.type === 'password' ? 'text' : 'password';
+        });
+    </script>
+</body>
+</html>

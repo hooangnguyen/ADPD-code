@@ -1,22 +1,121 @@
-html {
-  font-size: 14px;
+/* Custom Navbar */
+.navbar-custom {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    padding: 12px 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #667eea;
+    text-decoration: none;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+    .logo:hover {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+.nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    align-items: center;
 }
 
+    .nav-links li {
+        margin: 0;
+    }
+
+    .nav-links a {
+        color: #333;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 15px;
+        transition: color 0.3s;
+        padding: 5px 0;
+    }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+.nav-buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.btn {
+    padding: 11px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-block;
+}
+
+.btn-login {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+    .btn-login:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+        text-decoration: none;
+    }
+
+.btn-register {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: 2px solid transparent;
+}
+
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
+        text-decoration: none;
+        color: white;
+    }
+
+/* Adjust body for fixed navbar */
 body {
-  margin-bottom: 60px;
+    padding-top: 70px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+    }
+
+    .nav-container {
+        padding: 0 20px;
+    }
 }

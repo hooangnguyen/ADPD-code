@@ -5,21 +5,29 @@ using System.Diagnostics;
 
 namespace ADPD_code.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController(ApplicationDbContext context) : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<HomeController>? _logger;
         private bool isConnected = false;
-        private readonly ApplicationDbContext _context;
-
-        public HomeController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public IActionResult Index()
         {
-            this.isConnected = _context.Database.CanConnect();
-            ViewBag.IsConnected = isConnected;
+            try
+            {
+                this.isConnected = _context.Database.CanConnect();
+                ViewBag.IsConnected = isConnected;
+                ViewBag.ConnectionError = null;
+            }
+            catch (Exception ex)
+            {
+                this.isConnected = false;
+                ViewBag.IsConnected = false;
+                ViewBag.ConnectionError = ex.Message;
+                // Log the error for debugging
+                System.Diagnostics.Debug.WriteLine($"Database Connection Error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
+            }
             ViewBag.Username = HttpContext.Session.GetString("Username");
             return View();
         }

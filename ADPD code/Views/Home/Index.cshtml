@@ -1,37 +1,113 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Sinh viên</title>
+     <link rel="stylesheet" href="~/css/Home.css" />
 
+</head>
+<body>
 
-
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-xl-4">
-            </div>
-            <div class="col-xl-4 p-2">
-                <form asp-action="Login" method="post">
-                    <div class="mb-3">
-                        <label for="username">Username</label>
-                        <input type="text" name="username" class="form-control w-100" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="password">Password</label>
-                        <input type="password" name="password" class="form-control w-100" />
-                    </div>
-                    <input type="submit" class="btn btn-success w-100">
-                    Login
-                    </input>
-                </form>
-   
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Hệ thống Quản lý Sinh viên</h1>
+            <p>Giải pháp quản lý thông tin sinh viên hiện đại, hiệu quả và dễ sử dụng. Theo dõi điểm số, lịch học và thông tin cá nhân một cách tiện lợi.</p>
+            <div class="hero-buttons">
+                <a href="@Url.Action("Index", "Register")" class="btn btn-hero btn-register">Bắt đầu ngay</a>
+                <a href="#features" class="btn btn-hero btn-white">Tìm hiểu thêm</a>
             </div>
         </div>
-    @if (ViewBag.isConected != null && ViewBag.isConected == true)
-    {
-        <h1>Connected database</h1>
-    }
-    else
-    {
-        <h1>Couldn’t connect to database</h1>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="features-container">
+            <h2 class="section-title">Tính năng nổi bật</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">👤</div>
+                    <h3>Quản lý Thông tin</h3>
+                    <p>Quản lý thông tin cá nhân sinh viên một cách đầy đủ và chính xác</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Theo dõi Điểm số</h3>
+                    <p>Xem và cập nhật điểm số các môn học theo từng học kỳ</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📅</div>
+                    <h3>Lịch học</h3>
+                    <p>Quản lý thời khóa biểu và lịch thi một cách khoa học</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h3>Đăng ký Môn học</h3>
+                    <p>Đăng ký môn học trực tuyến nhanh chóng và tiện lợi</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💳</div>
+                    <h3>Thanh toán</h3>
+                    <p>Tra cứu và thanh toán học phí online an toàn</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔔</div>
+                    <h3>Thông báo</h3>
+                    <p>Nhận thông báo về lịch học, điểm số và sự kiện quan trọng</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat-item">
+                <h2>10,000+</h2>
+                <p>Sinh viên</p>
+            </div>
+            <div class="stat-item">
+                <h2>500+</h2>
+                <p>Giảng viên</p>
+            </div>
+            <div class="stat-item">
+                <h2>50+</h2>
+                <p>Khoa</p>
+            </div>
+            <div class="stat-item">
+                <h2>99%</h2>
+                <p>Hài lòng</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="cta-content">
+            <h2>Sẵn sàng bắt đầu?</h2>
+            <p>Tham gia cùng hàng ngàn sinh viên đã tin tưởng sử dụng hệ thống quản lý của chúng tôi. Đăng ký ngay hôm nay để trải nghiệm!</p>
+            <a href="@Url.Action("Index", "Register")" class="btn btn-register btn-hero">Đăng ký miễn phí</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#home">Trang chủ</a>
+                <a href="#features">Tính năng</a>
+                <a href="#about">Giới thiệu</a>
+                <a href="#contact">Liên hệ</a>
+                <a href="#">Chính sách</a>
+                <a href="#">Điều khoản</a>
+            </div>
+            <p>&copy; 2024 Hệ thống Quản lý Sinh viên. All rights reserved.</p>
+        </div>
+    </footer>
+    @section Scripts {
+        <script src="~/js/Home.js"></script>
     }
 
-</div>
+</body>
+</html>
