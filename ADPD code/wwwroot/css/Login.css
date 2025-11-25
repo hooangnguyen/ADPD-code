@@ -1,5 +1,4 @@
-﻿
-*{
+﻿* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -11,11 +10,14 @@ body {
 
 .login-page {
     width: 100%;
-    min-height: calc(100vh - 160px);
-    padding: 120px 20px 80px;
+    /* Sửa thành 100vh để chiếm toàn bộ chiều cao màn hình */
+    height: 100vh;
+    /* Flexbox để căn giữa */
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: center; /* Căn giữa ngang */
+    align-items: center; /* Căn giữa dọc */
+    /* Bỏ padding lớn gây lệch, chỉ để padding nhỏ tránh dính lề trên mobile */
+    padding: 20px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
@@ -284,4 +286,3 @@ body {
         align-items: flex-start;
     }
 }
-
