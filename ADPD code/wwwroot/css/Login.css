@@ -14,10 +14,17 @@ body {
        Hãy thay số 80px bằng chiều cao thực tế Header của bạn */
     min-height: calc(100vh - 80px);
     /* Căn giữa */
+    /* Sửa thành 100vh để chiếm toàn bộ chiều cao màn hình */
+    height: 100vh;
+    /* Flexbox để căn giữa */
     display: flex;
     justify-content: center; /* Giữa ngang */
     align-items: center; /* Giữa dọc */
     /* Padding nhỏ thôi để không bị dính sát mép trên mobile */
+    padding: 20px;
+    justify-content: center; /* Căn giữa ngang */
+    align-items: center; /* Căn giữa dọc */
+    /* Bỏ padding lớn gây lệch, chỉ để padding nhỏ tránh dính lề trên mobile */
     padding: 20px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
