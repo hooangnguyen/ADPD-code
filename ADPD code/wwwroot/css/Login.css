@@ -1,5 +1,4 @@
-﻿
-*{
+﻿* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -11,19 +10,24 @@ body {
 
 .login-page {
     width: 100%;
-    min-height: calc(100vh - 160px);
-    padding: 120px 20px 80px;
+    /* GIẢ SỬ Header của bạn cao 80px. 
+       Hãy thay số 80px bằng chiều cao thực tế Header của bạn */
+    min-height: calc(100vh - 80px);
+    /* Căn giữa */
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: center; /* Giữa ngang */
+    align-items: center; /* Giữa dọc */
+    /* Padding nhỏ thôi để không bị dính sát mép trên mobile */
+    padding: 20px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .login-container {
     background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    max-width: 450px;
+    border-radius: 15px; /* Bo góc nhỏ hơn xíu cho gọn */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    /* Giảm từ 450px xuống 380px hoặc 400px cho gọn */
+    max-width: 380px;
     width: 100%;
     overflow: hidden;
     animation: slideIn 0.5s ease-out;
@@ -44,18 +48,19 @@ body {
 .login-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 40px 30px;
+    /* Giảm padding cũ (40px) xuống còn 25px */
+    padding: 25px 20px;
     text-align: center;
 }
 
     .login-header .icon {
-        font-size: 48px;
-        margin-bottom: 15px;
+        font-size: 40px; /* Giảm icon */
+        margin-bottom: 10px;
     }
 
     .login-header h1 {
-        font-size: 28px;
-        margin-bottom: 8px;
+        font-size: 24px; /* Giảm từ 28px */
+        margin-bottom: 5px;
     }
 
     .login-header p {
@@ -64,7 +69,7 @@ body {
     }
 
 .login-body {
-    padding: 40px 30px;
+    padding: 30px 25px;
 }
 
 .form-group {
@@ -284,4 +289,3 @@ body {
         align-items: flex-start;
     }
 }
-
