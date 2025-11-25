@@ -140,7 +140,7 @@ body {
     color: white;
     position: relative;
     overflow: hidden;
-    margin-top: 60px;
+    margin-top: 70px;
 }
 
     .hero::before {
@@ -243,9 +243,28 @@ body {
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
 }
+
+    /* Điều chỉnh card thứ 4 và 5 để căn giữa */
+    .features-grid .feature-card:nth-child(4),
+    .features-grid .feature-card:nth-child(5) {
+        grid-column: span 1;
+    }
+
+    /* Nếu muốn 2 cards cuối nằm giữa */
+    .features-grid .feature-card:nth-child(4) {
+        grid-column: 1 / 2;
+        margin-left: auto;
+    }
+
+    .features-grid .feature-card:nth-child(5) {
+        grid-column: 3 / 4;
+        margin-right: auto;
+    }
 
 .feature-card {
     background: white;
@@ -288,7 +307,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 40px;
     text-align: center;
 }
@@ -369,6 +388,30 @@ body {
     color: #333;
 }
 
+@media (max-width: 992px) {
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 700px;
+    }
+
+        .features-grid .feature-card:nth-child(4),
+        .features-grid .feature-card:nth-child(5) {
+            grid-column: span 1;
+            margin: 0;
+        }
+
+        .features-grid .feature-card:nth-child(5) {
+            grid-column: 1 / -1;
+            max-width: 350px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+    .stats-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
     .navbar {
         min-height: 60px;
@@ -406,13 +449,18 @@ body {
         height: 60px;
     }
 
-    .hero h1 {
-        font-size: 32px;
+    .hero {
+        margin-top: 60px;
+        padding: 100px 20px 70px;
     }
 
-    .hero p {
-        font-size: 16px;
-    }
+        .hero h1 {
+            font-size: 32px;
+        }
+
+        .hero p {
+            font-size: 16px;
+        }
 
     .hero-buttons {
         flex-direction: column;
@@ -428,7 +476,17 @@ body {
         font-size: 28px;
     }
 
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+        .features-grid .feature-card:nth-child(5) {
+            max-width: 100%;
+        }
+
     .stats-container {
+        grid-template-columns: 1fr;
         gap: 30px;
     }
 

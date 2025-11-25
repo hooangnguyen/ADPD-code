@@ -11,23 +11,26 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 10px;
+    margin: 0;
 }
 
 .container {
     background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    max-width: 500px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    max-width: 350px;
     width: 100%;
-    padding: 40px;
-    animation: slideIn 0.5s ease-out;
+    padding: 20px;
+    animation: slideIn 0.4s ease-out;
+    /* đảm bảo form căn giữa */
+    margin: 0 auto;
 }
 
 @keyframes slideIn {
     from {
         opacity: 0;
-        transform: translateY(-30px);
+        transform: translateY(-15px);
     }
 
     to {
@@ -38,43 +41,39 @@ body {
 
 .header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 15px; /* giảm margin */
 }
 
     .header h1 {
         color: #667eea;
-        font-size: 28px;
-        margin-bottom: 10px;
+        font-size: 22px; /* giảm font */
+        margin-bottom: 5px;
     }
 
     .header p {
         color: #666;
-        font-size: 14px;
+        font-size: 12px; /* giảm font */
     }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 12px; /* giảm margin */
 }
 
     .form-group label {
         display: block;
         color: #333;
         font-weight: 600;
-        margin-bottom: 8px;
-        font-size: 14px;
+        margin-bottom: 4px; /* giảm margin */
+        font-size: 12px; /* giảm font */
     }
-
-        .form-group label .required {
-            color: #e74c3c;
-        }
 
     .form-group input,
     .form-group select {
         width: 100%;
-        padding: 12px 15px;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 14px;
+        padding: 8px 10px; /* giảm padding */
+        border: 1.5px solid #e0e0e0;
+        border-radius: 5px; /* giảm bo tròn */
+        font-size: 12px; /* giảm font */
         transition: all 0.3s ease;
         background-color: #f9f9f9;
     }
@@ -84,32 +83,32 @@ body {
             outline: none;
             border-color: #667eea;
             background-color: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
         }
 
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 8px; /* giảm gap */
 }
 
 .btn-submit {
     width: 100%;
-    padding: 14px;
+    padding: 10px; /* giảm chiều cao */
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    border-radius: 8px;
-    font-size: 16px;
+    border-radius: 5px; /* giảm bo tròn */
+    font-size: 13px; /* giảm font */
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 10px;
+    margin-top: 6px; /* giảm margin */
 }
 
     .btn-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
     }
 
     .btn-submit:active {
@@ -118,9 +117,9 @@ body {
 
 .login-link {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 10px; /* giảm margin */
     color: #666;
-    font-size: 14px;
+    font-size: 11px; /* giảm font */
 }
 
     .login-link a {
@@ -135,14 +134,15 @@ body {
 
 .form-group small {
     color: #999;
-    font-size: 12px;
+    font-size: 10px; /* giảm font */
     display: block;
-    margin-top: 5px;
+    margin-top: 3px;
 }
 
 @media (max-width: 576px) {
     .container {
-        padding: 30px 20px;
+        padding: 15px 10px;
+        max-width: 300px; /* thu nhỏ trên mobile */
     }
 
     .form-row {
@@ -150,6 +150,6 @@ body {
     }
 
     .header h1 {
-        font-size: 24px;
+        font-size: 18px; /* nhỏ hơn cho mobile */
     }
 }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ thống Quản lý Sinh viên</title>
-     <link rel="stylesheet" href="~/css/Home.css" />
+    <link rel="stylesheet" href="~/css/Home.css" />
 
 </head>
 <body>
@@ -45,11 +45,6 @@
                     <div class="feature-icon">📚</div>
                     <h3>Đăng ký Môn học</h3>
                     <p>Đăng ký môn học trực tuyến nhanh chóng và tiện lợi</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">💳</div>
-                    <h3>Thanh toán</h3>
-                    <p>Tra cứu và thanh toán học phí online an toàn</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">🔔</div>
@@ -103,6 +98,15 @@
                 <a href="#">Điều khoản</a>
             </div>
             <p>&copy; 2024 Hệ thống Quản lý Sinh viên. All rights reserved.</p>
+            @if (ViewBag.IsConnected == true)
+            {
+                <h1>Connected database</h1>
+            }
+            else
+            {
+                <h1>Couldn't connect to database</h1>
+            }
+
         </div>
     </footer>
     @section Scripts {
