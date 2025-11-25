@@ -1,4 +1,3 @@
-
 <link rel="stylesheet" href="~/css/Login.css" />
 
 <section class="login-page">
@@ -10,15 +9,20 @@
         </div>
 
         <div class="login-body">
-            <div id="errorMessage" class="error-message"></div>
-            <div id="successMessage" class="success-message"></div>
+            @if (ViewData.ModelState.Any(x => x.Value.Errors.Any()))
+            {
+                <div class="error-message alert alert-danger">
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                    @* Thêm các thông báo lỗi nếu có *@
+                </div>
+            }
 
-            <form id="loginForm">
+            <form method="post" asp-controller="Login" asp-action="Login">
+
                 <div class="form-group">
                     <label for="username">Tên đăng nhập hoặc Email</label>
                     <div class="input-wrapper">
                         <input type="text"
-                               id="username"
                                name="username"
                                placeholder="Nhập tên đăng nhập hoặc email"
                                required>
@@ -30,7 +34,6 @@
                     <label for="password">Mật khẩu</label>
                     <div class="input-wrapper">
                         <input type="password"
-                               id="password"
                                name="password"
                                placeholder="Nhập mật khẩu"
                                required>
@@ -53,25 +56,9 @@
                 <span>Hoặc đăng nhập bằng</span>
             </div>
 
-            <div class="social-login">
-                <button class="social-btn" title="Đăng nhập với Google">
-                    🔍
-                </button>
-                <button class="social-btn" title="Đăng nhập với Facebook">
-                    📘
-                </button>
-                <button class="social-btn" title="Đăng nhập với Microsoft">
-                    🪟
-                </button>
-            </div>
-
             <div class="register-link">
                 Chưa có tài khoản? <a href="@Url.Action("Index", "Register")">Đăng ký ngay</a>
             </div>
         </div>
     </div>
 </section>
-
-@section Scripts {
-    <script src="~/js/Login.js"></script>
-}

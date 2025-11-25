@@ -11,7 +11,15 @@
         <p>Hệ thống Quản lý Sinh viên</p>
     </div>
 
-    <form id="registerForm">
+    <form method="post" asp-controller="Login" asp-action="Register">
+
+        @if (ViewData.ModelState.Any(x => x.Value.Errors.Any()))
+        {
+            <div class="alert alert-danger" role="alert">
+                @Html.ValidationSummary(false, "Vui lòng kiểm tra các lỗi sau:", new { @class = "text-danger" })
+            </div>
+        }
+
         <div class="form-group">
             <label>Mã sinh viên <span class="required">*</span></label>
             <input type="text" name="studentId" placeholder="VD: SV001234" required>
@@ -71,8 +79,9 @@
     </form>
 </div>
 
+@* 2. XÓA SECTION SCRIPTS NÀY vì bạn không dùng Register.js nữa *@
+@*
 @section Scripts {
     <script src="~/js/Register.js"></script>
 }
-
-
+*@
