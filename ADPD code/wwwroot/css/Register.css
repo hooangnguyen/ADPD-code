@@ -1,4 +1,5 @@
-﻿* {
+﻿/* Reset cơ bản */
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -6,25 +7,34 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Background toàn màn hình */
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-    margin: 0;
 }
 
+/* --- Wrapper bao quanh Form để căn giữa --- */
+.register-page {
+    width: 100%;
+    /* Trừ đi chiều cao Header (Ví dụ 80px). Thay số 80 bằng chiều cao thật của Header */
+    min-height: calc(100vh - 80px);
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Căn giữa dọc */
+
+    padding: 20px 10px; /* Padding trên dưới để form không dính sát mép khi cuộn */
+}
+
+/* --- Khung chứa Form --- */
 .container {
     background: white;
     border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-    max-width: 350px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    /* Giữ độ rộng nhỏ gọn như bạn muốn */
+    max-width: 360px;
     width: 100%;
-    padding: 20px;
+    padding: 25px 20px;
+    margin: auto; /* Giúp căn giữa an toàn hơn trên mobile */
     animation: slideIn 0.4s ease-out;
-    /* đảm bảo form căn giữa */
-    margin: 0 auto;
 }
 
 @keyframes slideIn {
@@ -39,43 +49,46 @@ body {
     }
 }
 
+/* --- Header của Form --- */
 .header {
     text-align: center;
-    margin-bottom: 15px; /* giảm margin */
+    margin-bottom: 15px;
 }
 
     .header h1 {
         color: #667eea;
-        font-size: 22px; /* giảm font */
+        font-size: 22px;
+        font-weight: 700;
         margin-bottom: 5px;
     }
 
     .header p {
         color: #666;
-        font-size: 12px; /* giảm font */
+        font-size: 13px;
     }
 
+/* --- Các ô nhập liệu --- */
 .form-group {
-    margin-bottom: 12px; /* giảm margin */
+    margin-bottom: 12px;
 }
 
     .form-group label {
         display: block;
-        color: #333;
+        color: #444;
         font-weight: 600;
-        margin-bottom: 4px; /* giảm margin */
-        font-size: 12px; /* giảm font */
+        margin-bottom: 4px;
+        font-size: 12px;
     }
 
     .form-group input,
     .form-group select {
         width: 100%;
-        padding: 8px 10px; /* giảm padding */
+        padding: 9px 12px; /* Tăng nhẹ padding ngang cho thoáng chữ */
         border: 1.5px solid #e0e0e0;
-        border-radius: 5px; /* giảm bo tròn */
-        font-size: 12px; /* giảm font */
-        transition: all 0.3s ease;
-        background-color: #f9f9f9;
+        border-radius: 6px;
+        font-size: 13px; /* Tăng 1px cho dễ đọc hơn */
+        transition: all 0.2s ease;
+        background-color: #fafafa;
     }
 
         .form-group input:focus,
@@ -83,43 +96,46 @@ body {
             outline: none;
             border-color: #667eea;
             background-color: white;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
         }
 
+/* Hàng chia đôi cột (Họ - Tên) */
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px; /* giảm gap */
+    gap: 10px;
 }
 
+/* Nút Submit */
 .btn-submit {
     width: 100%;
-    padding: 10px; /* giảm chiều cao */
+    padding: 12px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    border-radius: 5px; /* giảm bo tròn */
-    font-size: 13px; /* giảm font */
+    border-radius: 6px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 6px; /* giảm margin */
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 10px;
 }
 
     .btn-submit:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
     }
 
     .btn-submit:active {
         transform: translateY(0);
     }
 
+/* Link Login */
 .login-link {
     text-align: center;
-    margin-top: 10px; /* giảm margin */
+    margin-top: 15px;
     color: #666;
-    font-size: 11px; /* giảm font */
+    font-size: 12px;
 }
 
     .login-link a {
@@ -132,24 +148,21 @@ body {
             text-decoration: underline;
         }
 
-.form-group small {
-    color: #999;
-    font-size: 10px; /* giảm font */
-    display: block;
-    margin-top: 3px;
-}
-
+/* Responsive Mobile */
 @media (max-width: 576px) {
+    .register-page {
+        /* Trên mobile, bỏ tính toán Header để tránh bàn phím ảo đẩy layout */
+        min-height: auto;
+        padding: 40px 15px; /* Padding lớn hơn để dễ thao tác */
+    }
+
     .container {
-        padding: 15px 10px;
-        max-width: 300px; /* thu nhỏ trên mobile */
+        max-width: 100%;
+        box-shadow: none; /* Bỏ bóng trên mobile cho nhẹ */
+        padding: 20px 15px;
     }
 
     .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .header h1 {
-        font-size: 18px; /* nhỏ hơn cho mobile */
+        grid-template-columns: 1fr; /* Về 1 cột trên mobile */
     }
 }
