@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http; // <- thêm dòng này
 
 namespace ADPD_code.Controllers
 {
