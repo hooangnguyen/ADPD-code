@@ -1,332 +1,269 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Gi?ng viên - StudentMS</title>
-   <link rel="stylesheet" href="~/css/Dashboardlecture.css" />
-</head>
-<body>
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <a href="#" class="sidebar-logo">
-                ?? StudentMS
+@{
+    ViewData["Title"] = "Dashboard - Gi?ng viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/Dashboardlecture.css" />
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <a href="@Url.Action("Dashboard", "Lecturer")" class="sidebar-logo">
+            ?? TeacherMS
+        </a>
+    </div>
+
+    <div class="user-profile">
+        <div class="user-avatar">?????</div>
+        <div class="user-info">
+            <h3>@(ViewBag.FullName ?? "Gi?ng viên")</h3>
+            <p>Gi?ng viên</p>
+        </div>
+    </div>
+
+    <ul class="menu">
+        <li class="menu-item">
+            <a href="@Url.Action("Dashboard", "Lecturer")" class="active">
+                <span class="menu-icon">??</span>
+                <span>Trang ch?</span>
             </a>
-        </div>
+        </li>
+        <li class="menu-item">
+            <a href="#">
+                <span class="menu-icon">??</span>
+                <span>Môn h?c</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="#">
+                <span class="menu-icon">??</span>
+                <span>Bài t?p</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="#">
+                <span class="menu-icon">?</span>
+                <span>Ch?m ?i?m</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="#">
+                <span class="menu-icon">??</span>
+                <span>?i?m danh</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="#">
+                <span class="menu-icon">??</span>
+                <span>Sinh viên</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="#">
+                <span class="menu-icon">??</span>
+                <span>H? s?</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="@Url.Action("Logout", "Login")">
+                <span class="menu-icon">??</span>
+                <span>??ng xu?t</span>
+            </a>
+        </li>
+    </ul>
+</aside>
 
-        <div class="user-profile">
-            <div class="user-avatar">?????</div>
-            <div class="user-info">
-                <h3>TS. Nguy?n V?n A</h3>
-                <p>Gi?ng viên</p>
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <h1>Dashboard Gi?ng viên</h1>
+            <div class="breadcrumb">
+                <span>Trang ch?</span>
+                <span>/</span>
+                <span>Dashboard</span>
             </div>
         </div>
+        <div class="topbar-right">
+            <button class="notification-btn">
+                ??
+                <span class="notification-badge">5</span>
+            </button>
+            <div class="user-menu">
+                <img src="" alt="?????">
+                <span>@(ViewBag.FullName ?? "Gi?ng viên")</span>
+            </div>
+        </div>
+    </div>
 
-        <ul class="menu">
-            <li class="menu-item">
-                <a href="#" class="active">
-                    <span class="menu-icon">??</span>
-                    <span>Trang ch?</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">??</span>
-                    <span>Môn h?c c?a tôi</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">??</span>
-                    <span>Bài t?p</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">?</span>
-                    <span>Ch?m bài</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">??</span>
-                    <span>Qu?n lý ?i?m</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">??</span>
-                    <span>?i?m danh</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">??</span>
-                    <span>Sinh viên</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">??</span>
-                    <span>L?ch gi?ng d?y</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">??</span>
-                    <span>H? s?</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">??</span>
-                    <span>??ng xu?t</span>
-                </a>
-            </li>
-        </ul>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Top Bar -->
-        <div class="topbar">
-            <div class="topbar-left">
-                <h1>Dashboard Gi?ng viên</h1>
-                <div class="breadcrumb">
-                    <span>Trang ch?</span>
-                    <span>/</span>
-                    <span>Dashboard</span>
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue">??</div>
+                <div class="stat-info">
+                    <h3>Môn h?c ph? trách</h3>
+                    <div class="value">4</div>
                 </div>
             </div>
-            <div class="topbar-right">
-                <button class="notification-btn">
-                    ??
-                    <span class="notification-badge">5</span>
-                </button>
-                <div class="user-menu">
-                    <img src="" alt="?????">
-                    <span>TS. Nguy?n V?n A</span>
+            <div class="stat-card">
+                <div class="stat-icon green">??</div>
+                <div class="stat-info">
+                    <h3>T?ng sinh viên</h3>
+                    <div class="value">156</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">??</div>
+                <div class="stat-info">
+                    <h3>Bài t?p ch?a ch?m</h3>
+                    <div class="value">23</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">??</div>
+                <div class="stat-info">
+                    <h3>L?p hôm nay</h3>
+                    <div class="value">2</div>
                 </div>
             </div>
         </div>
 
-        <!-- Dashboard Content -->
-        <div class="dashboard-content">
-            <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon blue">??</div>
-                    <div class="stat-info">
-                        <h3>Môn h?c ?ang d?y</h3>
-                        <div class="value">4</div>
-                    </div>
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Course Management -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Môn h?c c?a tôi</h2>
+                    <a href="#" class="view-all">Xem t?t c? ?</a>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon green">??</div>
-                    <div class="stat-info">
-                        <h3>T?ng sinh viên</h3>
-                        <div class="value">156</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon orange">??</div>
-                    <div class="stat-info">
-                        <h3>Bài t?p ch?a ch?m</h3>
-                        <div class="value">23</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon purple">??</div>
-                    <div class="stat-info">
-                        <h3>L?p hôm nay</h3>
-                        <div class="value">2</div>
-                    </div>
-                </div>
+                <table class="course-table">
+                    <thead>
+                        <tr>
+                            <th>Môn h?c</th>
+                            <th>L?p</th>
+                            <th>Sinh viên</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="course-name">L?p trình Web</div>
+                                <div class="course-code">CS301</div>
+                            </td>
+                            <td><span class="course-badge">CNPM01</span></td>
+                            <td>45 SV</td>
+                            <td>
+                                <div class="action-btns">
+                                    <a href="#" class="btn-sm btn-view">Xem</a>
+                                    <a href="#" class="btn-sm btn-edit">Qu?n lý</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="course-name">C? s? d? li?u</div>
+                                <div class="course-code">CS302</div>
+                            </td>
+                            <td><span class="course-badge">CNPM02</span></td>
+                            <td>38 SV</td>
+                            <td>
+                                <div class="action-btns">
+                                    <a href="#" class="btn-sm btn-view">Xem</a>
+                                    <a href="#" class="btn-sm btn-edit">Qu?n lý</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="course-name">Trí tu? nhân t?o</div>
+                                <div class="course-code">CS401</div>
+                            </td>
+                            <td><span class="course-badge">KHMT01</span></td>
+                            <td>42 SV</td>
+                            <td>
+                                <div class="action-btns">
+                                    <a href="#" class="btn-sm btn-view">Xem</a>
+                                    <a href="#" class="btn-sm btn-edit">Qu?n lý</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            <!-- Content Grid -->
-            <div class="content-grid">
-                <!-- My Courses -->
-                <div class="card">
+            <!-- Submissions & Schedule -->
+            <div>
+                <!-- Assignment Submissions -->
+                <div class="card" style="margin-bottom: 20px;">
                     <div class="card-header">
-                        <h2 class="card-title">Môn h?c c?a tôi</h2>
+                        <h2 class="card-title">Bài n?p g?n ?ây</h2>
                         <a href="#" class="view-all">Xem t?t c? ?</a>
                     </div>
-                    <table class="course-table">
-                        <thead>
-                            <tr>
-                                <th>Môn h?c</th>
-                                <th>Sinh viên</th>
-                                <th>L?p</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="course-name">L?p trình Web</div>
-                                    <div class="course-code">CS301 - 3 tín ch?</div>
-                                </td>
-                                <td>45 sinh viên</td>
-                                <td><span class="course-badge">CNTT-K19</span></td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button class="btn-sm btn-view">Xem</button>
-                                        <button class="btn-sm btn-edit">Qu?n lý</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="course-name">C? s? d? li?u</div>
-                                    <div class="course-code">CS302 - 3 tín ch?</div>
-                                </td>
-                                <td>38 sinh viên</td>
-                                <td><span class="course-badge">CNTT-K19</span></td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button class="btn-sm btn-view">Xem</button>
-                                        <button class="btn-sm btn-edit">Qu?n lý</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="course-name">M?ng máy tính</div>
-                                    <div class="course-code">CS303 - 3 tín ch?</div>
-                                </td>
-                                <td>42 sinh viên</td>
-                                <td><span class="course-badge">CNTT-K20</span></td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button class="btn-sm btn-view">Xem</button>
-                                        <button class="btn-sm btn-edit">Qu?n lý</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="course-name">L?p trình di ??ng</div>
-                                    <div class="course-code">CS304 - 3 tín ch?</div>
-                                </td>
-                                <td>31 sinh viên</td>
-                                <td><span class="course-badge">CNTT-K20</span></td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button class="btn-sm btn-view">Xem</button>
-                                        <button class="btn-sm btn-edit">Qu?n lý</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="submission-item">
+                        <div class="submission-info">
+                            <h4>BT1: L?p trình C++</h4>
+                            <p>Nguy?n V?n A - CNPM01</p>
+                            <span class="submission-time">2 gi? tr??c</span>
+                        </div>
+                        <span class="status-badge pending">Ch?a ch?m</span>
+                    </div>
+                    <div class="submission-item">
+                        <div class="submission-info">
+                            <h4>BT2: C? s? d? li?u</h4>
+                            <p>Tr?n Th? B - CNPM02</p>
+                            <span class="submission-time">5 gi? tr??c</span>
+                        </div>
+                        <span class="status-badge graded">?ã ch?m: 8.5?</span>
+                    </div>
+                    <div class="submission-item">
+                        <div class="submission-info">
+                            <h4>BT1: AI Project</h4>
+                            <p>Lê V?n C - KHMT01</p>
+                            <span class="submission-time">1 ngày tr??c</span>
+                        </div>
+                        <span class="status-badge late">N?p mu?n</span>
+                    </div>
                 </div>
 
-                <!-- Right Column -->
-                <div>
-                    <!-- Schedule Today -->
-                    <div class="card" style="margin-bottom: 20px;">
-                        <div class="card-header">
-                            <h2 class="card-title">L?ch d?y hôm nay</h2>
-                        </div>
-                        <div class="schedule-timeline">
-                            <div class="schedule-item">
-                                <div class="schedule-time">07:30 - 09:30</div>
-                                <div class="schedule-details">
-                                    <h4>L?p trình Web</h4>
-                                    <p>?? Phòng A101 - CNTT-K19</p>
-                                </div>
-                            </div>
-                            <div class="schedule-item">
-                                <div class="schedule-time">13:00 - 15:00</div>
-                                <div class="schedule-details">
-                                    <h4>C? s? d? li?u</h4>
-                                    <p>?? Phòng B205 - CNTT-K19</p>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Today's Schedule -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">L?ch d?y hôm nay</h2>
                     </div>
-
-                    <!-- Recent Submissions -->
-                    <div class="card" style="margin-bottom: 20px;">
-                        <div class="card-header">
-                            <h2 class="card-title">Bài n?p g?n ?ây</h2>
-                            <a href="#" class="view-all">Xem t?t c? ?</a>
-                        </div>
-                        <div class="submission-item">
-                            <div class="submission-info">
-                                <h4>Nguy?n V?n A - SV001234</h4>
-                                <p>Bài t?p tu?n 10 - L?p trình Web</p>
-                                <span class="submission-time">15 phút tr??c</span>
+                    <div class="schedule-timeline">
+                        <div class="schedule-item">
+                            <div class="schedule-time">07:30 - 09:30</div>
+                            <div class="schedule-details">
+                                <h4>L?p trình Web</h4>
+                                <p>L?p CNPM01 - Phòng A101</p>
                             </div>
-                            <span class="status-badge pending">Ch?a ch?m</span>
                         </div>
-                        <div class="submission-item">
-                            <div class="submission-info">
-                                <h4>Tr?n Th? B - SV001235</h4>
-                                <p>Th?c hành SQL - C? s? d? li?u</p>
-                                <span class="submission-time">1 gi? tr??c</span>
+                        <div class="schedule-item">
+                            <div class="schedule-time">13:00 - 15:00</div>
+                            <div class="schedule-details">
+                                <h4>C? s? d? li?u</h4>
+                                <p>L?p CNPM02 - Phòng B205</p>
                             </div>
-                            <span class="status-badge pending">Ch?a ch?m</span>
-                        </div>
-                        <div class="submission-item">
-                            <div class="submission-info">
-                                <h4>Lê V?n C - SV001236</h4>
-                                <p>Bài t?p tu?n 9 - L?p trình Web</p>
-                                <span class="submission-time">2 gi? tr??c</span>
-                            </div>
-                            <span class="status-badge late">N?p tr?</span>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">Thao tác nhanh</h2>
-                        </div>
-                        <div class="quick-actions">
-                            <a href="#" class="action-btn">
-                                <div class="icon">?</div>
-                                <span>T?o bài t?p</span>
-                            </a>
-                            <a href="#" class="action-btn">
-                                <div class="icon">?</div>
-                                <span>Ch?m bài</span>
-                            </a>
-                            <a href="#" class="action-btn">
-                                <div class="icon">??</div>
-                                <span>?i?m danh</span>
-                            </a>
-                            <a href="#" class="action-btn">
-                                <div class="icon">??</div>
-                                <span>Nh?p ?i?m</span>
-                            </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 
+@section Scripts {
     <script>
-        // Mobile menu toggle
-        const menuBtn = document.querySelector('.menu-btn');
-        const sidebar = document.querySelector('.sidebar');
-
-        if (menuBtn) {
-            menuBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('active');
-            });
-        }
-
         // Active menu item
         document.querySelectorAll('.menu-item a').forEach(link => {
-            link.addEventListener('click', function(e) {
+            if (link.href === window.location.href) {
                 document.querySelectorAll('.menu-item a').forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-            });
+                link.classList.add('active');
+            }
         });
     </script>
-</body>
-</html>
+}
