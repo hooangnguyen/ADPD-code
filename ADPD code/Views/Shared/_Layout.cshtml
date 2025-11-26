@@ -12,23 +12,24 @@
     <header>
         <nav class="navbar-custom">
             <div class="nav-container">
+
                 <a href="@Url.Action("Index", "Home")" class="logo">
                     📚 StudentMS
                 </a>
+
                 <ul class="nav-links">
                     <li><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
                     <li><a href="#features">Tính năng</a></li>
                     <li><a href="#about">Giới thiệu</a></li>
                     <li><a href="#contact">Liên hệ</a></li>
                 </ul>
-                <div class="nav-buttons">
-                    <a href="@Url.Action("Index", "Login")" class="btn btn-primary btn-nav-login">Đăng nhập</a>
-                    <a href="@Url.Action("Index", "Register")" class="btn btn-primary btn-nav-register">Đăng ký</a>
-                </div>
+
+                @await Html.PartialAsync("_LoginStatusPartial")
+
             </div>
         </nav>
     </header>
- 
+
     <div class="container-fluid">
         <main role="main" class="pb-3">
             @RenderBody()

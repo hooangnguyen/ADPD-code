@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNetCore.Http
+
+@{
+    // Use Context.Session and guard against null HttpContext/Session
+    var username = Context?.Session?.GetString("Username");
+    var role = Context?.Session?.GetString("Role");
+}
+
+<div class="nav-buttons">
+    @if (!string.IsNullOrEmpty(username))
+    {
+        <div class="dropdown">
+            <button class="btn btn-profile dropdown-toggle" type="button"
+                    id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                @username
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                <!-- Update the asp-page values to match your Razor Pages paths -->
+                <li><a class="dropdown-item" asp-page="/User/Profile">Hồ sơ (@role)</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" asp-page="/Login/Logout">Đăng xuất</a></li>
+            </ul>
+        </div>
+    }
+    else
+    {
+        <a href="@Url.Action("Index", "Login")" class="btn btn-primary btn-nav-login">Đăng nhập</a>
+        <a href="@Url.Action("Index", "Register")" class="btn btn-primary btn-nav-register">Đăng ký</a>
+    }
+</div>

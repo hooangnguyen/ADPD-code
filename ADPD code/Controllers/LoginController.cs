@@ -15,25 +15,28 @@ namespace ADPD_code.Controllers
         {
             _context = context;
         }
-
-        // ==========================================================
         // 1. [GET] Index: Hiển thị form đăng nhập
-        // ==========================================================
         [HttpGet]
         public IActionResult Index()
         {
             // Kiểm tra Session: Nếu đã có Role trong Session, người dùng đã đăng nhập.
-            if (HttpContext.Session.GetString("Role") != null)
+            var role = HttpContext.Session.GetString("Role");
+            if (!string.IsNullOrEmpty(role))
             {
-                // Chuyển hướng đến Dashboard để hệ thống phân quyền tiếp
-                return RedirectToAction("Dashboard", "Home"); 
+                // Chuyển hướng theo role nếu đã đăng nhập
+                var roleLower = role.ToLowerInvariant();
+                if (roleLower == "student")
+                    return Redirect("/Student/Dashboard");
+                if (roleLower == "lecturer")
+                    return Redirect("/Lecturer/Dashboard");
+                if (roleLower == "admin")
+                    return Redirect("/Admin/Dashboard");
+
+                // Default fallback
+                return RedirectToAction("Dashboard", "Home");
             }
             return View(); // Trả về View Index.cshtml (chứa form login)
         }
-
-        // ==========================================================
-        // 2. [POST] Login: Xử lý xác thực người dùng
-        // ==========================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         // Sử dụng tham số trực tiếp (như yêu cầu)
@@ -67,19 +70,37 @@ namespace ADPD_code.Controllers
             }
             
             // 3. Đăng nhập thành công: Thiết lập Session
-            
-            // Đặt các giá trị vào Session, dùng đúng tên thuộc tính của bảng Account
-            HttpContext.Session.SetString("Username", account.Username);
+                HttpContext.Session.SetString("Username", account.Username ?? string.Empty);
             HttpContext.Session.SetInt32("UserID", account.UserID); // Dùng UserID
-            HttpContext.Session.SetString("Role", account.Role); // Lấy Role để phân quyền
+            HttpContext.Session.SetString("Role", account.Role ?? string.Empty); // Lấy Role để phân quyền
+
+            if (account.StudentID.HasValue)
+                HttpContext.Session.SetInt32("StudentID", account.StudentID.Value);
+            if (account.LecturerID.HasValue)
+                HttpContext.Session.SetInt32("LecturerID", account.LecturerID.Value);
 
             // 4. Điều hướng sau phân quyền
-            return RedirectToAction("Dashboard", "Home");
+            var roleNormalized = (account.Role ?? string.Empty).ToLowerInvariant();
+            if (roleNormalized == "student")
+            {
+                // Redirect to student dashboard (adjust path if your route differs)
+                return Redirect("/Student/Dashboard");
+            }
+            else if (roleNormalized == "lecturer")
+            {
+                return Redirect("/Lecturer/Dashboard");
+            }
+            else if (roleNormalized == "admin")
+            {
+                return Redirect("/Admin/Dashboard");
+            }
+            else
+            {
+                // Default fallback
+                return RedirectToAction("Dashboard", "Home");
+            }
         }
-        
-        // ==========================================================
         // 3. LOGOUT: Đăng xuất
-        // ==========================================================
         [HttpGet]
         public IActionResult Logout()
         {

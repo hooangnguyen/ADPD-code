@@ -1,5 +1,41 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Quản trị hệ thống";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<div class="container mt-4">
+    <div class="alert alert-primary">
+        <h1>👋 Chào mừng Quản trị viên (Admin)</h1>
+        <p>Bạn đang đăng nhập với quyền cao nhất.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Quản lý Tài khoản</div>
+                <div class="card-body">
+                    <p class="card-text">Thêm, sửa, xóa tài khoản sinh viên và giảng viên.</p>
+                    <a href="#" class="btn btn-light">Truy cập</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Quản lý Môn học</div>
+                <div class="card-body">
+                    <p class="card-text">Quản lý danh sách môn học và lớp học.</p>
+                    <a href="#" class="btn btn-light">Truy cập</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header">Thống kê</div>
+                <div class="card-body">
+                    <p class="card-text">Xem báo cáo tổng quan về hệ thống.</p>
+                    <a href="#" class="btn btn-light">Xem báo cáo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

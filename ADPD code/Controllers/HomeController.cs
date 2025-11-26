@@ -7,7 +7,6 @@ namespace ADPD_code.Controllers
 {
     public class HomeController(ApplicationDbContext context) : Controller
     {
-        private readonly ILogger<HomeController>? _logger;
         private bool isConnected = false;
         private readonly ApplicationDbContext _context = context;
 
