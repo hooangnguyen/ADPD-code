@@ -1,6 +1,10 @@
 ﻿@{
+<<<<<<< HEAD
     ViewData["Title"] = "Dashboard - Sinh viên";
     Layout = "~/Views/Shared/_Layout.cshtml";
+=======
+    Layout = null;
+>>>>>>> 54a9c6827043fd99a2ece98a3fa1275f2b5cb6d9
 }
 
 <link rel="stylesheet" href="~/css/Dashboard.css" />
@@ -99,34 +103,54 @@
 
     <!-- Dashboard Content -->
     <div class="dashboard-content">
+<<<<<<< HEAD
         <!-- Stats Cards - Dữ liệu thực từ Database -->
+=======
+        <!-- Stats Cards -->
+>>>>>>> 54a9c6827043fd99a2ece98a3fa1275f2b5cb6d9
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon blue">📊</div>
                 <div class="stat-info">
                     <h3>GPA Tích lũy</h3>
+<<<<<<< HEAD
                     <div class="value">@ViewBag.GPA</div>
+=======
+                    <div class="value">3.65</div>
+>>>>>>> 54a9c6827043fd99a2ece98a3fa1275f2b5cb6d9
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon green">📚</div>
                 <div class="stat-info">
                     <h3>Tín chỉ đã học</h3>
+<<<<<<< HEAD
                     <div class="value">@ViewBag.TotalCredits/@ViewBag.MaxCredits</div>
+=======
+                    <div class="value">85/120</div>
+>>>>>>> 54a9c6827043fd99a2ece98a3fa1275f2b5cb6d9
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon orange">✅</div>
                 <div class="stat-info">
                     <h3>Môn học kỳ này</h3>
+<<<<<<< HEAD
                     <div class="value">@ViewBag.CurrentSemesterCourses</div>
+=======
+                    <div class="value">6</div>
+>>>>>>> 54a9c6827043fd99a2ece98a3fa1275f2b5cb6d9
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon purple">📅</div>
                 <div class="stat-info">
                     <h3>Lớp hôm nay</h3>
+<<<<<<< HEAD
                     <div class="value">@ViewBag.TodayClasses</div>
+=======
+                    <div class="value">3</div>
+>>>>>>> 54a9c6827043fd99a2ece98a3fa1275f2b5cb6d9
                 </div>
             </div>
         </div>
@@ -149,6 +173,7 @@
                         </tr>
                     </thead>
                     <tbody>
+<<<<<<< HEAD
                         @if (ViewBag.TodaySchedule != null && ((IEnumerable<dynamic>)ViewBag.TodaySchedule).Any())
                         {
                             @foreach (var schedule in ViewBag.TodaySchedule)
@@ -172,6 +197,35 @@
                                 </td>
                             </tr>
                         }
+=======
+                        <tr>
+                            <td>
+                                <div class="subject-name">Lập trình Web</div>
+                                <div class="subject-code">CS301</div>
+                            </td>
+                            <td><span class="time-badge">07:30 - 09:30</span></td>
+                            <td><span class="room-badge">A101</span></td>
+                            <td>TS. Nguyễn Văn B</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="subject-name">Cơ sở dữ liệu</div>
+                                <div class="subject-code">CS302</div>
+                            </td>
+                            <td><span class="time-badge">09:45 - 11:45</span></td>
+                            <td><span class="room-badge">B205</span></td>
+                            <td>ThS. Trần Thị C</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="subject-name">Mạng máy tính</div>
+                                <div class="subject-code">CS303</div>
+                            </td>
+                            <td><span class="time-badge">13:00 - 15:00</span></td>
+                            <td><span class="room-badge">C308</span></td>
+                            <td>TS. Lê Văn D</td>
+                        </tr>
+>>>>>>> 54a9c6827043fd99a2ece98a3fa1275f2b5cb6d9
                     </tbody>
                 </table>
             </div>
@@ -184,6 +238,7 @@
                         <h2 class="card-title">Thông báo</h2>
                         <a href="#" class="view-all">Xem tất cả →</a>
                     </div>
+<<<<<<< HEAD
                     @if (ViewBag.RecentAssignments != null && ((IEnumerable<dynamic>)ViewBag.RecentAssignments).Any())
                     {
                         @foreach (var assignment in ViewBag.RecentAssignments)
@@ -214,6 +269,32 @@
                             </div>
                         </div>
                     }
+=======
+                    <div class="notification-item">
+                        <div class="notification-icon info">📢</div>
+                        <div class="notification-content">
+                            <h4>Thông báo lịch thi giữa kỳ</h4>
+                            <p>Lịch thi giữa kỳ đã được cập nhật</p>
+                            <span class="notification-time">2 giờ trước</span>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <div class="notification-icon success">✅</div>
+                        <div class="notification-content">
+                            <h4>Điểm đã cập nhật</h4>
+                            <p>Điểm môn Lập trình Web đã được công bố</p>
+                            <span class="notification-time">5 giờ trước</span>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <div class="notification-icon warning">⚠️</div>
+                        <div class="notification-content">
+                            <h4>Bài tập sắp hết hạn</h4>
+                            <p>Bài tập Lập trình Web - Deadline: 28/11/2024</p>
+                            <span class="notification-time">1 ngày trước</span>
+                        </div>
+                    </div>
+>>>>>>> 54a9c6827043fd99a2ece98a3fa1275f2b5cb6d9
                 </div>
 
                 <!-- Quick Actions -->

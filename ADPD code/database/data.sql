@@ -165,6 +165,60 @@ CREATE TABLE StudentClass (
 -- INSERT DỮ LIỆU MẪU
 -- =====================================
 
+<<<<<<< HEAD
+=======
+-- ================================
+-- 1. XÓA DỮ LIỆU TRÙNG (AN TOÀN)
+-- ================================
+DELETE FROM Account 
+WHERE Username IN ('admin', 'gv_hangoclinh', 'gv_nguyenthanhtrieu', 'gv_nguyenthihonghanh');
+
+DELETE FROM Lecturer 
+WHERE LecturerId IN (4, 5, 6);
+-- Nếu Id tự tạo, có thể dùng:
+-- DELETE FROM Lecturer WHERE FullName IN (...)
+
+
+-- ================================
+-- 2. THÊM 3 GIẢNG VIÊN
+-- ================================
+INSERT INTO Lecturer (FullName, Email, Phone, DepartmentId)
+VALUES 
+    (N'Hà Ngọc Linh',      'linh@example.com',  '0912345678', 1),
+    (N'Nguyễn Thanh Triều','trieu@example.com', '0912345679', 1),
+    (N'Nguyễn Thị Hồng Hạnh','hanh@example.com','0912345680', 2);
+
+
+-- ================================
+-- 3. LẤY ID CÁC GIẢNG VIÊN
+-- ================================
+SELECT * FROM Lecturer;
+
+
+-- ================================
+-- 4. THÊM TÀI KHOẢN CHO GIẢNG VIÊN (MẬT KHẨU CHƯA MÃ HÓA)
+-- ================================
+INSERT INTO Account (Username, PasswordHash, Role, LecturerId)
+VALUES
+    ('gv_hangoclinh',       '123456', 'Lecturer', (SELECT LecturerId FROM Lecturer WHERE Email='linh@example.com')),
+    ('gv_nguyenthanhtrieu', '123456', 'Lecturer', (SELECT LecturerId FROM Lecturer WHERE Email='trieu@example.com')),
+    ('gv_nguyenthihonghanh','123456', 'Lecturer', (SELECT LecturerId FROM Lecturer WHERE Email='hanh@example.com'));
+
+
+-- ================================
+-- 5. THÊM TÀI KHOẢN ADMIN
+-- ================================
+INSERT INTO Account (Username, PasswordHash, Role, LecturerId)
+VALUES ('admin', '123456', 'Admin', NULL);
+
+
+-- ================================
+-- 6. KIỂM TRA KẾT QUẢ
+-- ================================
+SELECT * FROM Account;
+
+
+>>>>>>> 54a9c6827043fd99a2ece98a3fa1275f2b5cb6d9
 -- =====================================
 -- KẾT THÚC INSERT DỮ LIỆU MẪU
 -- =====================================
