@@ -1,0 +1,507 @@
+﻿@model IEnumerable<ADPD_code.Models.Assignment>
+@{
+    ViewData["Title"] = "Bài tập";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var submissions = ViewBag.Submissions as List<ADPD_code.Models.AssignmentSubmission>;
+}
+
+<style>
+    .assignments-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .assignments-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+        .assignments-header h1 {
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+    .back-btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        transition: all 0.3s;
+    }
+
+        .back-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+    .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .tab-btn {
+        padding: 12px 24px;
+        border: none;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+    .assignment-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s;
+    }
+
+        .assignment-card:hover {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+    .assignment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 15px;
+    }
+
+    .assignment-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .course-name {
+        color: #667eea;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-submitted {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-graded {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-overdue {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .assignment-description {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    .assignment-meta {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .meta-icon {
+        font-size: 20px;
+    }
+
+    .meta-content {
+        flex: 1;
+    }
+
+    .meta-label {
+        font-size: 12px;
+        color: #999;
+        margin-bottom: 2px;
+    }
+
+    .meta-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .assignment-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    .btn-primary {
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+    .btn-secondary {
+        padding: 10px 20px;
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+    .no-data {
+        background: white;
+        border-radius: 12px;
+        padding: 60px 20px;
+        text-align: center;
+        color: #999;
+    }
+
+        .no-data h3 {
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+    .submission-info {
+        background: #e8f5e9;
+        border: 1px solid #c3e6cb;
+        border-radius: 8px;
+        padding: 12px;
+        margin-top: 15px;
+    }
+
+        .submission-info strong {
+            color: #155724;
+        }
+
+    @@media (max-width: 768px) {
+        .assignment-header {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .assignment-meta {
+            grid-template-columns: 1fr;
+        }
+
+        .assignment-actions {
+            flex-direction: column;
+        }
+
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            text-align: center;
+        }
+    }
+
+</style>
+
+<div class="assignments-container">
+    <a href="@Url.Action("Dashboard", "Student")" class="back-btn">← Quay lại Dashboard</a>
+
+    <div class="assignments-header">
+        <h1>📝 Bài Tập</h1>
+        <p>Quản lý bài tập và deadline</p>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        var now = DateTime.Now;
+        var upcomingAssignments = Model.Where(a => a.EndDate >= now).OrderBy(a => a.EndDate).ToList();
+        var overdueAssignments = Model.Where(a => a.EndDate < now).OrderByDescending(a => a.EndDate).ToList();
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('upcoming')">
+                Đang mở (@upcomingAssignments.Count)
+            </button>
+            <button class="tab-btn" onclick="showTab('overdue')">
+                Quá hạn (@overdueAssignments.Count)
+            </button>
+        </div>
+
+        <!-- Upcoming Assignments -->
+        <div id="upcoming-tab" class="tab-content">
+            @if (upcomingAssignments.Any())
+            {
+                @foreach (var assignment in upcomingAssignments)
+                {
+                    var daysLeft = (assignment.EndDate - now).TotalDays;
+                    var submission = submissions?.FirstOrDefault(s => s.AssignmentID == assignment.AssignmentID);
+                    var hasSubmitted = submission != null;
+                    var isGraded = hasSubmitted && submission.Score > 0;
+
+                    <div class="assignment-card">
+                        <div class="assignment-header">
+                            <div>
+                                <div class="assignment-title">@assignment.Title</div>
+                                <div class="course-name">📚 @assignment.Course.CourseName</div>
+                            </div>
+                            @if (isGraded)
+                            {
+                                <span class="status-badge status-graded">✅ Đã chấm: @submission.Score điểm</span>
+                            }
+                            else if (hasSubmitted)
+                            {
+                                <span class="status-badge status-submitted">📤 Đã nộp</span>
+                            }
+                            else if (daysLeft < 2)
+                            {
+                                <span class="status-badge status-overdue">⚠️ Sắp hết hạn</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-pending">⏳ Chưa nộp</span>
+                            }
+                        </div>
+
+                        <div class="assignment-description">
+                            @(assignment.Description ?? "Không có mô tả")
+                        </div>
+
+                        <div class="assignment-meta">
+                            <div class="meta-item">
+                                <span class="meta-icon">👨‍🏫</span>
+                                <div class="meta-content">
+                                    <div class="meta-label">Giảng viên</div>
+                                    <div class="meta-value">@assignment.lecturer.FullName</div>
+                                </div>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-icon">📅</span>
+                                <div class="meta-content">
+                                    <div class="meta-label">Ngày giao</div>
+                                    <div class="meta-value">@assignment.StartDate.ToString("dd/MM/yyyy")</div>
+                                </div>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-icon">⏰</span>
+                                <div class="meta-content">
+                                    <div class="meta-label">Deadline</div>
+                                    <div class="meta-value" style="color: @(daysLeft < 2 ? "#e74c3c" : "#333");">
+                                        @assignment.EndDate.ToString("dd/MM/yyyy HH:mm")
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-icon">⏳</span>
+                                <div class="meta-content">
+                                    <div class="meta-label">Thời gian còn lại</div>
+                                    <div class="meta-value" style="color: @(daysLeft < 2 ? "#e74c3c" : "#27ae60");">
+                                        @(daysLeft >= 1 ? $"{(int)daysLeft} ngày" : $"{(int)(daysLeft * 24)} giờ")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (hasSubmitted)
+                        {
+                            <div class="submission-info">
+                                <strong>✅ Bạn đã nộp bài này</strong><br />
+                                Ngày nộp: @submission.SubmitDate.ToString("dd/MM/yyyy HH:mm")<br />
+                                @if (isGraded && !string.IsNullOrEmpty(submission.Feedback))
+                                {
+                                    <div style="margin-top: 8px;">
+                                        <strong>Nhận xét:</strong> @submission.Feedback
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <div class="assignment-actions">
+                            <a href="#" class="btn-secondary">📄 Xem chi tiết</a>
+                            @if (!hasSubmitted)
+                            {
+                                <a href="#" class="btn-primary">📤 Nộp bài</a>
+                            }
+                            else if (!isGraded)
+                            {
+                                <a href="#" class="btn-primary">✏️ Chỉnh sửa bài nộp</a>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="no-data">
+                    <h3>🎉 Không có bài tập đang mở</h3>
+                    <p>Bạn đã hoàn thành tất cả bài tập hiện tại!</p>
+                </div>
+            }
+        </div>
+
+        <!-- Overdue Assignments -->
+        <div id="overdue-tab" class="tab-content" style="display: none;">
+            @if (overdueAssignments.Any())
+            {
+                @foreach (var assignment in overdueAssignments)
+                {
+                    var submission = submissions?.FirstOrDefault(s => s.AssignmentID == assignment.AssignmentID);
+                    var hasSubmitted = submission != null;
+                    var isGraded = hasSubmitted && submission.Score > 0;
+
+                    <div class="assignment-card" style="opacity: 0.8;">
+                        <div class="assignment-header">
+                            <div>
+                                <div class="assignment-title">@assignment.Title</div>
+                                <div class="course-name">📚 @assignment.Course.CourseName</div>
+                            </div>
+                            @if (isGraded)
+                            {
+                                <span class="status-badge status-graded">✅ Đã chấm: @submission.Score điểm</span>
+                            }
+                            else if (hasSubmitted)
+                            {
+                                <span class="status-badge status-submitted">📤 Nộp muộn</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-overdue">❌ Quá hạn</span>
+                            }
+                        </div>
+
+                        <div class="assignment-description">
+                            @(assignment.Description ?? "Không có mô tả")
+                        </div>
+
+                        <div class="assignment-meta">
+                            <div class="meta-item">
+                                <span class="meta-icon">👨‍🏫</span>
+                                <div class="meta-content">
+                                    <div class="meta-label">Giảng viên</div>
+                                    <div class="meta-value">@assignment.lecturer.FullName</div>
+                                </div>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-icon">⏰</span>
+                                <div class="meta-content">
+                                    <div class="meta-label">Deadline</div>
+                                    <div class="meta-value" style="color: #e74c3c;">
+                                        @assignment.EndDate.ToString("dd/MM/yyyy HH:mm")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (hasSubmitted && isGraded)
+                        {
+                            <div class="submission-info">
+                                <strong>✅ Đã chấm điểm</strong><br />
+                                Điểm: @submission.Score<br />
+                                @if (!string.IsNullOrEmpty(submission.Feedback))
+                                {
+                                    <div style="margin-top: 8px;">
+                                        <strong>Nhận xét:</strong> @submission.Feedback
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <div class="assignment-actions">
+                            <a href="#" class="btn-secondary">📄 Xem chi tiết</a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="no-data">
+                    <h3>✅ Không có bài tập quá hạn</h3>
+                    <p>Bạn đã nộp đúng hạn tất cả bài tập!</p>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="no-data">
+            <h3>📝 Chưa có bài tập</h3>
+            <p>Chưa có bài tập nào được giao cho các môn học của bạn.</p>
+        </div>
+    }
+</div>
+
+<script>
+    function showTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.style.display = 'none';
+        });
+
+        // Remove active class from all buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // Show selected tab
+        document.getElementById(tabName + '-tab').style.display = 'block';
+
+        // Add active class to clicked button
+        event.target.classList.add('active');
+    }
+</script>

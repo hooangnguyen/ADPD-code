@@ -1,269 +1,258 @@
-﻿
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - StudentMS</title>
-    <link rel="stylesheet" href="~/css/Dashboard.css" />
-      
-</head>
-<body>
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <a href="#" class="sidebar-logo">
-                📚 StudentMS
+﻿@{
+    ViewData["Title"] = "Dashboard - Sinh viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/Dashboard.css" />
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <a href="@Url.Action("Dashboard", "Student")" class="sidebar-logo">
+            📚 StudentMS
+        </a>
+    </div>
+
+    <div class="user-profile">
+        <div class="user-avatar">👤</div>
+        <div class="user-info">
+            <h3>@ViewBag.FullName</h3>
+            <p>SV@(ViewBag.StudentId ?? "N/A")</p>
+        </div>
+    </div>
+
+    <ul class="menu">
+        <li class="menu-item">
+            <a href="@Url.Action("Dashboard", "Student")" class="active">
+                <span class="menu-icon">🏠</span>
+                <span>Trang chủ</span>
             </a>
-        </div>
+        </li>
+        <li class="menu-item">
+            <a href="@Url.Action("Grades", "Student")">
+                <span class="menu-icon">📊</span>
+                <span>Điểm số</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="@Url.Action("Schedule", "Student")">
+                <span class="menu-icon">📅</span>
+                <span>Lịch học</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="#">
+                <span class="menu-icon">📚</span>
+                <span>Môn học</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="#">
+                <span class="menu-icon">✏️</span>
+                <span>Đăng ký học</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="@Url.Action("Assignments", "Student")">
+                <span class="menu-icon">📝</span>
+                <span>Bài tập</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="@Url.Action("Profile", "Student")">
+                <span class="menu-icon">👤</span>
+                <span>Hồ sơ</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="@Url.Action("Logout", "Login")">
+                <span class="menu-icon">🚪</span>
+                <span>Đăng xuất</span>
+            </a>
+        </li>
+    </ul>
+</aside>
 
-        <div class="user-profile">
-            <div class="user-avatar">👤</div>
-            <div class="user-info">
-                <h3>Nguyễn Văn A</h3>
-                <p>SV001234</p>
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <h1>Dashboard</h1>
+            <div class="breadcrumb">
+                <span>Trang chủ</span>
+                <span>/</span>
+                <span>Dashboard</span>
             </div>
         </div>
+        <div class="topbar-right">
+            <button class="notification-btn">
+                🔔
+                <span class="notification-badge">3</span>
+            </button>
+            <div class="user-menu">
+                <img src="" alt="👤">
+                <span>@ViewBag.FullName</span>
+            </div>
+        </div>
+    </div>
 
-        <ul class="menu">
-            <li class="menu-item">
-                <a href="#" class="active">
-                    <span class="menu-icon">🏠</span>
-                    <span>Trang chủ</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">📊</span>
-                    <span>Điểm số</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">📅</span>
-                    <span>Lịch học</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">📚</span>
-                    <span>Môn học</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">✏️</span>
-                    <span>Đăng ký học</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">📝</span>
-                    <span>Bài tập</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">👤</span>
-                    <span>Hồ sơ</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#">
-                    <span class="menu-icon">🚪</span>
-                    <span>Đăng xuất</span>
-                </a>
-            </li>
-        </ul>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Top Bar -->
-        <div class="topbar">
-            <div class="topbar-left">
-                <h1>Dashboard</h1>
-                <div class="breadcrumb">
-                    <span>Trang chủ</span>
-                    <span>/</span>
-                    <span>Dashboard</span>
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+        <!-- Stats Cards - Dữ liệu thực từ Database -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue">📊</div>
+                <div class="stat-info">
+                    <h3>GPA Tích lũy</h3>
+                    <div class="value">@ViewBag.GPA</div>
                 </div>
             </div>
-            <div class="topbar-right">
-                <button class="notification-btn">
-                    🔔
-                    <span class="notification-badge">3</span>
-                </button>
-                <div class="user-menu">
-                    <img src="" alt="👤">
-                    <span>Nguyễn Văn A</span>
+            <div class="stat-card">
+                <div class="stat-icon green">📚</div>
+                <div class="stat-info">
+                    <h3>Tín chỉ đã học</h3>
+                    <div class="value">@ViewBag.TotalCredits/@ViewBag.MaxCredits</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">✅</div>
+                <div class="stat-info">
+                    <h3>Môn học kỳ này</h3>
+                    <div class="value">@ViewBag.CurrentSemesterCourses</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">📅</div>
+                <div class="stat-info">
+                    <h3>Lớp hôm nay</h3>
+                    <div class="value">@ViewBag.TodayClasses</div>
                 </div>
             </div>
         </div>
 
-        <!-- Dashboard Content -->
-        <div class="dashboard-content">
-            <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon blue">📊</div>
-                    <div class="stat-info">
-                        <h3>GPA Tích lũy</h3>
-                        <div class="value">3.65</div>
-                    </div>
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Schedule Today -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Lịch học hôm nay</h2>
+                    <a href="@Url.Action("Schedule", "Student")" class="view-all">Xem tất cả →</a>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon green">📚</div>
-                    <div class="stat-info">
-                        <h3>Tín chỉ đã học</h3>
-                        <div class="value">85/120</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon orange">✅</div>
-                    <div class="stat-info">
-                        <h3>Môn học kỳ này</h3>
-                        <div class="value">6</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon purple">📅</div>
-                    <div class="stat-info">
-                        <h3>Lớp hôm nay</h3>
-                        <div class="value">3</div>
-                    </div>
-                </div>
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Môn học</th>
+                            <th>Thời gian</th>
+                            <th>Phòng</th>
+                            <th>Giảng viên</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.TodaySchedule != null && ((IEnumerable<dynamic>)ViewBag.TodaySchedule).Any())
+                        {
+                            @foreach (var schedule in ViewBag.TodaySchedule)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="subject-name">@schedule.CourseName</div>
+                                        <div class="subject-code">@schedule.CourseCode</div>
+                                    </td>
+                                    <td><span class="time-badge">@schedule.Time</span></td>
+                                    <td><span class="room-badge">@schedule.Room</span></td>
+                                    <td>@schedule.LecturerName</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: #999;">
+                                    Không có lịch học hôm nay
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
 
-            <!-- Content Grid -->
-            <div class="content-grid">
-                <!-- Schedule Today -->
-                <div class="card">
+            <!-- Notifications & Quick Actions -->
+            <div>
+                <!-- Notifications -->
+                <div class="card" style="margin-bottom: 20px;">
                     <div class="card-header">
-                        <h2 class="card-title">Lịch học hôm nay</h2>
+                        <h2 class="card-title">Thông báo</h2>
                         <a href="#" class="view-all">Xem tất cả →</a>
                     </div>
-                    <table class="schedule-table">
-                        <thead>
-                            <tr>
-                                <th>Môn học</th>
-                                <th>Thời gian</th>
-                                <th>Phòng</th>
-                                <th>Giảng viên</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="subject-name">Lập trình Web</div>
-                                    <div class="subject-code">CS301</div>
-                                </td>
-                                <td><span class="time-badge">07:30 - 09:30</span></td>
-                                <td><span class="room-badge">A101</span></td>
-                                <td>TS. Nguyễn Văn B</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="subject-name">Cơ sở dữ liệu</div>
-                                    <div class="subject-code">CS302</div>
-                                </td>
-                                <td><span class="time-badge">09:45 - 11:45</span></td>
-                                <td><span class="room-badge">B205</span></td>
-                                <td>ThS. Trần Thị C</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="subject-name">Mạng máy tính</div>
-                                    <div class="subject-code">CS303</div>
-                                </td>
-                                <td><span class="time-badge">13:00 - 15:00</span></td>
-                                <td><span class="room-badge">C308</span></td>
-                                <td>TS. Lê Văn D</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                    @if (ViewBag.RecentAssignments != null && ((IEnumerable<dynamic>)ViewBag.RecentAssignments).Any())
+                    {
+                        @foreach (var assignment in ViewBag.RecentAssignments)
+                        {
+                            var daysLeft = (int)assignment.DaysLeft;
+                            var iconType = daysLeft < 2 ? "warning" : daysLeft < 0 ? "info" : "success";
+                            var icon = daysLeft < 0 ? "📢" : daysLeft < 2 ? "⚠️" : "✅";
+                            var title = daysLeft < 0 ? "Đã quá hạn" : "Sắp đến hạn";
 
-                <!-- Notifications & Quick Actions -->
-                <div>
-                    <!-- Notifications -->
-                    <div class="card" style="margin-bottom: 20px;">
-                        <div class="card-header">
-                            <h2 class="card-title">Thông báo</h2>
-                            <a href="#" class="view-all">Xem tất cả →</a>
-                        </div>
+                            <div class="notification-item">
+                                <div class="notification-icon @iconType">@icon</div>
+                                <div class="notification-content">
+                                    <h4>@assignment.Title</h4>
+                                    <p>@assignment.CourseName - Deadline: @assignment.Deadline.ToString("dd/MM/yyyy")</p>
+                                    <span class="notification-time">@(daysLeft >= 0 ? $"Còn {daysLeft} ngày" : $"Quá hạn {-daysLeft} ngày")</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
                         <div class="notification-item">
                             <div class="notification-icon info">📢</div>
                             <div class="notification-content">
-                                <h4>Thông báo lịch thi giữa kỳ</h4>
-                                <p>Lịch thi giữa kỳ đã được cập nhật</p>
-                                <span class="notification-time">2 giờ trước</span>
+                                <h4>Chưa có thông báo</h4>
+                                <p>Hiện tại chưa có thông báo mới</p>
+                                <span class="notification-time">Hôm nay</span>
                             </div>
                         </div>
-                        <div class="notification-item">
-                            <div class="notification-icon success">✅</div>
-                            <div class="notification-content">
-                                <h4>Điểm đã cập nhật</h4>
-                                <p>Điểm môn Lập trình Web đã được công bố</p>
-                                <span class="notification-time">5 giờ trước</span>
-                            </div>
-                        </div>
-                        <div class="notification-item">
-                            <div class="notification-icon warning">⚠️</div>
-                            <div class="notification-content">
-                                <h4>Bài tập sắp hết hạn</h4>
-                                <p>Bài tập Lập trình Web - Deadline: 28/11/2024</p>
-                                <span class="notification-time">1 ngày trước</span>
-                            </div>
-                        </div>
-                    </div>
+                    }
+                </div>
 
-                    <!-- Quick Actions -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">Thao tác nhanh</h2>
-                        </div>
-                        <div class="quick-actions">
-                            <a href="#" class="action-btn">
-                                <div class="icon">✏️</div>
-                                <span>Đăng ký môn học</span>
-                            </a>
-                            <a href="#" class="action-btn">
-                                <div class="icon">📊</div>
-                                <span>Xem điểm</span>
-                            </a>
-                            <a href="#" class="action-btn">
-                                <div class="icon">📝</div>
-                                <span>Bài tập</span>
-                            </a>
-                            <a href="#" class="action-btn">
-                                <div class="icon">📅</div>
-                                <span>Lịch thi</span>
-                            </a>
-                        </div>
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Thao tác nhanh</h2>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn">
+                            <div class="icon">✏️</div>
+                            <span>Đăng ký môn học</span>
+                        </a>
+                        <a href="@Url.Action("Grades", "Student")" class="action-btn">
+                            <div class="icon">📊</div>
+                            <span>Xem điểm</span>
+                        </a>
+                        <a href="@Url.Action("Assignments", "Student")" class="action-btn">
+                            <div class="icon">📝</div>
+                            <span>Bài tập</span>
+                        </a>
+                        <a href="@Url.Action("Schedule", "Student")" class="action-btn">
+                            <div class="icon">📅</div>
+                            <span>Lịch thi</span>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 
+@section Scripts {
     <script>
-        // Mobile menu toggle
-        const menuBtn = document.querySelector('.menu-btn');
-        const sidebar = document.querySelector('.sidebar');
-
-        if (menuBtn) {
-            menuBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('active');
-            });
-        }
         // Active menu item
         document.querySelectorAll('.menu-item a').forEach(link => {
-            link.addEventListener('click', function(e) {
+            if (link.href === window.location.href) {
                 document.querySelectorAll('.menu-item a').forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-            });
+                link.classList.add('active');
+            }
         });
     </script>
-</body>
-</html>
+}

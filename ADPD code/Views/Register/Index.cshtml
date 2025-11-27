@@ -11,7 +11,8 @@
         <p>Hệ thống Quản lý Sinh viên</p>
     </div>
 
-    <form method="post" asp-controller="Login" asp-action="Register">
+    <form method="post" asp-controller="Register" asp-action="Register">
+        @Html.AntiForgeryToken()
 
         @if (ViewData.ModelState.Any(x => x.Value.Errors.Any()))
         {

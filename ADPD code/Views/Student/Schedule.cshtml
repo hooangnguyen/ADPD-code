@@ -1,0 +1,308 @@
+﻿@model IEnumerable<ADPD_code.Models.Course>
+@{
+    ViewData["Title"] = "Lịch học";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .schedule-container {
+        max-width: 1400px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .schedule-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+        .schedule-header h1 {
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+    .back-btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        transition: all 0.3s;
+    }
+
+        .back-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+    .week-view {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: 80px repeat(6, 1fr);
+        gap: 1px;
+        background: #e0e0e0;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .time-slot, .day-header, .class-cell {
+        background: white;
+        padding: 15px;
+        min-height: 80px;
+    }
+
+    .day-header {
+        background: #667eea;
+        color: white;
+        font-weight: 700;
+        text-align: center;
+        min-height: auto;
+        padding: 15px;
+    }
+
+    .time-slot {
+        background: #f9f9f9;
+        font-weight: 600;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-size: 13px;
+    }
+
+    .class-cell {
+        position: relative;
+        transition: all 0.3s;
+    }
+
+        .class-cell:hover {
+            background: #f9f9ff;
+        }
+
+    .class-info {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px;
+        border-radius: 8px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .class-name {
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+
+    .class-details {
+        font-size: 12px;
+        opacity: 0.9;
+    }
+
+    .class-room {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+        margin-top: 6px;
+        font-size: 11px;
+    }
+
+    .courses-list {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        margin-bottom: 30px;
+    }
+
+    .course-card {
+        background: #f9f9f9;
+        border-left: 4px solid #667eea;
+        padding: 20px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 20px;
+        align-items: center;
+    }
+
+        .course-card:hover {
+            background: #f0f0f0;
+        }
+
+    .course-info h3 {
+        color: #333;
+        margin-bottom: 8px;
+        font-size: 18px;
+    }
+
+    .course-code {
+        color: #999;
+        font-size: 13px;
+    }
+
+    .course-detail {
+        text-align: center;
+    }
+
+    .course-detail-label {
+        color: #999;
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    .course-detail-value {
+        color: #333;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+
+        .no-data h3 {
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+    @@media (max-width: 768px) {
+        .assignment-header {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .assignment-meta {
+            grid-template-columns: 1fr;
+        }
+
+        .assignment-actions {
+            flex-direction: column;
+        }
+
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            text-align: center;
+        }
+    }
+
+</style>
+
+<div class="schedule-container">
+    <a href="@Url.Action("Dashboard", "Student")" class="back-btn">← Quay lại Dashboard</a>
+
+    <div class="schedule-header">
+        <h1>📅 Lịch Học</h1>
+        <p>Thời khóa biểu học kỳ hiện tại</p>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <!-- Danh sách môn học -->
+        <div class="courses-list">
+            <h2 style="margin-bottom: 20px; color: #333;">📚 Danh sách môn học</h2>
+            @foreach (var course in Model)
+            {
+                <div class="course-card">
+                    <div class="course-info">
+                        <h3>@course.CourseName</h3>
+                        <div class="course-code">Mã môn: CS@(course.CourseID)</div>
+                    </div>
+                    <div class="course-detail">
+                        <div class="course-detail-label">Tín chỉ</div>
+                        <div class="course-detail-value">@(course.Credits ?? "N/A")</div>
+                    </div>
+                    <div class="course-detail">
+                        <div class="course-detail-label">Giảng viên</div>
+                        <div class="course-detail-value">@(course.Lecturer?.FullName ?? "N/A")</div>
+                    </div>
+                    <div class="course-detail">
+                        <div class="course-detail-label">Phòng học</div>
+                        <div class="course-detail-value">A@(100 + course.CourseID)</div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Lịch theo tuần (giả lập) -->
+        <div class="week-view">
+            <h2 style="margin-bottom: 20px; color: #333;">📆 Thời khóa biểu tuần</h2>
+            <div class="calendar-grid">
+                <!-- Header -->
+                <div class="day-header" style="background: #f9f9f9; color: #666;">Giờ</div>
+                <div class="day-header">Thứ 2</div>
+                <div class="day-header">Thứ 3</div>
+                <div class="day-header">Thứ 4</div>
+                <div class="day-header">Thứ 5</div>
+                <div class="day-header">Thứ 6</div>
+                <div class="day-header">Thứ 7</div>
+
+                @{
+                    var timeSlots = new[] { "7:30", "9:45", "13:00", "15:15" };
+                    var courses = Model.ToList();
+                    int courseIndex = 0;
+
+                    foreach (var time in timeSlots)
+                    {
+                        <!-- Time label -->
+                        <div class="time-slot">@time</div>
+
+                        @for (int day = 0; day < 6; day++)
+                        {
+                            @if (courseIndex < courses.Count && (day + timeSlots.ToList().IndexOf(time)) % 3 == 0)
+                            {
+                                var course = courses[courseIndex];
+                                <div class="class-cell">
+                                    <div class="class-info">
+                                        <div>
+                                            <div class="class-name">@course.CourseName</div>
+                                            <div class="class-details">
+                                                @(course.Lecturer?.FullName ?? "N/A")
+                                            </div>
+                                        </div>
+                                        <div class="class-room">Phòng A@(100 + course.CourseID)</div>
+                                    </div>
+                                </div>
+                                courseIndex++;
+                            }
+                            else
+                            {
+                                <div class="class-cell"></div>
+                            }
+                        }
+                    }
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="week-view">
+            <div class="no-data">
+                <h3>📅 Chưa có lịch học</h3>
+                <p>Bạn chưa đăng ký môn học nào trong học kỳ này.</p>
+            </div>
+        </div>
+    }
+</div>

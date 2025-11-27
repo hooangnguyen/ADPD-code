@@ -1,0 +1,289 @@
+﻿@model ADPD_code.Models.Student
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .profile-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .back-btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        transition: all 0.3s;
+    }
+
+        .back-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+    .profile-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+        position: relative;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: white;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 50px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-name {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .profile-id {
+        font-size: 16px;
+        opacity: 0.9;
+    }
+
+    .profile-body {
+        padding: 40px;
+    }
+
+    .section-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .info-label {
+        font-size: 13px;
+        color: #999;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-value {
+        font-size: 16px;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-inactive {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .class-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .class-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .edit-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .edit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+</style>
+<style>
+    @@media (max-width: 768px) {
+        .assignment-header {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .assignment-meta {
+            grid-template-columns: 1fr;
+        }
+
+        .assignment-actions {
+            flex-direction: column;
+        }
+
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            text-align: center;
+        }
+    }
+
+</style>
+
+<div class="profile-container">
+    <a href="@Url.Action("Dashboard", "Student")" class="back-btn">← Quay lại Dashboard</a>
+
+    <div class="profile-card">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar">👤</div>
+            <div class="profile-name">@Model.FullName</div>
+            <div class="profile-id">Mã sinh viên: SV@Model.StudentId</div>
+        </div>
+
+        <!-- Profile Body -->
+        <div class="profile-body">
+            <!-- Personal Information -->
+            <div class="section-title">
+                <span>📋</span> Thông tin cá nhân
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Họ và tên</div>
+                    <div class="info-value">@Model.FullName</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Giới tính</div>
+                    <div class="info-value">@Model.Gender</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Ngày sinh</div>
+                    <div class="info-value">@Model.DOB.ToString("dd/MM/yyyy")</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">@Model.Email</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Số điện thoại</div>
+                    <div class="info-value">@Model.Phone</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Trạng thái</div>
+                    <div class="info-value">
+                        <span class="status-badge @(Model.Status == "Đang học" ? "status-active" : "status-inactive")">
+                            @Model.Status
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Address -->
+            <div class="section-title">
+                <span>🏠</span> Địa chỉ
+            </div>
+            <div class="info-grid" style="margin-bottom: 40px;">
+                <div class="info-item" style="grid-column: 1 / -1;">
+                    <div class="info-label">Địa chỉ thường trú</div>
+                    <div class="info-value">@(string.IsNullOrEmpty(Model.Address) ? "Chưa cập nhật" : Model.Address)</div>
+                </div>
+            </div>
+
+            <!-- Academic Information -->
+            <div class="section-title">
+                <span>🎓</span> Thông tin học tập
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Mã sinh viên</div>
+                    <div class="info-value">SV@Model.StudentId</div>
+                </div>
+                @if (Model.StudentClasses != null && Model.StudentClasses.Any())
+                {
+                    var firstClass = Model.StudentClasses.First().Class;
+                    <div class="info-item">
+                        <div class="info-label">Ngành học</div>
+                        <div class="info-value">@(firstClass?.Major?.MajorName ?? "N/A")</div>
+                    </div>
+                    <div class="info-item" style="grid-column: 1 / -1;">
+                        <div class="info-label">Lớp học</div>
+                        <div class="class-list">
+                            @foreach (var studentClass in Model.StudentClasses)
+                            {
+                                <span class="class-badge">@studentClass.Class.ClassName</span>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="info-item">
+                        <div class="info-label">Ngành học</div>
+                        <div class="info-value" style="color: #999;">Chưa được phân lớp</div>
+                    </div>
+                }
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px solid #f0f0f0;">
+                <a href="#" class="edit-btn">✏️ Chỉnh sửa thông tin</a>
+            </div>
+        </div>
+    </div>
+</div>
