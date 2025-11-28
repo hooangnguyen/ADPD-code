@@ -1,40 +1,65 @@
-﻿@{
-    Layout = null;
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Hệ thống Quản lý Sinh viên</title>
+    <link rel="stylesheet" href="~/css/Home.css" />
+</head>
+<body>
+
+    <!-- Top / Hero -->
+    <section class="hero" id="admin-hero">
+        <div class="hero-content">
+            <h1>👋 Chào mừng Quản trị viên (Admin)</h1>
+            <p>Bạn đang đăng nhập với quyền cao nhất. Quản lý hệ thống từ đây.</p>
+        </div>
+    </section>
+
+    <!-- Admin features (match site theme) -->
+    <section class="features" id="admin-features">
+        <div class="features-container">
+            <h2 class="section-title">Bảng điều khiển Quản trị</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h3>Quản lý Tài khoản</h3>
+                    <p>Thêm, sửa, xóa tài khoản sinh viên và giảng viên.</p>
+                    <a href="@Url.Action("Index", "AccountManagement")" class="btn btn-register">Truy cập</a>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h3>Quản lý Môn học</h3>
+                    <p>Quản lý danh sách môn học, lớp học và phân công giảng dạy.</p>
+                    <a href="@Url.Action("Index", "CourseManagement")" class="btn btn-register">Truy cập</a>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Thống kê & Báo cáo</h3>
+                    <p>Xem báo cáo tổng quan và xuất dữ liệu hệ thống.</p>
+                    <a href="@Url.Action("Index", "Reports")" class="btn btn-register">Xem báo cáo</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer (same as Home) -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="@Url.Action("Index", "Home")">Trang chủ</a>
+                <a href="@Url.Action("Index", "Register")">Đăng ký</a>
+                <a href="#">Chính sách</a>
+                <a href="#">Liên hệ</a>
+            </div>
+            <p>&copy; 2024 Hệ thống Quản lý Sinh viên. All rights reserved.</p>
+        </div>
+    </footer>
+
+@section Scripts {
+    <script src="~/js/Home.js"></script>
 }
-
-<div class="container mt-4">
-    <div class="alert alert-primary">
-        <h1>👋 Chào mừng Quản trị viên (Admin)</h1>
-        <p>Bạn đang đăng nhập với quyền cao nhất.</p>
-    </div>
-
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card text-white bg-primary mb-3">
-                <div class="card-header">Quản lý Tài khoản</div>
-                <div class="card-body">
-                    <p class="card-text">Thêm, sửa, xóa tài khoản sinh viên và giảng viên.</p>
-                    <a href="#" class="btn btn-light">Truy cập</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-header">Quản lý Môn học</div>
-                <div class="card-body">
-                    <p class="card-text">Quản lý danh sách môn học và lớp học.</p>
-                    <a href="#" class="btn btn-light">Truy cập</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-warning mb-3">
-                <div class="card-header">Thống kê</div>
-                <div class="card-body">
-                    <p class="card-text">Xem báo cáo tổng quan về hệ thống.</p>
-                    <a href="#" class="btn btn-light">Xem báo cáo</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+</body>
+</html>
