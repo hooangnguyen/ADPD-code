@@ -12,24 +12,21 @@
             <p>Hệ thống Quản lý Sinh viên</p>
         </div>
 
-<<<<<<< HEAD
-    <form method="post" asp-controller="Register" asp-action="Register">
-        @Html.AntiForgeryToken()
-
-        @if (ViewData.ModelState.Any(x => x.Value.Errors.Any()))
-=======
-        <!-- Hiển thị thông báo lỗi -->
-        @if (!ViewData.ModelState.IsValid)
->>>>>>> 54a9c6827043fd99a2ece98a3fa1275f2b5cb6d9
-        {
-            <div class="alert alert-danger" role="alert">
-                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
-            </div>
-        }
-
         <!-- Form đăng ký - POST đến RegisterController -->
         <form method="post" asp-controller="Register" asp-action="Register">
             @Html.AntiForgeryToken()
+
+            @if (ViewData.ModelState.Any(x => x.Value.Errors.Any()))
+            {
+                @* You may want to show field-level errors here if needed *@
+            }
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                </div>
+            }
 
             <div class="form-group">
                 <label>Mã sinh viên <span class="required">*</span></label>

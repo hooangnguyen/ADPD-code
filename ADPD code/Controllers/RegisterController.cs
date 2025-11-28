@@ -94,21 +94,13 @@ namespace ADPD_code.Controllers
                 await _context.SaveChangesAsync();
 
                 // 7. Tạo Account cho sinh viên
-<<<<<<< HEAD
                 // ✅ Hash password bằng BCrypt
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
-                
+
                 var newAccount = new Account
                 {
                     Username = studentId, // Dùng mã sinh viên làm username
                     PasswordHash = hashedPassword, // Password đã được hash
-=======
-                // ⚠️ LƯU Ý: Đang lưu password dạng plaintext - CẦN HASH SAU
-                var newAccount = new Account
-                {
-                    Username = studentId, // Dùng mã sinh viên làm username
-                    PasswordHash = password, // TODO: Hash password bằng BCrypt
->>>>>>> 54a9c6827043fd99a2ece98a3fa1275f2b5cb6d9
                     Role = "Student",
                     StudentID = newStudent.StudentId,
                     LecturerID = null
