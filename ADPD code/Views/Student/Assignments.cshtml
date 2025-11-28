@@ -301,7 +301,7 @@
                                 <div class="assignment-title">@assignment.Title</div>
                                 <div class="course-name">📚 @assignment.Course.CourseName</div>
                             </div>
-                            @if (isGraded)
+                            @if (isGraded && submission != null)
                             {
                                 <span class="status-badge status-graded">✅ Đã chấm: @submission.Score điểm</span>
                             }

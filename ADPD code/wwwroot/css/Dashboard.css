@@ -40,6 +40,7 @@ body {
 }
 
 .user-profile {
+    /* ... các thuộc tính khác không đổi ... */
     display: flex;
     align-items: center;
     gap: 12px;
@@ -48,6 +49,15 @@ body {
     margin: 0 10px 20px;
     border-radius: 10px;
 }
+
+    /* CHỈNH SỬA: Xóa gạch chân (underline) cho liên kết trong phần profile */
+    .user-profile a {
+        text-decoration: none; /* Xóa gạch chân */
+        color: white; /* Đảm bảo màu chữ vẫn là màu trắng */
+        display: flex; /* Giữ bố cục flex */
+        align-items: center;
+        gap: 12px;
+    }
 
 .user-avatar {
     width: 50px;
@@ -58,16 +68,19 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 24px;
+    flex-shrink: 0; /* Đảm bảo avatar không bị co lại */
 }
 
 .user-info h3 {
     font-size: 16px;
     margin-bottom: 4px;
+    /* Có thể thêm text-decoration: none; ở đây để đảm bảo tuyệt đối */
 }
 
 .user-info p {
     font-size: 12px;
     opacity: 0.8;
+    /* Có thể thêm text-decoration: none; ở đây để đảm bảo tuyệt đối */
 }
 
 .menu {

@@ -15,13 +15,14 @@
     </div>
 
     <div class="user-profile">
-        <div class="user-avatar">👤</div>
-        <div class="user-info">
-            <h3>@ViewBag.FullName</h3>
-            <p>SV@(ViewBag.StudentId ?? "N/A")</p>
-        </div>
+        <a href="@Url.Action("Profile", "Student")">
+            <div class="user-avatar">👤</div>
+            <div class="user-info">
+                <h3>@ViewBag.FullName</h3>
+                <p>@(ViewBag.StudentId ?? "N/A")</p>
+            </div>
+        </a>
     </div>
-
     <ul class="menu">
         <li class="menu-item">
             <a href="@Url.Action("Dashboard", "Student")" class="active">
@@ -59,7 +60,7 @@
                 <span>Bài tập</span>
             </a>
         </li>
-        <li class="menu-item">
+        <li class="menu-item">  
             <a href="@Url.Action("Profile", "Student")">
                 <span class="menu-icon">👤</span>
                 <span>Hồ sơ</span>
@@ -90,11 +91,7 @@
             <button class="notification-btn">
                 🔔
                 <span class="notification-badge">3</span>
-            </button>
-            <div class="user-menu">
-                <img src="" alt="👤">
-                <span>@ViewBag.FullName</span>
-            </div>
+            </button>   
         </div>
     </div>
 

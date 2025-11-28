@@ -61,8 +61,8 @@ namespace ADPD_code.Controllers
 
             var student = await _context.Students
                 .Include(s => s.StudentClasses)
-                    .ThenInclude(sc => sc.Class)
-                        .ThenInclude(c => c.Major)
+                .ThenInclude(sc => sc.Class)
+                .ThenInclude(c => c.Major)
                 .FirstOrDefaultAsync(s => s.StudentId == studentId.Value);
 
             if (student == null)
@@ -74,26 +74,26 @@ namespace ADPD_code.Controllers
         }
 
         // Grades - Xem điểm
-        public async Task<IActionResult> Grades()
+        public Task<IActionResult> Grades()
         {
             if (HttpContext.Session.GetString("Role") != "Student")
             {
-                return RedirectToAction("Index", "Login");
+                return Task.FromResult<IActionResult>(RedirectToAction("Index", "Login"));
             }
 
             var studentId = HttpContext.Session.GetInt32("StudentID");
             if (!studentId.HasValue)
             {
-                return RedirectToAction("Index", "Login");
+                return Task.FromResult<IActionResult>(RedirectToAction("Index", "Login"));
             }
 
             // TODO: Lấy danh sách điểm từ bảng Enrollment
             ViewBag.StudentId = studentId.Value;
-            return View();
+            return Task.FromResult<IActionResult>(View());
         }
 
         // Schedule - Lịch học
-        public async Task<IActionResult> Schedule()
+        public IActionResult Schedule()
         {
             if (HttpContext.Session.GetString("Role") != "Student")
             {
@@ -112,22 +112,22 @@ namespace ADPD_code.Controllers
         }
 
         // Assignments - Bài tập
-        public async Task<IActionResult> Assignments()
+        public Task<IActionResult> Assignments()
         {
             if (HttpContext.Session.GetString("Role") != "Student")
             {
-                return RedirectToAction("Index", "Login");
+                return Task.FromResult<IActionResult>(RedirectToAction("Index", "Login"));
             }
 
             var studentId = HttpContext.Session.GetInt32("StudentID");
             if (!studentId.HasValue)
             {
-                return RedirectToAction("Index", "Login");
+                return Task.FromResult<IActionResult>(RedirectToAction("Index", "Login"));
             }
 
             // TODO: Lấy danh sách bài tập
             ViewBag.StudentId = studentId.Value;
-            return View();
+            return Task.FromResult<IActionResult>(View());
         }
     }
 }

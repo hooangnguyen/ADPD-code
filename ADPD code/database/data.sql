@@ -47,7 +47,7 @@ CREATE TABLE Student (
     StudentID INT IDENTITY PRIMARY KEY,
     FullName NVARCHAR(100),
     Gender NVARCHAR(10),
-    DOB DATE,
+    DOB DATETIME,
     Email NVARCHAR(100),
     Phone NVARCHAR(20),
     Address NVARCHAR(255),

@@ -17,7 +17,7 @@ namespace ADPD_code.Models
 
         [Required]
         [DataType(DataType.Text)]
-        public string StudyTime { get; set; }
+        public DateTime StudyTime { get; set; }
         [ForeignKey(nameof(Major))]
         public int MajorID { get; set; } // Khóa ngoại trỏ tới bảng Major
         public Major Major { get; set; } // Navigation property

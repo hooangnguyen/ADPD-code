@@ -34,7 +34,6 @@ namespace ADPD_code.Models
         [Required]
         [DataType(DataType.Text)]
         public string Address { get; set; }
-
         [Required]
         [DataType(DataType.Text)]
         public string Status { get; set; }

@@ -194,7 +194,7 @@
         <div class="profile-header">
             <div class="profile-avatar">👤</div>
             <div class="profile-name">@Model.FullName</div>
-            <div class="profile-id">Mã sinh viên: SV@Model.StudentId</div>
+            <div class="profile-id">Mã sinh viên: @Model.StudentId</div>
         </div>
 
         <!-- Profile Body -->
@@ -252,7 +252,7 @@
             <div class="info-grid">
                 <div class="info-item">
                     <div class="info-label">Mã sinh viên</div>
-                    <div class="info-value">SV@Model.StudentId</div>
+                    <div class="info-value">@Model.StudentId</div>
                 </div>
                 @if (Model.StudentClasses != null && Model.StudentClasses.Any())
                 {
