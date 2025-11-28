@@ -1,7 +1,8 @@
 ﻿@model IEnumerable<ADPD_code.Models.Enrollment>
 @{
     ViewData["Title"] = "Bảng điểm";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    var isPartial = ViewData["IsPartial"] as bool? ?? false;
+    Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
 }
 
 <link rel="stylesheet" href="~/css/Dashboard.css" />

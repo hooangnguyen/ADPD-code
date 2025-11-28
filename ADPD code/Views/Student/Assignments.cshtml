@@ -1,7 +1,8 @@
 ﻿@model IEnumerable<ADPD_code.Models.Assignment>
 @{
     ViewData["Title"] = "Bài tập";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    var isPartial = ViewData["IsPartial"] as bool? ?? false;
+    Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
     var submissions = ViewBag.Submissions as List<ADPD_code.Models.AssignmentSubmission>;
 }
 

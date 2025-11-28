@@ -14,7 +14,7 @@ namespace ADPD_code.Controllers
         }
 
         // Dashboard - Trang chủ sinh viên
-        public async Task<IActionResult> Dashboard()
+        public async Task<IActionResult> Dashboard(bool partial = false)
         {
             // Kiểm tra đăng nhập và role
             if (HttpContext.Session.GetString("Role") != "Student")
@@ -42,11 +42,17 @@ namespace ADPD_code.Controllers
             }
 
             ViewBag.Username = username;
+
+            if (partial)
+            {
+                return PartialView("_DashboardHomePartial");
+            }
+
             return View();
         }
 
         // Profile - Hồ sơ sinh viên
-        public async Task<IActionResult> Profile()
+        public async Task<IActionResult> Profile(bool partial = false)
         {
             if (HttpContext.Session.GetString("Role") != "Student")
             {
@@ -70,11 +76,12 @@ namespace ADPD_code.Controllers
                 return NotFound();
             }
 
-            return View(student);
+            ViewData["IsPartial"] = partial;
+            return partial ? PartialView(student) : View(student);
         }
 
         // Grades - Xem điểm
-        public Task<IActionResult> Grades()
+        public Task<IActionResult> Grades(bool partial = false)
         {
             if (HttpContext.Session.GetString("Role") != "Student")
             {
@@ -89,11 +96,12 @@ namespace ADPD_code.Controllers
 
             // TODO: Lấy danh sách điểm từ bảng Enrollment
             ViewBag.StudentId = studentId.Value;
-            return Task.FromResult<IActionResult>(View());
+            ViewData["IsPartial"] = partial;
+            return Task.FromResult<IActionResult>(partial ? PartialView() : View());
         }
 
         // Schedule - Lịch học
-        public IActionResult Schedule()
+        public IActionResult Schedule(bool partial = false)
         {
             if (HttpContext.Session.GetString("Role") != "Student")
             {
@@ -108,11 +116,12 @@ namespace ADPD_code.Controllers
 
             // TODO: Lấy lịch học từ DB
             ViewBag.StudentId = studentId.Value;
-            return View();
+            ViewData["IsPartial"] = partial;
+            return partial ? PartialView() : View();
         }
 
         // Assignments - Bài tập
-        public Task<IActionResult> Assignments()
+        public Task<IActionResult> Assignments(bool partial = false)
         {
             if (HttpContext.Session.GetString("Role") != "Student")
             {
@@ -127,7 +136,8 @@ namespace ADPD_code.Controllers
 
             // TODO: Lấy danh sách bài tập
             ViewBag.StudentId = studentId.Value;
-            return Task.FromResult<IActionResult>(View());
+            ViewData["IsPartial"] = partial;
+            return Task.FromResult<IActionResult>(partial ? PartialView() : View());
         }
     }
 }

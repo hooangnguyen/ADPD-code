@@ -1,7 +1,8 @@
 ﻿@model ADPD_code.Models.Student
 @{
     ViewData["Title"] = "Hồ sơ cá nhân";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    var isPartial = ViewData["IsPartial"] as bool? ?? false;
+    Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
 }
 
 <style>
