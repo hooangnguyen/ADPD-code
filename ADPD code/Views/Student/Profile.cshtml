@@ -267,7 +267,7 @@
                         <div class="class-list">
                             @foreach (var studentClass in Model.StudentClasses)
                             {
-                                <span class="class-badge">@studentClass.Class.ClassName</span>
+                                <span class="class-badge">@studentClass.Class?.ClassName ?? "N/A"</span>
                             }
                         </div>
                     </div>

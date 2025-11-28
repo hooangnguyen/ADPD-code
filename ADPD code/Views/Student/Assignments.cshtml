@@ -294,13 +294,13 @@
                     var daysLeft = (assignment.EndDate - now).TotalDays;
                     var submission = submissions?.FirstOrDefault(s => s.AssignmentID == assignment.AssignmentID);
                     var hasSubmitted = submission != null;
-                    var isGraded = hasSubmitted && submission.Score > 0;
+                    var isGraded = hasSubmitted && submission?.Score > 0;
 
                     <div class="assignment-card">
                         <div class="assignment-header">
                             <div>
                                 <div class="assignment-title">@assignment.Title</div>
-                                <div class="course-name">📚 @assignment.Course.CourseName</div>
+                                <div class="course-name">📚 @(assignment.Course?.CourseName ?? "N/A")</div>
                             </div>
                             @if (isGraded && submission != null)
                             {
@@ -329,7 +329,7 @@
                                 <span class="meta-icon">👨‍🏫</span>
                                 <div class="meta-content">
                                     <div class="meta-label">Giảng viên</div>
-                                    <div class="meta-value">@assignment.lecturer.FullName</div>
+                                    <div class="meta-value">@assignment.Lecturer?.FullName ?? "N/A"</div>
                                 </div>
                             </div>
                             <div class="meta-item">
@@ -359,7 +359,7 @@
                             </div>
                         </div>
 
-                        @if (hasSubmitted)
+                        @if (hasSubmitted && submission != null)
                         {
                             <div class="submission-info">
                                 <strong>✅ Bạn đã nộp bài này</strong><br />
@@ -404,17 +404,17 @@
                 {
                     var submission = submissions?.FirstOrDefault(s => s.AssignmentID == assignment.AssignmentID);
                     var hasSubmitted = submission != null;
-                    var isGraded = hasSubmitted && submission.Score > 0;
+                    var isGraded = hasSubmitted && submission?.Score > 0;
 
                     <div class="assignment-card" style="opacity: 0.8;">
                         <div class="assignment-header">
                             <div>
                                 <div class="assignment-title">@assignment.Title</div>
-                                <div class="course-name">📚 @assignment.Course.CourseName</div>
+                                <div class="course-name">📚 @(assignment.Course?.CourseName ?? "N/A")</div>
                             </div>
                             @if (isGraded)
                             {
-                                <span class="status-badge status-graded">✅ Đã chấm: @submission.Score điểm</span>
+                                <span class="status-badge status-graded">✅ Đã chấm: @(submission != null ? submission.Score : 0) điểm</span>
                             }
                             else if (hasSubmitted)
                             {
@@ -435,7 +435,7 @@
                                 <span class="meta-icon">👨‍🏫</span>
                                 <div class="meta-content">
                                     <div class="meta-label">Giảng viên</div>
-                                    <div class="meta-value">@assignment.lecturer.FullName</div>
+                                    <div class="meta-value">@assignment.Lecturer?.FullName ?? "N/A"</div>
                                 </div>
                             </div>
                             <div class="meta-item">
@@ -449,7 +449,7 @@
                             </div>
                         </div>
 
-                        @if (hasSubmitted && isGraded)
+                        @if (hasSubmitted && isGraded && submission != null)
                         {
                             <div class="submission-info">
                                 <strong>✅ Đã chấm điểm</strong><br />
@@ -486,23 +486,4 @@
         </div>
     }
 </div>
-
-<script>
-    function showTab(tabName) {
-        // Hide all tabs
-        document.querySelectorAll('.tab-content').forEach(tab => {
-            tab.style.display = 'none';
-        });
-
-        // Remove active class from all buttons
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-
-        // Show selected tab
-        document.getElementById(tabName + '-tab').style.display = 'block';
-
-        // Add active class to clicked button
-        event.target.classList.add('active');
-    }
-</script>
+<script src="~/js/site.js" asp-append-version="true"></script>

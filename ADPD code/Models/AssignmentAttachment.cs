@@ -7,12 +7,13 @@ namespace ADPD_code.Models
     public class AssignmentAttachment
     {
         [Key]
-        public string AttachmentID { get; set; }
-        [ForeignKey(nameof(Attendance))]
-        public Attendance Attendance { get; set; }
-        [Required]
-        [DataType(DataType.Text)]
-        public string FilePath { get; set; }
+        public int AttachmentID { get; set; }
 
+        [ForeignKey(nameof(Assignment))]
+        public int AssignmentID { get; set; }
+
+        [Required, StringLength(500)]
+        public string? FilePath { get; set; }
+        public Assignment? Assignment { get; set; }
     }
 }

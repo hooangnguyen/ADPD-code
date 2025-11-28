@@ -8,18 +8,20 @@ namespace ADPD_code.Models
     {
         [Key]
         public int UserID { get; set; }
-        [Required]
-        [DataType(DataType.Text)]
+
+        [Required, StringLength(50)]
         public string? Username { get; set; }
-        [Required]
-        [DataType(DataType.Text)]
+
+        [Required, StringLength(255)]
         public string? PasswordHash { get; set; }
-        public string? Role { get; set; } // -- Admin / Student / Lecturer   
+
+        [StringLength(20)]
+        public string? Role { get; set; }
+
         public int? StudentID { get; set; }
         public Student? Student { get; set; }
 
         public int? LecturerID { get; set; }
         public Lecturer? Lecturer { get; set; }
-
     }
 }

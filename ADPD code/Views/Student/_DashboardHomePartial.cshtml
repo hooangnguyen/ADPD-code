@@ -21,8 +21,7 @@
             <div class="stat-icon blue">📊</div>
             <div class="stat-info">
                 <h3>GPA Tích lũy</h3>
-                <div class="value">@ViewBag.GPA</div>
-                <div class="value">3.65</div>
+                <div class="value">@ViewBag.GPA</div>  
             </div>
         </div>
         <div class="stat-card">
@@ -30,7 +29,6 @@
             <div class="stat-info">
                 <h3>Tín chỉ đã học</h3>
                 <div class="value">@ViewBag.TotalCredits/@ViewBag.MaxCredits</div>
-                <div class="value">85/120</div>
             </div>
         </div>
         <div class="stat-card">
@@ -38,7 +36,6 @@
             <div class="stat-info">
                 <h3>Môn học kỳ này</h3>
                 <div class="value">@ViewBag.CurrentSemesterCourses</div>
-                <div class="value">6</div>
             </div>
         </div>
         <div class="stat-card">
@@ -46,7 +43,6 @@
             <div class="stat-info">
                 <h3>Lớp hôm nay</h3>
                 <div class="value">@ViewBag.TodayClasses</div>
-                <div class="value">3</div>
             </div>
         </div>
     </div>
@@ -192,9 +188,11 @@
                     <h2 class="card-title">Thao tác nhanh</h2>
                 </div>
                 <div class="quick-actions">
-                    <a href="#" class="action-btn">
-                        <div class="icon">✏️</div>
-                        <span>Đăng ký môn học</span>
+                <a href="@Url.Action("RegisterStudy", "Student")"
+                   class="action-btn"
+                   data-partial-url="@Url.Action("RegisterStudy", "Student", new { partial = true })">
+                    <div class="icon">✏️</div>
+                    <span>Đăng ký môn học</span>
                     </a>
                     <a href="@Url.Action("Grades", "Student")"
                        class="action-btn"

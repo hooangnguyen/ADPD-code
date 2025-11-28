@@ -1,0 +1,176 @@
+﻿@model IEnumerable<ADPD_code.Models.Course>
+@{
+    ViewData["Title"] = "Đăng ký học";
+    var isPartial = ViewData["IsPartial"] as bool? ?? false;
+    Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
+    var registeredCourseIds = ViewBag.RegisteredCourseIds as List<int> ?? new List<int>();
+    var currentSemester = ViewBag.CurrentSemester as string ?? "HK1";
+    var currentYear = ViewBag.CurrentAcademicYear as string ?? "2024-2025";
+}
+
+<link rel="stylesheet" href="~/css/RegisterStudy.css" />
+
+<div class="registration-container">
+    <a href="@Url.Action("Dashboard", "Student")" 
+       class="back-btn"
+       data-partial-url="@Url.Action("Dashboard", "Student", new { partial = true })">← Quay lại Dashboard</a>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            <span>✓</span>
+            <span>@TempData["SuccessMessage"]</span>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-error">
+            <span>⚠</span>
+            <span>@TempData["ErrorMessage"]</span>
+        </div>
+    }
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-title">📚 Đăng ký học phần</div>
+        <div class="semester-info">
+            Học kỳ: @currentSemester | Năm học: @currentYear
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+        <div class="summary-card">
+            <div class="summary-number" id="totalCourses">@Model.Count()</div>
+            <div class="summary-label">Môn học khả dụng</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-number" id="registeredCount">@registeredCourseIds.Count</div>
+            <div class="summary-label">Đã đăng ký</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-number" id="totalCredits">
+                @Model.Where(c => registeredCourseIds.Contains(c.CourseID)).Sum(c => c.Credits)
+            </div>
+            <div class="summary-label">Tổng tín chỉ</div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <form method="get" action="@Url.Action("RegisterStudy", "Student")" id="filterForm">
+            <input type="hidden" name="partial" value="@(isPartial ? "true" : "false")" />
+            <div class="filter-grid">
+                <div class="filter-item">
+                    <label class="filter-label">Tìm kiếm môn học</label>
+                    <input type="text" name="search" class="filter-input"
+                           placeholder="Nhập tên môn học..."
+                           value="@Context.Request.Query["search"]">
+                </div>
+                <div class="filter-item">
+                    <label class="filter-label">Số tín chỉ</label>
+                    <select name="credits" class="filter-select">
+                        <option value="">Tất cả</option>
+                        <option value="2" selected="@(Context.Request.Query["credits"] == "2")">2 tín chỉ</option>
+                        <option value="3" selected="@(Context.Request.Query["credits"] == "3")">3 tín chỉ</option>
+                        <option value="4" selected="@(Context.Request.Query["credits"] == "4")">4 tín chỉ</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label class="filter-label">Giảng viên</label>
+                    <input type="text" name="lecturer" class="filter-input"
+                           placeholder="Tên giảng viên..."
+                           value="@Context.Request.Query["lecturer"]">
+                </div>
+                <div class="filter-item">
+                    <button type="submit" class="btn-filter">🔍 Tìm kiếm</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Course Table -->
+    <div class="course-table-container">
+        @if (Model != null && Model.Any())
+        {
+            <table class="course-table">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">Môn học</th>
+                        <th style="width: 20%;">Giảng viên</th>
+                        <th style="width: 10%; text-align: center;">Tín chỉ</th>
+                        <th style="width: 15%; text-align: center;">Chỗ trống</th>
+                        <th style="width: 25%; text-align: right;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var course in Model)
+                    {
+                        var isRegistered = registeredCourseIds.Contains(course.CourseID);
+                        var enrolledCount = course.Enrollments?.Count ?? 0;
+                        var maxStudents = 50; // Giới hạn sinh viên mỗi lớp
+                        var availableSeats = maxStudents - enrolledCount;
+                        var isFull = availableSeats <= 0;
+
+                        <tr>
+                            <td>
+                                <div class="course-name">@course.CourseName</div>
+                                <div class="course-code">Mã môn: MH @course.CourseID.ToString().PadLeft(4, '0')</div>
+                            </td>
+                            <td>
+                                <div class="lecturer-name">
+                                    @(course.Lecturer?.FullName ?? "Chưa phân công")
+                                </div>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="credits-badge">@course.Credits TC</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <div class="seats-info">
+                                    <span class="@(isFull ? "seats-full" : "seats-available")">
+                                        @availableSeats/@maxStudents
+                                    </span>
+                                </div>
+                            </td>
+                            <td style="text-align: right;">
+                                @if (isRegistered)
+                                {
+                                    <span class="status-registered">
+                                        <span>✓</span>
+                                        <span>Đã đăng ký</span>
+                                    </span>
+                                }
+                                else if (isFull)
+                                {
+                                    <button class="btn-register" disabled>Đã đầy</button>
+                                }
+                                else
+                                {
+                                    <form method="post" action="@Url.Action("RegisterCourse", "Student")" style="display: inline;" onsubmit="return confirm('Bạn có chắc muốn đăng ký môn học này?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="courseId" value="@course.CourseID" />
+                                        <input type="hidden" name="semester" value="@currentSemester" />
+                                        <input type="hidden" name="academicYear" value="@currentYear" />
+                                        <input type="hidden" name="partial" value="@(isPartial ? "true" : "false")" />
+                                        <button type="submit" class="btn-register">
+                                            ➕ Đăng ký
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-icon">📚</div>
+                <p style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Không có môn học nào</p>
+                <p>Vui lòng thử lại với bộ lọc khác</p>
+            </div>
+        }
+    </div>
+</div>

@@ -7,26 +7,24 @@ namespace ADPD_code.Models
     public class Lecturer
     {
         [Key]
-        public int LecturerID { get; set; } // Sửa từ Id thành LecturerID
+        public int LecturerID { get; set; }
 
         [Required]
-        [DataType(DataType.Text)]
-        public string FullName { get; set; } // Sửa từ Name thành FullName
+        public string? FullName { get; set; }
 
-        [Required]
-        [DataType(DataType.EmailAddress)]
-        public string Email { get; set; }
+        [Required, DataType(DataType.EmailAddress)]
+        public string? Email { get; set; }
 
-        [Required]
-        [DataType(DataType.Text)]
-        public string Phone { get; set; } // Bổ sung cột Phone
-
-        // --- QUAN HỆ KHÓA NGOẠI VỚI DEPARTMENT ---
+        [StringLength(20)]
+        public string? Phone { get; set; }
 
         [ForeignKey(nameof(Department))]
-        public int DepartmentID { get; set; } // Khóa ngoại
+        public int DepartmentID { get; set; }
 
-        // Thuộc tính điều hướng (Navigation Property)
-        public Department Department { get; set; }
+        public Department? Department { get; set; }
+
+        // Navigation collections referenced by DbContext
+        public ICollection<Course> Courses { get; set; } = new List<Course>();
+        public ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
     }
 }

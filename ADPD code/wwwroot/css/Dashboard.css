@@ -474,3 +474,140 @@ body {
         padding: 20px;
     }
 }
+/*Grades*/
+.grades-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.grades-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+    .grades-header h1 {
+        margin-bottom: 10px;
+        font-size: 32px;
+    }
+
+.semester-group {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.semester-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.grades-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .grades-table th {
+        background: #f9f9f9;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .grades-table td {
+        padding: 15px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .grades-table tr:hover {
+        background: #fafafa;
+    }
+
+.score-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.score-excellent {
+    background: #d4edda;
+    color: #155724;
+}
+
+.score-good {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.score-average {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.score-poor {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.gpa-summary {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.gpa-item {
+    text-align: center;
+}
+
+    .gpa-item h3 {
+        color: #999;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .gpa-item .value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #667eea;
+    }
+
+.back-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #667eea;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+}
+
+    .back-btn:hover {
+        background: #764ba2;
+        transform: translateY(-2px);
+    }
+
+.no-data {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+}

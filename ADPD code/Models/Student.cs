@@ -5,6 +5,7 @@ using System.Collections.Generic; // Cần thêm namespace này
 
 namespace ADPD_code.Models
 {
+
     [Table("Student")]
     public class Student
     {
@@ -12,35 +13,30 @@ namespace ADPD_code.Models
         public int StudentId { get; set; }
 
         [Required]
-        [DataType(DataType.Text)]
-        public string FullName { get; set; }
+        public string? FullName { get; set; }
 
         [Required]
-        [DataType(DataType.Text)]
-        public string Gender { get; set; }
+        public string? Gender { get; set; }
 
         [Required]
-        [DataType(DataType.Date)]
         public DateTime DOB { get; set; }
 
         [Required]
-        [DataType(DataType.Text)]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [Required]
-        [DataType(DataType.Text)]
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
 
         [Required]
-        [DataType(DataType.Text)]
-        public string Address { get; set; }
+        public string? Address { get; set; }
+
         [Required]
-        [DataType(DataType.Text)]
-        public string Status { get; set; }
+        public string? Status { get; set; }
 
-        // --- THAY ĐỔI CHO QUAN HỆ N:M ---
-
-        // Thuộc tính điều hướng đến bảng trung gian StudentClass
-        public ICollection<StudentClass> StudentClasses { get; set; }
+        // Navigation collections used by ApplicationDbContext mapping
+        public ICollection<StudentClass> StudentClasses { get; set; } = new List<StudentClass>();
+        public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+        public ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
+        public ICollection<AssignmentSubmission> AssignmentSubmissions { get; set; } = new List<AssignmentSubmission>();
     }
 }

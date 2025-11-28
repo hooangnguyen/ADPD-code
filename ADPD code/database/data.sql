@@ -161,69 +161,122 @@ CREATE TABLE StudentClass (
     FOREIGN KEY (ClassID) REFERENCES Class(ClassID),
     UNIQUE (StudentID, ClassID) -- Đảm bảo cặp (SV, Lớp) là duy nhất
 );
--- =====================================
--- INSERT DỮ LIỆU MẪU
--- =====================================
+CREATE TABLE Timetable (
+    TimetableID INT IDENTITY PRIMARY KEY,
+    ClassID INT NOT NULL,
+    CourseID INT NOT NULL,
+    StudyDate DATE NOT NULL,
+    StartTime TIME NOT NULL,
+    EndTime TIME NOT NULL,
+    Room NVARCHAR(100),
+    FOREIGN KEY (ClassID) REFERENCES Class(ClassID),
+    FOREIGN KEY (CourseID) REFERENCES Course(CourseID)
+);
 
-<<<<<<< HEAD
-=======
--- ================================
--- 1. XÓA DỮ LIỆU TRÙNG (AN TOÀN)
--- ================================
-DELETE FROM Account 
-WHERE Username IN ('admin', 'gv_hangoclinh', 'gv_nguyenthanhtrieu', 'gv_nguyenthihonghanh');
+-- Dữ liệu cho Department
+SET IDENTITY_INSERT Department ON; -- Cần thiết nếu bạn muốn tự đặt ID (không bắt buộc với IDENTITY)
+INSERT INTO Department (DepartmentID, DepartmentName) VALUES
+(1, N'Khoa Công nghệ Thông tin'),
+(2, N'Khoa Kinh tế'),
+(3, N'Khoa Kỹ thuật Điện');
+SET IDENTITY_INSERT Department OFF;
 
-DELETE FROM Lecturer 
-WHERE LecturerId IN (4, 5, 6);
--- Nếu Id tự tạo, có thể dùng:
--- DELETE FROM Lecturer WHERE FullName IN (...)
+-- Dữ liệu cho Major
+SET IDENTITY_INSERT Major ON;
+INSERT INTO Major (MajorID, MajorName, Description) VALUES
+(1, 'Computer Science', N'Nghiên cứu về khoa học máy tính và lập trình.'),
+(2, 'Business Administration', N'Nghiên cứu về quản lý và vận hành doanh nghiệp.'),
+(3, 'Electrical Engineering', N'Nghiên cứu về kỹ thuật điện và điện tử.');
+SET IDENTITY_INSERT Major OFF;
 
+-- Dữ liệu cho Lecturer
+SET IDENTITY_INSERT Lecturer ON;
+INSERT INTO Lecturer (LecturerID, FullName, Email, Phone, DepartmentID) VALUES
+(1, N'Nguyễn Văn A', 'anv@university.edu.vn', '0901111111', 1),
+(2, N'Trần Thị B', 'btt@university.edu.vn', '0902222222', 1),
+(3, N'Lê Văn C', 'clv@university.edu.vn', '0903333333', 2),
+(4, N'Phạm Thị D', 'dpth@university.edu.vn', '0904444444', 3);
+SET IDENTITY_INSERT Lecturer OFF;
 
--- ================================
--- 2. THÊM 3 GIẢNG VIÊN
--- ================================
-INSERT INTO Lecturer (FullName, Email, Phone, DepartmentId)
-VALUES 
-    (N'Hà Ngọc Linh',      'linh@example.com',  '0912345678', 1),
-    (N'Nguyễn Thanh Triều','trieu@example.com', '0912345679', 1),
-    (N'Nguyễn Thị Hồng Hạnh','hanh@example.com','0912345680', 2);
+-- Dữ liệu cho Class
+SET IDENTITY_INSERT Class ON;
+INSERT INTO Class (ClassID, ClassName, StudyTime, MajorID) VALUES
+(1, N'CS2025A', '2025-09-05 08:00:00', 1),
+(2, N'BA2025B', '2025-09-05 08:00:00', 2),
+(3, N'EE2025C', '2025-09-05 08:00:00', 3);
+SET IDENTITY_INSERT Class OFF;
 
+-- Dữ liệu cho Student
+SET IDENTITY_INSERT Student ON;
+INSERT INTO Student (StudentID, FullName, Gender, DOB, Email, Phone, Address, Status) VALUES
+(1, N'Hồ Hoàng Q', N'Nam', '2005-01-15', 'hoangq@gmail.com', '0911223344', N'Thủ Đức, TP.HCM', N'Active'),
+(2, N'Phan Thị K', N'Nữ', '2005-03-20', 'phanthik@gmail.com', '0911223355', N'Quận 1, TP.HCM', N'Active'),
+(3, N'Đặng Văn L', N'Nam', '2004-11-01', 'vanl@gmail.com', '0911223366', N'Quận 3, TP.HCM', N'Active'),
+(4, N'Võ Thị M', N'Nữ', '2006-05-25', 'vom@gmail.com', '0911223377', N'Quận 5, TP.HCM', N'Active');
+SET IDENTITY_INSERT Student OFF;
 
--- ================================
--- 3. LẤY ID CÁC GIẢNG VIÊN
--- ================================
-SELECT * FROM Lecturer;
+-- Dữ liệu cho Course
+SET IDENTITY_INSERT Course ON;
+INSERT INTO Course (CourseID, CourseName, Credits, Description, LecturerID) VALUES
+(1, N'Cơ sở Dữ liệu', 3, N'Lý thuyết và thực hành SQL.', 1),
+(2, N'Lập trình Hướng đối tượng', 4, N'Giới thiệu về OOP.', 2),
+(3, N'Kinh tế Vi mô', 3, N'Nguyên lý kinh tế cơ bản.', 3),
+(4, N'Mạch Điện tử', 4, N'Phân tích và thiết kế mạch điện.', 4);
+SET IDENTITY_INSERT Course OFF;
 
+-- Dữ liệu cho StudentClass
+INSERT INTO StudentClass (StudentID, ClassID) VALUES
+(1, 1),
+(2, 1),
+(3, 2),
+(4, 3),
+(1, 2);
 
--- ================================
--- 4. THÊM TÀI KHOẢN CHO GIẢNG VIÊN (MẬT KHẨU CHƯA MÃ HÓA)
--- ================================
-INSERT INTO Account (Username, PasswordHash, Role, LecturerId)
-VALUES
-    ('gv_hangoclinh',       '123456', 'Lecturer', (SELECT LecturerId FROM Lecturer WHERE Email='linh@example.com')),
-    ('gv_nguyenthanhtrieu', '123456', 'Lecturer', (SELECT LecturerId FROM Lecturer WHERE Email='trieu@example.com')),
-    ('gv_nguyenthihonghanh','123456', 'Lecturer', (SELECT LecturerId FROM Lecturer WHERE Email='hanh@example.com'));
+-- Dữ liệu cho Timetable
+INSERT INTO Timetable (ClassID, CourseID, StudyDate, StartTime, EndTime, Room) VALUES
+(1, 1, '2025-11-10', '08:00:00', '10:30:00', 'Room A101'),
+(1, 2, '2025-11-12', '13:00:00', '16:00:00', 'Room A102'),
+(2, 3, '2025-11-10', '10:30:00', '13:00:00', 'Room B201'),
+(3, 4, '2025-11-13', '08:00:00', '11:00:00', 'Room C301');
 
+-- Dữ liệu cho Enrollment
+INSERT INTO Enrollment (StudentID, CourseID, Semester, AcademicYear, Score) VALUES
+(1, 1, N'Kỳ 1', '2025-2026', 8.5),
+(1, 2, N'Kỳ 1', '2025-2026', 7.0),
+(2, 1, N'Kỳ 1', '2025-2026', 9.2),
+(3, 3, N'Kỳ 1', '2025-2026', 7.5),
+(4, 4, N'Kỳ 1', '2025-2026', NULL);
 
--- ================================
--- 5. THÊM TÀI KHOẢN ADMIN
--- ================================
-INSERT INTO Account (Username, PasswordHash, Role, LecturerId)
-VALUES ('admin', '123456', 'Admin', NULL);
+-- Dữ liệu cho Attendance
+INSERT INTO Attendance (StudentID, CourseID, Date, Status) VALUES
+(1, 1, '2025-11-10', N'Present'),
+(2, 1, '2025-11-10', N'Present'),
+(3, 3, '2025-11-10', N'Present'),
+(1, 2, '2025-11-12', N'Absent'),
+(4, 4, '2025-11-13', N'Present');
 
+-- Dữ liệu cho Account
+INSERT INTO Account (Username, PasswordHash, Role, StudentID, LecturerID) VALUES
+('admin', 'hashed_admin_password', 'Admin', NULL, NULL),
+('hoangq', 'hashed_student1_password', 'Student', 1, NULL),
+('phanthik', 'hashed_student2_password', 'Student', 2, NULL),
+('nguyenvana', 'hashed_lecturer1_password', 'Lecturer', NULL, 1);
 
--- ================================
--- 6. KIỂM TRA KẾT QUẢ
--- ================================
-SELECT * FROM Account;
+-- Dữ liệu cho Assignment
+SET IDENTITY_INSERT Assignment ON;
+INSERT INTO Assignment (AssignmentID, CourseID, LecturerID, Title, Description, StartDate, EndDate) VALUES
+(1, 1, 1, N'Bài tập lớn CSDL', N'Thiết kế và triển khai CSDL cho hệ thống quản lý thư viện.', '2025-11-15 09:00:00', '2025-12-15 23:59:59'),
+(2, 2, 2, N'Project OOP', N'Xây dựng ứng dụng quản lý sinh viên bằng Java/C#.', '2025-11-20 08:00:00', '2025-12-20 23:59:59');
+SET IDENTITY_INSERT Assignment OFF;
 
+-- Dữ liệu cho AssignmentAttachment
+INSERT INTO AssignmentAttachment (AssignmentID, FilePath) VALUES
+(1, '/assignments/csdl/yeucau_bttl.pdf'),
+(2, '/assignments/oop/template_project.zip');
 
->>>>>>> 54a9c6827043fd99a2ece98a3fa1275f2b5cb6d9
--- =====================================
--- KẾT THÚC INSERT DỮ LIỆU MẪU
--- =====================================
---======================================
---1. Cài đặt BCrypt
---bashcd "ADPD code"
---dotnet add package BCrypt.Net-Next
---=======================================
+-- Dữ liệu cho AssignmentSubmission
+INSERT INTO AssignmentSubmission (AssignmentID, StudentID, SubmitDate, FilePath, AnswerText, Score, Feedback) VALUES
+(1, 1, '2025-12-10 15:30:00', '/submissions/bttl/hoangq_csdl.zip', NULL, 9.0, N'Bài làm tốt, triển khai đầy đủ các yêu cầu.'),
+(1, 2, '2025-12-14 20:00:00', NULL, N'Đã nộp bài tập lớn qua hệ thống khác.', 8.5, N'Đầy đủ, cần chú ý chuẩn hóa thêm.'),
+(2, 1, '2025-12-18 10:00:00', '/submissions/oop/hoangq_oop_project.zip', NULL, NULL, NULL);
+

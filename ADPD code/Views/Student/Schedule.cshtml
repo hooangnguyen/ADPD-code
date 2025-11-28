@@ -232,7 +232,7 @@
                     </div>
                     <div class="course-detail">
                         <div class="course-detail-label">Tín chỉ</div>
-                        <div class="course-detail-value">@(course.Credits ?? "N/A")</div>
+                        <div class="course-detail-value">@(course.Credits == 0 ? "N/A" : course.Credits.ToString())</div>
                     </div>
                     <div class="course-detail">
                         <div class="course-detail-label">Giảng viên</div>

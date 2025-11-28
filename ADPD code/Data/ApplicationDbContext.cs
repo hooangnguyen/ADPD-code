@@ -9,18 +9,27 @@ namespace ADPD_code.Data
             : base(options)
         {
         }
-
+        public DbSet<Timetable> Timetable { get; set; }
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<AssignmentSubmission> AssignmentSubmissions { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Lecturer> Lecturers { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
         public DbSet<Account> Accounts { get; set; }
+        public DbSet<Enrollment> Enrollments { get; set; }
+        public DbSet<Attendance> Attendances { get; set; }
+        public DbSet<Class> Classes { get; set; }
+        public DbSet<Major> Majors { get; set; }
+        public DbSet<StudentClass> StudentClasses { get; set; }
+        public DbSet<AssignmentAttachment> AssignmentAttachments { get; set; }
 
         // override OnModelCreating if you need custom mapping
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            // example: modelBuilder.Entity<Student>().ToTable("Student");
+
+            // ========== STUDENT ==========
             modelBuilder.Entity<Student>(e =>
             {
                 e.ToTable("Student");
@@ -33,104 +42,257 @@ namespace ADPD_code.Data
                 e.Property(s => s.Address).HasColumnName("Address").HasMaxLength(500).IsRequired();
                 e.Property(s => s.Status).HasColumnName("Status").HasMaxLength(50).IsRequired();
             });
-            // 1. Thiết lập mối quan hệ: Student - StudentClass
+
+            // ========== STUDENTCLASS (Bảng trung gian) ==========
             modelBuilder.Entity<StudentClass>(entity =>
-                {
-                    entity.ToTable("StudentClass");
-                    entity.HasKey(sc => sc.StudentClassID); // Khóa chính của bảng trung gian
-                    // 1. Quan hệ: StudentClass -> Student
-                    entity.HasOne(sc => sc.Student)
-                          .WithMany(s => s.StudentClasses)     // Student có nhiều StudentClasses
-                          .HasForeignKey(sc => sc.StudentId)
-                          .OnDelete(DeleteBehavior.Cascade);
-                    // 2. Quan hệ: StudentClass -> Class
-                    entity.HasOne(sc => sc.Class)
-                          .WithMany(c => c.StudentClasses)     // Class có nhiều StudentClasses
-                          .HasForeignKey(sc => sc.ClassID)
-                          .OnDelete(DeleteBehavior.Cascade);
-                });
+            {
+                entity.ToTable("StudentClass");
+                entity.HasKey(sc => sc.StudentClassID);
+
+                // Quan hệ: StudentClass -> Student
+                entity.HasOne(sc => sc.Student)
+                      .WithMany(s => s.StudentClasses)
+                      .HasForeignKey(sc => sc.StudentId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Quan hệ: StudentClass -> Class
+                entity.HasOne(sc => sc.Class)
+                      .WithMany(c => c.StudentClasses)
+                      .HasForeignKey(sc => sc.ClassID)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ========== CLASS ==========
             modelBuilder.Entity<Class>(c =>
             {
-                c.ToTable("Class"); // Tên bảng trong SQL
-                // 1. Khóa chính
+                c.ToTable("Class");
                 c.HasKey(x => x.ClassID);
-                // 2. Các thuộc tính cơ bản
                 c.Property(x => x.ClassName).HasColumnName("ClassName").HasMaxLength(100).IsRequired();
-                c.Property(x => x.StudyTime).HasColumnName("StudyTime").HasMaxLength(20).IsRequired(); 
+                c.Property(x => x.StudyTime).HasColumnName("StudyTime").IsRequired();
                 c.Property(x => x.MajorID).HasColumnName("MajorID").IsRequired();
-                // 4. Thiết lập mối quan hệ với bảng Major
-                // "Một Lớp (Class) thuộc về Một Ngành (Major)"
+
+                // Quan hệ: Class -> Major
                 c.HasOne(x => x.Major)
-                 .WithMany(m => m.Classes)         
-                 .HasForeignKey(x => x.MajorID)    // Khóa ngoại liên kết
-                 .OnDelete(DeleteBehavior.Cascade);// Xóa Ngành -> Xóa luôn các Lớp thuộc ngành đó (tùy chọn)
+                 .WithMany(m => m.Classes)
+                 .HasForeignKey(x => x.MajorID)
+                 .OnDelete(DeleteBehavior.Cascade);
             });
+
+            // ========== MAJOR ==========
             modelBuilder.Entity<Major>(m =>
             {
-                m.ToTable("Major"); // Tên bảng trong SQL
-                // 1. Khóa chính
+                m.ToTable("Major");
                 m.HasKey(x => x.MajorID);
-                // 2. Các thuộc tính cơ bản
                 m.Property(x => x.MajorName).HasColumnName("MajorName").HasMaxLength(100).IsRequired();
-                m.Property(x => x.Description).HasColumnName("Description").HasMaxLength(500).IsRequired();
-            });// Add other entities similarly
-               // Thêm cấu hình này vào OnModelCreating
+                m.Property(x => x.Description).HasColumnName("Description").HasMaxLength(500);
+            });
+
+            // ========== DEPARTMENT ==========
             modelBuilder.Entity<Department>(d =>
             {
                 d.ToTable("Department");
                 d.HasKey(x => x.DepartmentID);
-                d.Property(x => x.DepartmentName)
-                 .HasMaxLength(100)
-                 .IsRequired();
-                // Không cần cấu hình lại HasMany ở đây vì đã cấu hình bên Lecturer rồi
-                // EF Core sẽ tự hiểu 2 chiều.
+                d.Property(x => x.DepartmentName).HasMaxLength(100).IsRequired();
+                d.Property(x => x.Description).HasMaxLength(255);
             });
+
+            // ========== LECTURER ==========
             modelBuilder.Entity<Lecturer>(l =>
             {
                 l.ToTable("Lecturer");
-                // Khóa chính
                 l.HasKey(x => x.LecturerID);
                 l.Property(x => x.FullName).HasColumnName("FullName").HasMaxLength(100).IsRequired();
                 l.Property(x => x.Email).HasColumnName("Email").HasMaxLength(100).IsRequired();
-                l.Property(x => x.Phone).HasColumnName("Phone").HasMaxLength(20).IsRequired();
-                l.Property(x => x.DepartmentID).HasColumnName("DepartmentID").IsRequired();
+                l.Property(x => x.Phone).HasColumnName("Phone").HasMaxLength(20);
+                l.Property(x => x.DepartmentID).HasColumnName("DepartmentID");
 
-                // Thiết lập quan hệ
+                // Quan hệ: Lecturer -> Department
                 l.HasOne(x => x.Department)
-                 .WithMany(d => d.Lecturers) 
+                 .WithMany(d => d.Lecturers)
                  .HasForeignKey(x => x.DepartmentID)
                  .OnDelete(DeleteBehavior.Cascade);
             });
+
+            // ========== COURSE ==========
+            modelBuilder.Entity<Course>(c =>
+            {
+                c.ToTable("Course");
+                c.HasKey(x => x.CourseID);
+                c.Property(x => x.CourseName).HasColumnName("CourseName").HasMaxLength(100).IsRequired();
+                c.Property(x => x.Credits).HasColumnName("Credits").IsRequired();
+                c.Property(x => x.Description).HasColumnName("Description").HasMaxLength(255);
+                c.Property(x => x.LecturerID).HasColumnName("LecturerID");
+
+                // Quan hệ: Course -> Lecturer
+                c.HasOne(x => x.Lecturer)
+                 .WithMany(l => l.Courses)
+                 .HasForeignKey(x => x.LecturerID)
+                 .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // ========== ENROLLMENT ==========
+            modelBuilder.Entity<Enrollment>(e =>
+            {
+                e.ToTable("Enrollment");
+                e.HasKey(x => x.EnrollmentID);
+                e.Property(x => x.StudentID).HasColumnName("StudentID").IsRequired();
+                e.Property(x => x.CourseID).HasColumnName("CourseID").IsRequired();
+                e.Property(x => x.Semester).HasColumnName("Semester").HasMaxLength(20);
+                e.Property(x => x.AcademicYear).HasColumnName("AcademicYear").HasMaxLength(20);
+                e.Property(x => x.Score).HasColumnName("Score");
+
+                // Quan hệ: Enrollment -> Student
+                e.HasOne(x => x.Student)
+                 .WithMany(s => s.Enrollments)
+                 .HasForeignKey(x => x.StudentID)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+                // Quan hệ: Enrollment -> Course
+                e.HasOne(x => x.Course)
+                 .WithMany(c => c.Enrollments)
+                 .HasForeignKey(x => x.CourseID)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ========== ATTENDANCE ==========
+            modelBuilder.Entity<Attendance>(a =>
+            {
+                a.ToTable("Attendance");
+                a.HasKey(x => x.AttendanceID);
+                a.Property(x => x.StudentID).HasColumnName("StudentID").IsRequired();
+                a.Property(x => x.CourseID).HasColumnName("CourseID").IsRequired();
+                a.Property(x => x.Date).HasColumnName("Date").IsRequired();
+                a.Property(x => x.Status).HasColumnName("Status").HasMaxLength(20);
+
+                // Quan hệ: Attendance -> Student
+                a.HasOne(x => x.Student)
+                 .WithMany(s => s.Attendances)
+                 .HasForeignKey(x => x.StudentID)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+                // Quan hệ: Attendance -> Course
+                a.HasOne(x => x.Course)
+                 .WithMany(c => c.Attendances)
+                 .HasForeignKey(x => x.CourseID)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ========== ASSIGNMENT ==========
+            modelBuilder.Entity<Assignment>(a =>
+            {
+                a.ToTable("Assignment");
+                a.HasKey(x => x.AssignmentID);
+                a.Property(x => x.CourseID).HasColumnName("CourseID").IsRequired();
+                a.Property(x => x.LecturerID).HasColumnName("LecturerID").IsRequired();
+                a.Property(x => x.Title).HasColumnName("Title").HasMaxLength(200).IsRequired();
+                a.Property(x => x.Description).HasColumnName("Description");
+                a.Property(x => x.StartDate).HasColumnName("StartDate").IsRequired();
+                a.Property(x => x.EndDate).HasColumnName("EndDate").IsRequired();
+
+                // Quan hệ: Assignment -> Course
+                a.HasOne(x => x.Course)
+                 .WithMany(c => c.Assignments)
+                 .HasForeignKey(x => x.CourseID)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+                // Quan hệ: Assignment -> Lecturer
+                a.HasOne(x => x.Lecturer)
+                 .WithMany(l => l.Assignments)
+                 .HasForeignKey(x => x.LecturerID)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ========== ASSIGNMENTATTACHMENT ==========
+            modelBuilder.Entity<AssignmentAttachment>(a =>
+            {
+                a.ToTable("AssignmentAttachment");
+                a.HasKey(x => x.AttachmentID);
+                a.Property(x => x.AssignmentID).HasColumnName("AssignmentID").IsRequired();
+                a.Property(x => x.FilePath).HasColumnName("FilePath").HasMaxLength(500).IsRequired();
+
+                // Quan hệ: AssignmentAttachment -> Assignment
+                a.HasOne(x => x.Assignment)
+                 .WithMany(a => a.AssignmentAttachments)
+                 .HasForeignKey(x => x.AssignmentID)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ========== ASSIGNMENTSUBMISSION ==========
+            modelBuilder.Entity<AssignmentSubmission>(a =>
+            {
+                a.ToTable("AssignmentSubmission");
+                a.HasKey(x => x.SubmissionID);
+                a.Property(x => x.AssignmentID).HasColumnName("AssignmentID").IsRequired();
+                a.Property(x => x.StudentID).HasColumnName("StudentID").IsRequired();
+                a.Property(x => x.SubmitDate).HasColumnName("SubmitDate").IsRequired();
+                a.Property(x => x.FilePath).HasColumnName("FilePath").HasMaxLength(500);
+                a.Property(x => x.AnswerText).HasColumnName("AnswerText");
+                a.Property(x => x.Score).HasColumnName("Score");
+                a.Property(x => x.Feedback).HasColumnName("Feedback");
+
+                // Quan hệ: AssignmentSubmission -> Assignment
+                a.HasOne(x => x.Assignment)
+                 .WithMany(a => a.AssignmentSubmissions)
+                 .HasForeignKey(x => x.AssignmentID)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+                // Quan hệ: AssignmentSubmission -> Student
+                a.HasOne(x => x.Student)
+                 .WithMany(s => s.AssignmentSubmissions)
+                 .HasForeignKey(x => x.StudentID)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ========== ACCOUNT ==========
             modelBuilder.Entity<Account>(A =>
             {
                 A.ToTable("Account");
-                // 1. Khóa chính
                 A.HasKey(a => a.UserID);
-                // 2. Username
+
                 A.Property(a => a.Username)
                  .HasColumnName("Username")
                  .HasMaxLength(50)
                  .IsRequired();
-                // THÊM: Ràng buộc Unique cho Username (Khớp với SQL UNIQUE)
                 A.HasIndex(a => a.Username).IsUnique();
 
-                // 3. PasswordHash
                 A.Property(a => a.PasswordHash).HasColumnName("PasswordHash").HasMaxLength(255).IsRequired();
                 A.Property(a => a.Role).HasColumnName("Role").HasMaxLength(20).IsRequired();
                 A.Property(a => a.StudentID).IsRequired(false);
                 A.Property(a => a.LecturerID).IsRequired(false);
-                // 6. Thiết lập mối quan hệ (Nếu trong Model Account có biến Student và Lecturer)
+
+                // Quan hệ: Account -> Student
                 A.HasOne(a => a.Student)
-                 .WithMany() // Hoặc .WithOne() nếu thiết lập 1-1
+                 .WithMany()
                  .HasForeignKey(a => a.StudentID)
-                 .OnDelete(DeleteBehavior.Restrict); // Tránh xóa nhầm
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                // Quan hệ: Account -> Lecturer
                 A.HasOne(a => a.Lecturer)
                  .WithMany()
                  .HasForeignKey(a => a.LecturerID)
                  .OnDelete(DeleteBehavior.Restrict);
             });
-        }
-
-
+            modelBuilder.Entity<Timetable>(t =>
+            {
+                t.ToTable("Timetable");
+                t.HasKey(x => x.TimetableID);
+                t.Property(x => x.ClassID).HasColumnName("ClassID").IsRequired();
+                t.Property(x => x.CourseID).HasColumnName("CourseID").IsRequired();
+                t.Property(x => x.StudyDate).HasColumnName("StudyDate").IsRequired();
+                t.Property(x => x.StartTime).HasColumnName("StartTime").IsRequired();
+                t.Property(x => x.EndTime).HasColumnName("EndTime").IsRequired();
+                t.Property(x => x.Room).HasColumnName("Room").HasMaxLength(100);
+                // Quan hệ: Timetable -> Class
+                t.HasOne(x => x.Class)
+                 .WithMany(c => c.Timetable)
+                 .HasForeignKey(x => x.ClassID)
+                 .OnDelete(DeleteBehavior.Cascade);
+                // Quan hệ: Timetable -> Course
+                t.HasOne(x => x.Course)
+                 .WithMany(c => c.Timetable)
+                 .HasForeignKey(x => x.CourseID)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+        } 
     }
 }

@@ -3,25 +3,27 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ADPD_code.Models
 {
-    [Table("Enrollments")]
+    [Table("Enrollment")]
     public class Enrollment
     {
         [Key]
         public int EnrollmentID { get; set; }
+
         [ForeignKey(nameof(Student))]
         public int StudentID { get; set; }
-        public Student Student { get; set; }
+
         [ForeignKey(nameof(Course))]
         public int CourseID { get; set; }
-        public Course Course { get; set; }
-        [Required]
-        [DataType(DataType.Text)]
-        public string Semester { get; set; }
-        [Required]
-        [DataType(DataType.Text)]
-        public string AcademicYear { get; set; }
-        [Required]
-        [DataType(DataType.Text)]
-        public string Score { get; set; }
+
+        [StringLength(20)]
+        public string? Semester { get; set; }
+
+        [StringLength(20)]
+        public string? AcademicYear { get; set; }
+
+        public double? Score { get; set; }
+
+        public Student? Student { get; set; }
+        public Course? Course { get; set; }
     }
 }

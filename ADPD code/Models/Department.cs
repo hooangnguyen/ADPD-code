@@ -11,14 +11,13 @@ namespace ADPD_code.Models
         [Key]
         public int DepartmentID { get; set; }
 
-        [Required]
-        [DataType(DataType.Text)]
-        [StringLength(100)] // 2. Thêm giới hạn độ dài cho khớp NVARCHAR(100)
+        [Required, StringLength(100)]
         public string? DepartmentName { get; set; }
-        [DataType(DataType.Text)]
-        [StringLength(255)] 
+
+        [StringLength(255)]
         public string? Description { get; set; }
-        // Navigation property: chuẩn rồi
+
+        // Navigation
         public ICollection<Lecturer> Lecturers { get; set; } = new List<Lecturer>();
     }
 }

@@ -59,7 +59,8 @@ else
                 </a>
             </li>
             <li class="menu-item">
-                <a href="#">
+                <a href="@Url.Action("RegisterStudy", "Student")"
+                   data-partial-url="@Url.Action("RegisterStudy", "Student", new { partial = true })">
                     <span class="menu-icon">✏️</span>
                     <span>Đăng ký học</span>
                 </a>
