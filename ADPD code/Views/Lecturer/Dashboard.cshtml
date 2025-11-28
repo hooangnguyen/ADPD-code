@@ -1,18 +1,22 @@
-﻿@{
-    Layout = null;
-}
-<meta charset="utf-8" />
-<link rel="stylesheet" href="~/css/Dashboardlecture.css" />
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Giảng viên</title>
+    <link rel="stylesheet" href="~/css/Dashboardlecture.css" />
+</head>
+<body>
 
 <aside class="sidebar">
     <div class="sidebar-header">
         <a href="@Url.Action("Dashboard", "Lecturer")" class="sidebar-logo">
-            👨‍🏫 TeacherMS
+            👩‍🏫 TeacherMS
         </a>
     </div>
 
     <div class="user-profile">
-        <div class="user-avatar">👤</div>
+        <div class="user-avatar"></div>
         <div class="user-info">
             <h3>@(ViewBag.FullName ?? "Giảng viên")</h3>
             <p>Giảng viên</p>
@@ -40,25 +44,31 @@
         </li>
         <li class="menu-item">
             <a href="#">
-                <span class="menu-icon">💯</span>
+                <span class="menu-icon">✅</span>
                 <span>Chấm điểm</span>
             </a>
         </li>
         <li class="menu-item">
             <a href="#">
-                <span class="menu-icon">✅</span>
+                <span class="menu-icon">📋</span>
                 <span>Điểm danh</span>
             </a>
         </li>
         <li class="menu-item">
             <a href="#">
-                <span class="menu-icon">🧑‍🎓</span>
+                <span class="menu-icon">🎓</span>
                 <span>Sinh viên</span>
             </a>
         </li>
         <li class="menu-item">
+            <a href="#">
+                <span class="menu-icon">🗂️</span>
+                <span>Hồ sơ</span>
+            </a>
+        </li>
+        <li class="menu-item">
             <a href="@Url.Action("Logout", "Login")">
-                <span class="menu-icon">🚪</span>
+                <span class="menu-icon">🔒</span>
                 <span>Đăng xuất</span>
             </a>
         </li>
@@ -81,7 +91,7 @@
                 <span class="notification-badge">5</span>
             </button>
             <div class="user-menu">
-                <img src="" alt="Ảnh đại diện">
+                <img src="" alt="avatar">
                 <span>@(ViewBag.FullName ?? "Giảng viên")</span>
             </div>
         </div>
@@ -104,14 +114,14 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon orange">✍️</div>
+                <div class="stat-icon orange">📝</div>
                 <div class="stat-info">
                     <h3>Bài tập chưa chấm</h3>
                     <div class="value">23</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon purple">🗓️</div>
+                <div class="stat-icon purple">⏰</div>
                 <div class="stat-info">
                     <h3>Lớp hôm nay</h3>
                     <div class="value">2</div>
@@ -201,7 +211,7 @@
                             <p>Trần Thị B - CNPM02</p>
                             <span class="submission-time">5 giờ trước</span>
                         </div>
-                        <span class="status-badge graded">Đã chấm: 8.5đ</span>
+                        <span class="status-badge graded">Đã chấm: 8.5</span>
                     </div>
                     <div class="submission-item">
                         <div class="submission-info">
@@ -237,16 +247,19 @@
             </div>
         </div>
     </div>
+
 </main>
 
-@section Scripts {
-    <script>
-        // Active menu item
-        document.querySelectorAll('.menu-item a').forEach(link => {
-            if (link.href === window.location.href) {
-                document.querySelectorAll('.menu-item a').forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-            }
-        });
-    </script>
-}
+<!-- Scripts -->
+<script>
+    // Active menu item
+    document.querySelectorAll('.menu-item a').forEach(link => {
+        if (link.href === window.location.href) {
+            document.querySelectorAll('.menu-item a').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+        }
+    });
+</script>
+
+</body>
+</html>
