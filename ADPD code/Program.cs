@@ -1,5 +1,7 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ADPD_code.Data;
+using ADPD_code.Services.Notification;
+using ADPD_code.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,15 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+// ========== NOTIFICATION SERVICES REGISTRATION ==========
+builder.Services.AddScoped<INotificationFactory, NotificationFactory>();
+builder.Services.AddScoped<INotificationManager, NotificationManager>();
+
+// Register notification implementations (optional)
+builder.Services.AddScoped<EmailNotificationService>();
+builder.Services.AddScoped<SMSNotificationService>();
+builder.Services.AddScoped<InAppNotificationService>();
+builder.Services.AddScoped<PushNotificationService>();
 
 var app = builder.Build();
 
@@ -41,5 +52,31 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// TEMP: minimal test endpoint to send a notification
+// Usage:
+//  GET /test-notification?recipientId=1&title=Hi&message=Hello&type=InApp&email=someone@domain.com
+app.MapGet("/test-notification", async (
+    int recipientId,
+    string title,
+    string message,
+    string type,
+    string? email,
+    INotificationManager notificationManager) =>
+{
+    if (!Enum.TryParse<NotificationType>(type, true, out var ntype))
+        return Results.BadRequest($"Invalid notification type '{type}'. Valid: Email,SMS,InApp,Push");
+
+    var success = await notificationManager.SendNotificationAsync(
+        recipientId,
+        title,
+        message,
+        ntype,
+        email: email,
+        phone: null,
+        priority: "Medium");
+
+    return success ? Results.Ok("Notification queued/sent") : Results.Problem("Failed to send notification");
+});
 
 app.Run();

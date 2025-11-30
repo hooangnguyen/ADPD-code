@@ -10,6 +10,8 @@ namespace ADPD_code.Data
         {
         }
         public DbSet<Timetable> Timetable { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<NotificationLog> NotificationLogs { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<AssignmentSubmission> AssignmentSubmissions { get; set; }
         public DbSet<Student> Students { get; set; }
@@ -292,6 +294,85 @@ namespace ADPD_code.Data
                  .WithMany(c => c.Timetable)
                  .HasForeignKey(x => x.CourseID)
                  .OnDelete(DeleteBehavior.Cascade);
+            });
+            // ========== NOTIFICATION ==========
+            modelBuilder.Entity<Notification>(e =>
+            {
+                e.ToTable("Notification");
+                e.HasKey(x => x.NotificationID);
+
+                e.Property(x => x.RecipientID)
+                    .HasColumnName("RecipientID")
+                    .IsRequired();
+
+                e.Property(x => x.Title)
+                    .HasColumnName("Title")
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                e.Property(x => x.Message)
+                    .HasColumnName("Message")
+                    .IsRequired();
+
+                e.Property(x => x.Type)
+                    .HasColumnName("Type")
+                    .HasConversion<string>()
+                    .IsRequired();
+
+                e.Property(x => x.Status)
+                    .HasColumnName("Status")
+                    .HasConversion<string>()
+                    .IsRequired();
+
+                e.Property(x => x.CreatedDate)
+                    .HasColumnName("CreatedDate")
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                e.Property(x => x.SentDate)
+                    .HasColumnName("SentDate")
+                    .IsRequired(false);
+
+                e.Property(x => x.RecipientEmail)
+                    .HasColumnName("RecipientEmail")
+                    .HasMaxLength(255);
+
+                e.Property(x => x.RecipientPhone)
+                    .HasColumnName("RecipientPhone")
+                    .HasMaxLength(20);
+
+                e.Property(x => x.ErrorMessage)
+                    .HasColumnName("ErrorMessage");
+
+                e.Property(x => x.Priority)
+                    .HasColumnName("Priority")
+                    .HasMaxLength(50);
+            });
+
+            // ========== NOTIFICATION LOG ==========
+            modelBuilder.Entity<NotificationLog>(e =>
+            {
+                e.ToTable("NotificationLog");
+                e.HasKey(x => x.LogID);
+
+                e.Property(x => x.NotificationID)
+                    .HasColumnName("NotificationID")
+                    .IsRequired();
+
+                e.Property(x => x.LogDate)
+                    .HasColumnName("LogDate")
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                e.Property(x => x.Action)
+                    .HasColumnName("Action")
+                    .HasMaxLength(50);
+
+                e.Property(x => x.Details)
+                    .HasColumnName("Details");
+
+                e.HasOne(x => x.Notification)
+                    .WithMany()
+                    .HasForeignKey(x => x.NotificationID)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         } 
     }

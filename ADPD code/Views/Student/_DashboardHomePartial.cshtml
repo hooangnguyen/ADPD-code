@@ -106,7 +106,9 @@
             <div class="card" style="margin-bottom: 20px;">
                 <div class="card-header">
                     <h2 class="card-title">Thông báo</h2>
-                    <a href="#" class="view-all">Xem tất cả →</a>
+                    <a href="@Url.Action("Assignments", "Student")" 
+                       class="view-all"
+                       data-partial-url="@Url.Action("Assignments", "Student", new { partial = true })">Xem tất cả →</a>
                 </div>
 
                 @if (ViewBag.RecentAssignments != null && ((IEnumerable<dynamic>)ViewBag.RecentAssignments).Any())
