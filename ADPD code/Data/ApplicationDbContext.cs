@@ -226,7 +226,7 @@ namespace ADPD_code.Data
                 a.Property(x => x.StudentID).HasColumnName("StudentID").IsRequired();
                 a.Property(x => x.SubmitDate).HasColumnName("SubmitDate").IsRequired();
                 a.Property(x => x.FilePath).HasColumnName("FilePath").HasMaxLength(500);
-                a.Property(x => x.AnswerText).HasColumnName("AnswerText");
+                a.Property(x => x.SubmissionText).HasColumnName("AnswerText");
                 a.Property(x => x.Score).HasColumnName("Score");
                 a.Property(x => x.Feedback).HasColumnName("Feedback");
 

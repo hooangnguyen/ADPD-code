@@ -1,0 +1,240 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điểm danh Sinh viên</title>
+
+    <link rel="stylesheet" href="~/css/Attendance.css" />
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Hệ thống Điểm danh Sinh viên</h1>
+            <div class="class-info">
+                <div class="info-card">
+                    <label>Môn học</label>
+                    <select id="subject">
+                        <option>Lập trình Web</option>
+                        <option>Cơ sở dữ liệu</option>
+                        <option>Mạng máy tính</option>
+                        <option>Trí tuệ nhân tạo</option>
+                    </select>
+                </div>
+                <div class="info-card">
+                    <label>Lớp</label>
+                    <select id="class">
+                        <option>CNTT01-K65</option>
+                        <option>CNTT02-K65</option>
+                        <option>CNTT03-K65</option>
+                    </select>
+                </div>
+                <div class="info-card">
+                    <label>Ngày điểm danh</label>
+                    <input type="date" id="date" value="">
+                </div>
+                <div class="info-card">
+                    <label>Buổi học</label>
+                    <select id="session">
+                        <option>Buổi 1 (7:00-9:00)</option>
+                        <option>Buổi 2 (9:15-11:15)</option>
+                        <option>Buổi 3 (13:00-15:00)</option>
+                        <option>Buổi 4 (15:15-17:15)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="stats">
+                <div class="stat-card">
+                    <h3 id="totalStudents">45</h3>
+                    <p>Tổng số sinh viên</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="presentCount">0</h3>
+                    <p>Có mặt</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="absentCount">0</h3>
+                    <p>Vắng mặt</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="attendanceRate">0%</h3>
+                    <p>Tỷ lệ tham dự</p>
+                </div>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm theo tên, MSSV...">
+                <select id="filterStatus">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="present">Có mặt</option>
+                    <option value="absent">Vắng mặt</option>
+                    <option value="pending">Chưa điểm danh</option>
+                </select>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="markAllPresent()">✓ Điểm danh tất cả</button>
+                <button class="btn btn-success" onclick="saveAttendance()">💾 Lưu điểm danh</button>
+                <button class="btn btn-danger" onclick="resetAttendance()">↺ Làm mới</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="attendanceTable">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>MSSV</th>
+                        <th>Họ và tên</th>
+                        <th class="checkbox-cell">Có mặt</th>
+                        <th class="checkbox-cell">Vắng</th>
+                        <th>Trạng thái</th>
+                        <th>Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody id="studentList">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const students = [
+            { id: 1, mssv: '2021600001', name: 'Nguyễn Văn An' },
+            { id: 2, mssv: '2021600002', name: 'Trần Thị Bình' },
+            { id: 3, mssv: '2021600003', name: 'Lê Văn Cường' },
+            { id: 4, mssv: '2021600004', name: 'Phạm Thị Dung' },
+            { id: 5, mssv: '2021600005', name: 'Hoàng Văn Em' },
+            { id: 6, mssv: '2021600006', name: 'Vũ Thị Phương' },
+            { id: 7, mssv: '2021600007', name: 'Đặng Văn Giang' },
+            { id: 8, mssv: '2021600008', name: 'Bùi Thị Hoa' },
+            { id: 9, mssv: '2021600009', name: 'Ngô Văn Hùng' },
+            { id: 10, mssv: '2021600010', name: 'Đinh Thị Lan' }
+        ];
+
+        const attendance = {};
+
+        function initDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+        }
+
+        function renderStudents() {
+            const tbody = document.getElementById('studentList');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filterStatus = document.getElementById('filterStatus').value;
+
+            tbody.innerHTML = '';
+
+            students.forEach((student, index) => {
+                const status = attendance[student.id] || 'pending';
+
+                if (searchTerm && !student.name.toLowerCase().includes(searchTerm) && !student.mssv.includes(searchTerm)) {
+                    return;
+                }
+
+                if (filterStatus && status !== filterStatus) {
+                    return;
+                }
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${student.mssv}</td>
+                    <td>${student.name}</td>
+                    <td class="checkbox-cell">
+                        <input type="checkbox" ${status === 'present' ? 'checked' : ''}
+                               onchange="markAttendance(${student.id}, 'present')">
+                    </td>
+                    <td class="checkbox-cell">
+                        <input type="checkbox" ${status === 'absent' ? 'checked' : ''}
+                               onchange="markAttendance(${student.id}, 'absent')">
+                    </td>
+                    <td>
+                        <span class="status-badge status-${status}">
+                            ${status === 'present' ? 'Có mặt' : status === 'absent' ? 'Vắng mặt' : 'Chưa điểm danh'}
+                        </span>
+                    </td>
+                    <td>
+                        <input type="text" class="note-input" placeholder="Nhập ghi chú..."
+                               id="note-${student.id}">
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            updateStats();
+        }
+
+        function markAttendance(studentId, status) {
+            if (attendance[studentId] === status) {
+                delete attendance[studentId];
+            } else {
+                attendance[studentId] = status;
+            }
+            renderStudents();
+        }
+
+        function markAllPresent() {
+            students.forEach(student => {
+                attendance[student.id] = 'present';
+            });
+            renderStudents();
+        }
+
+        function resetAttendance() {
+            if (confirm('Bạn có chắc muốn làm mới tất cả điểm danh?')) {
+                Object.keys(attendance).forEach(key => delete attendance[key]);
+                renderStudents();
+            }
+        }
+
+        function updateStats() {
+            const total = students.length;
+            const present = Object.values(attendance).filter(s => s === 'present').length;
+            const absent = Object.values(attendance).filter(s => s === 'absent').length;
+            const rate = total > 0 ? Math.round((present / total) * 100) : 0;
+
+            document.getElementById('totalStudents').textContent = total;
+            document.getElementById('presentCount').textContent = present;
+            document.getElementById('absentCount').textContent = absent;
+            document.getElementById('attendanceRate').textContent = rate + '%';
+        }
+
+        function saveAttendance() {
+            const subject = document.getElementById('subject').value;
+            const classInfo = document.getElementById('class').value;
+            const date = document.getElementById('date').value;
+            const session = document.getElementById('session').value;
+
+            const data = {
+                subject,
+                class: classInfo,
+                date,
+                session,
+                attendance,
+                notes: {}
+            };
+
+            students.forEach(student => {
+                const noteInput = document.getElementById(`note-${student.id}`);
+                if (noteInput && noteInput.value) {
+                    data.notes[student.id] = noteInput.value;
+                }
+            });
+
+            console.log('Dữ liệu điểm danh:', data);
+            alert('Đã lưu điểm danh thành công!\n\nMôn: ' + subject + '\nLớp: ' + classInfo + '\nNgày: ' + date);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', renderStudents);
+        document.getElementById('filterStatus').addEventListener('change', renderStudents);
+
+        initDate();
+        renderStudents();
+    </script>
+</body>
+</html>

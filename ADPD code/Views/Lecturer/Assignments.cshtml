@@ -1,0 +1,171 @@
+﻿@model IEnumerable<ADPD_code.Models.Assignment>
+@{
+    ViewData["Title"] = "Quản lý bài tập";
+    var submissionCounts = ViewBag.SubmissionCounts as Dictionary<int, int>;
+}
+<link rel="stylesheet" href="~/css/Assinments.css" />
+
+<div class="lecturer-assignments-container">
+    <a href="@Url.Action("Dashboard", "Lecturer")" class="back-btn">← Quay lại Dashboard</a>
+
+    <div class="page-header">
+        <h1>📝 Quản lý Bài tập</h1>
+        <p>Giao bài tập và chấm điểm cho sinh viên</p>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-value">@Model.Count()</div>
+                <div class="stat-label">Tổng bài tập</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value">@Model.Count(a => a.EndDate >= DateTime.Now)</div>
+                <div class="stat-label">Đang mở</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏰</div>
+                <div class="stat-value">@Model.Count(a => a.EndDate < DateTime.Now)</div>
+                <div class="stat-label">Đã đóng</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📤</div>
+                <div class="stat-value">@(submissionCounts?.Values.Sum() ?? 0)</div>
+                <div class="stat-label">Bài nộp</div>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <div></div>
+            <a href="@Url.Action("CreateAssignment", "Lecturer")" class="btn-create">
+                ➕ Tạo bài tập mới
+            </a>
+        </div>
+
+        <!-- Assignment List -->
+        @foreach (var assignment in Model.OrderByDescending(a => a.StartDate))
+        {
+            var now = DateTime.Now;
+            var isActive = assignment.StartDate <= now && assignment.EndDate >= now;
+            var isUpcoming = assignment.StartDate > now;
+            var isEnded = assignment.EndDate < now;
+
+            var submissionCount = submissionCounts?.ContainsKey(assignment.AssignmentID) == true
+            ? submissionCounts[assignment.AssignmentID]
+            : 0;
+
+            <div class="assignment-card">
+                <div class="assignment-header">
+                    <div style="flex: 1;">
+                        <div class="assignment-title">@assignment.Title</div>
+                        <span class="course-badge">@(assignment.Course?.CourseName ?? "N/A")</span>
+                    </div>
+                    <div class="status-indicator">
+                        @if (isActive)
+                        {
+                            <span class="status-badge status-active">✅ Đang mở</span>
+                        }
+                        else if (isUpcoming)
+                        {
+                            <span class="status-badge status-upcoming">🕐 Sắp mở</span>
+                        }
+                        else
+                        {
+                            <span class="status-badge status-ended">🔒 Đã đóng</span>
+                        }
+                    </div>
+                </div>
+
+                <div style="color: #666; margin-bottom: 15px; line-height: 1.6;">
+                    @(assignment.Description ?? "Không có mô tả")
+                </div>
+
+                <div class="assignment-meta">
+                    <div class="meta-item">
+                        <span class="meta-icon">📅</span>
+                        <div class="meta-content">
+                            <div class="meta-label">Ngày giao</div>
+                            <div class="meta-value">@assignment.StartDate.ToString("dd/MM/yyyy")</div>
+                        </div>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-icon">⏰</span>
+                        <div class="meta-content">
+                            <div class="meta-label">Deadline</div>
+                            <div class="meta-value" style="color: @(isEnded ? "#e74c3c" : "#27ae60");">
+                                @assignment.EndDate.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                        </div>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-icon">👥</span>
+                        <div class="meta-content">
+                            <div class="meta-label">Số bài nộp</div>
+                            <div class="meta-value">@submissionCount</div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (submissionCount > 0)
+                {
+                    var gradedCount = ViewBag.GradedCounts != null &&
+                    ((Dictionary<int, int>)ViewBag.GradedCounts).ContainsKey(assignment.AssignmentID)
+                    ? ((Dictionary<int, int>)ViewBag.GradedCounts)[assignment.AssignmentID]
+                    : 0;
+
+                    var needGradingCount = submissionCount - gradedCount;
+
+                    <div class="submission-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">@submissionCount</div>
+                            <div class="stat-text">Tổng bài nộp</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" style="color: #27ae60;">@gradedCount</div>
+                            <div class="stat-text">Đã chấm</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" style="color: #e74c3c;">@needGradingCount</div>
+                            <div class="stat-text">Chưa chấm</div>
+                        </div>
+                    </div>
+                }
+
+                <div class="assignment-actions">
+                    <a href="@Url.Action("GradeAssignment", "Lecturer", new { id = assignment.AssignmentID })"
+                       class="btn-primary">
+                        ✏️ Chấm điểm (@submissionCount)
+                    </a>
+                    <a href="@Url.Action("EditAssignment", "Lecturer", new { id = assignment.AssignmentID })"
+                       class="btn-secondary">
+                        📝 Sửa
+                    </a>
+                    <a href="@Url.Action("DeleteAssignment", "Lecturer", new { id = assignment.AssignmentID })"
+                       class="btn-danger"
+                       onclick="return confirm('Bạn có chắc muốn xóa bài tập này?')">
+                        🗑️ Xóa
+                    </a>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="action-bar">
+            <div></div>
+            <a href="@Url.Action("CreateAssignment", "Lecturer")" class="btn-create">
+                ➕ Tạo bài tập mới
+            </a>
+        </div>
+
+        <div class="no-data">
+            <h3>📝 Chưa có bài tập nào</h3>
+            <p>Bạn chưa tạo bài tập nào. Nhấn nút "Tạo bài tập mới" để bắt đầu.</p>
+        </div>
+    }
+</div>

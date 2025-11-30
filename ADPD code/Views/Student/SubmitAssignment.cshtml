@@ -1,0 +1,510 @@
+﻿@model ADPD_code.Models.Assignment
+@{
+    ViewData["Title"] = "Nộp bài tập";
+    var isPartial = ViewData["IsPartial"] as bool? ?? false;
+    Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
+    var submission = ViewBag.Submission as ADPD_code.Models.AssignmentSubmission;
+    var hasSubmitted = submission != null;
+}
+
+<style>
+    .submit-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .back-btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        transition: all 0.3s;
+    }
+
+        .back-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+    .submit-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+        .submit-header h1 {
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+    .assignment-info-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .info-row {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+    .info-label {
+        font-weight: 600;
+        color: #666;
+    }
+
+    .info-value {
+        color: #333;
+    }
+
+    .deadline-warning {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+
+    .deadline-danger {
+        background: #f8d7da;
+        border-left: 4px solid #dc3545;
+    }
+
+    .submit-form-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        font-size: 15px;
+    }
+
+        .form-label .required {
+            color: #e74c3c;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
+        font-family: inherit;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .file-upload-area {
+        border: 3px dashed #e0e0e0;
+        border-radius: 12px;
+        padding: 40px;
+        text-align: center;
+        background: #f9f9f9;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+
+        .file-upload-area:hover {
+            border-color: #667eea;
+            background: #f5f7ff;
+        }
+
+        .file-upload-area.dragover {
+            border-color: #667eea;
+            background: #e8ecff;
+        }
+
+    .upload-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+        color: #667eea;
+    }
+
+    .upload-text {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .upload-hint {
+        font-size: 13px;
+        color: #999;
+    }
+
+    .file-input {
+        display: none;
+    }
+
+    .file-list {
+        margin-top: 20px;
+    }
+
+    .file-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .file-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+    }
+
+    .file-icon {
+        font-size: 24px;
+    }
+
+    .file-details {
+        flex: 1;
+    }
+
+    .file-name {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 3px;
+    }
+
+    .file-size {
+        font-size: 12px;
+        color: #999;
+    }
+
+    .remove-file-btn {
+        background: #e74c3c;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+        .remove-file-btn:hover {
+            background: #c0392b;
+        }
+
+    .submit-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn-submit {
+        flex: 1;
+        padding: 15px 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+    .btn-cancel {
+        padding: 15px 30px;
+        background: white;
+        color: #666;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+
+        .btn-cancel:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+    .success-alert {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .error-alert {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .submitted-info {
+        background: #e8f5e9;
+        border: 2px solid #c3e6cb;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+
+        .submitted-info h3 {
+            color: #155724;
+            margin-bottom: 15px;
+        }
+
+    .submitted-file {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+    }
+</style>
+
+<div class="submit-container">
+    <a href="@Url.Action("Assignments", "Student")" class="back-btn">← Quay lại Danh sách bài tập</a>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="success-alert">
+            <span style="font-size: 20px;">✅</span>
+            <span>@TempData["SuccessMessage"]</span>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="error-alert">
+            <span style="font-size: 20px;">❌</span>
+            <span>@TempData["ErrorMessage"]</span>
+        </div>
+    }
+
+    <div class="submit-header">
+        <h1>📤 Nộp Bài Tập</h1>
+        <p>@Model.Title</p>
+    </div>
+
+    <!-- Thông tin bài tập -->
+    <div class="assignment-info-card">
+        <h2 style="margin-bottom: 20px; color: #333;">📋 Thông tin bài tập</h2>
+
+        <div class="info-row">
+            <div class="info-label">Môn học:</div>
+            <div class="info-value">@(Model.Course?.CourseName ?? "N/A")</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Giảng viên:</div>
+            <div class="info-value">@(Model.Lecturer?.FullName ?? "N/A")</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Ngày giao:</div>
+            <div class="info-value">@Model.StartDate.ToString("dd/MM/yyyy HH:mm")</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Deadline:</div>
+            <div class="info-value" style="color: #e74c3c; font-weight: 700;">
+                @Model.EndDate.ToString("dd/MM/yyyy HH:mm")
+            </div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Mô tả:</div>
+            <div class="info-value">@(Model.Description ?? "Không có mô tả")</div>
+        </div>
+    </div>
+
+    @{
+        var daysLeft = (Model.EndDate - DateTime.Now).TotalDays;
+        var isOverdue = daysLeft < 0;
+    }
+
+    @if (isOverdue)
+    {
+        <div class="deadline-warning deadline-danger">
+            <strong>⚠️ Bài tập đã quá hạn!</strong><br />
+            Thời hạn nộp bài đã kết thúc. Vui lòng liên hệ giảng viên nếu bạn muốn nộp muộn.
+        </div>
+    }
+    else if (daysLeft < 2)
+    {
+        <div class="deadline-warning">
+            <strong>⚠️ Sắp hết hạn!</strong><br />
+            Bạn chỉ còn @(daysLeft >= 1 ? $"{(int)daysLeft} ngày" : $"{(int)(daysLeft * 24)} giờ") để nộp bài tập này.
+        </div>
+    }
+
+    @if (hasSubmitted)
+    {
+        <!-- Thông tin bài đã nộp -->
+        <div class="submitted-info">
+            <h3>✅ Bạn đã nộp bài tập này</h3>
+            <div class="info-row">
+                <div class="info-label">Ngày nộp:</div>
+                <div class="info-value">@submission.SubmitDate.ToString("dd/MM/yyyy HH:mm")</div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(submission.SubmissionText))
+            {
+                <div class="info-row">
+                    <div class="info-label">Nội dung:</div>
+                    <div class="info-value">@submission.SubmissionText</div>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(submission.FilePath))
+            {
+                <div class="submitted-file">
+                    <strong>📎 File đã nộp:</strong><br />
+                    <a href="@Url.Action("DownloadSubmission", "Student", new { id = submission.SubmissionID })"
+                       style="color: #667eea; text-decoration: none; font-weight: 600;">
+                        📥 Tải xuống file
+                    </a>
+                </div>
+            }
+
+            @if (submission.Score.HasValue && submission.Score > 0)
+            {
+                <div class="info-row" style="margin-top: 15px;">
+                    <div class="info-label">Điểm:</div>
+                    <div class="info-value" style="color: #27ae60; font-weight: 700; font-size: 18px;">
+                        @submission.Score
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(submission.Feedback))
+                {
+                    <div class="info-row">
+                        <div class="info-label">Nhận xét:</div>
+                        <div class="info-value">@submission.Feedback</div>
+                    </div>
+                }
+            }
+
+            <p style="margin-top: 15px; color: #666;">
+                Bạn có thể chỉnh sửa bài nộp của mình bằng form bên dưới.
+            </p>
+        </div>
+    }
+
+    <!-- Form nộp bài -->
+    @if (!isOverdue)
+    {
+        <div class="submit-form-card">
+            <h2 style="margin-bottom: 25px; color: #333;">
+                @(hasSubmitted ? "✏️ Chỉnh sửa bài nộp" : "📝 Nộp bài mới")
+            </h2>
+
+            <form asp-action="SubmitAssignment" asp-controller="Student" method="post" enctype="multipart/form-data" id="submitForm" data-has-submitted="@(hasSubmitted ? "true" : "false")">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="assignmentId" value="@Model.AssignmentID" />
+
+                <!-- Nội dung bài làm -->
+                <div class="form-group">
+                    <label class="form-label">
+                        💬 Nội dung bài làm
+                    </label>
+                    <textarea name="submissionText"
+                          class="form-control"
+                          placeholder="Nhập nội dung bài làm của bạn (nếu có)...">@((hasSubmitted && submission?.SubmissionText != null) ? submission.SubmissionText : "")</textarea>
+                </div>
+
+                <!-- Upload file -->
+                <div class="form-group">
+                    <label class="form-label">
+                        📎 File đính kèm <span class="required">*</span>
+                    </label>
+
+                    <div class="file-upload-area" id="uploadArea">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">
+                            <strong>Kéo thả file vào đây</strong> hoặc nhấn để chọn file
+                        </div>
+                        <div class="upload-hint">
+                            Hỗ trợ: Word (.doc, .docx), Excel (.xls, .xlsx), PDF, ZIP (Tối đa 10MB)
+                        </div>
+                    </div>
+
+                    <input type="file"
+                           name="file"
+                           id="fileInput"
+                           class="file-input"
+                           accept=".doc,.docx,.xls,.xlsx,.pdf,.zip,.rar" />
+
+                    <div class="file-list" id="fileList"></div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="submit-actions">
+                    <a href="@Url.Action("Assignments", "Student")" class="btn-cancel">Hủy</a>
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        @(hasSubmitted ? "💾 Cập nhật bài nộp" : "📤 Nộp bài tập")
+                    </button>
+                </div>
+            </form>
+        </div>
+    }
+</div>
+<script src="~/js/SubmitAssignment.js" asp-append-version="true"></script>

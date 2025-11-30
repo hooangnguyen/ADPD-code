@@ -1,0 +1,200 @@
+﻿@model ADPD_code.Models.Assignment
+@{
+    ViewData["Title"] = "Chấm điểm bài tập";
+    var submissions = ViewBag.Submissions as List<ADPD_code.Models.AssignmentSubmission>;
+}
+<link rel="stylesheet" href="~/css/GradeAssignment.css" />
+
+<div class="grade-container">
+    <a href="@Url.Action("Assignments", "Lecturer")" class="back-btn">← Quay lại Danh sách bài tập</a>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="success-alert">
+            <span style="font-size: 20px;">✅</span>
+            <span>@TempData["SuccessMessage"]</span>
+        </div>
+    }
+
+    <div class="grade-header">
+        <h1>✏️ Chấm điểm Bài tập</h1>
+        <p>@Model.Title</p>
+    </div>
+
+    <!-- Assignment Info -->
+    <div class="assignment-info">
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-icon">📚</span>
+                <div class="info-content">
+                    <h4>Môn học</h4>
+                    <p>@(Model.Course?.CourseName ?? "N/A")</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <span class="info-icon">⏰</span>
+                <div class="info-content">
+                    <h4>Deadline</h4>
+                    <p>@Model.EndDate.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <span class="info-icon">📤</span>
+                <div class="info-content">
+                    <h4>Tổng bài nộp</h4>
+                    <p>@(submissions?.Count ?? 0) bài</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <span class="info-icon">✅</span>
+                <div class="info-content">
+                    <h4>Đã chấm</h4>
+                    <p>@(submissions?.Count(s => s.Score.HasValue && s.Score > 0) ?? 0) bài</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (submissions != null && submissions.Any())
+    {
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <strong>Lọc:</strong>
+            <button class="filter-btn active" onclick="filterSubmissions('all')">
+                Tất cả (@submissions.Count)
+            </button>
+            <button class="filter-btn" onclick="filterSubmissions('pending')">
+                Chưa chấm (@submissions.Count(s => !s.Score.HasValue || s.Score == 0))
+            </button>
+            <button class="filter-btn" onclick="filterSubmissions('graded')">
+                Đã chấm (@submissions.Count(s => s.Score.HasValue && s.Score > 0))
+            </button>
+        </div>
+
+        <!-- Submissions List -->
+        @foreach (var submission in submissions.OrderBy(s => s.Score.HasValue ? 1 : 0).ThenBy(s => s.SubmitDate))
+        {
+            var isGraded = submission.Score.HasValue && submission.Score > 0;
+            var student = submission.Student;
+
+            <div class="submission-card" data-status="@(isGraded ? "graded" : "pending")">
+                <div class="submission-header">
+                    <div class="student-info">
+                        <div class="student-name">
+                            👤 @(student?.FullName ?? "N/A")
+                        </div>
+                        <div class="student-id">
+                            MSSV: @(student?.StudentId ?? 0) | Email: @(student?.Email ?? "N/A")
+                        </div>
+                    </div>
+                    <div class="submission-status">
+                        @if (isGraded)
+                        {
+                            <span class="status-badge status-graded">✅ Đã chấm: @submission.Score điểm</span>
+                        }
+                        else
+                        {
+                            <span class="status-badge status-pending">⏳ Chưa chấm</span>
+                        }
+                        <div class="submit-time">
+                            📅 Nộp lúc: @submission.SubmitDate.ToString("dd/MM/yyyy HH:mm")
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submission Content -->
+                <div class="submission-content">
+                    @if (!string.IsNullOrEmpty(submission.SubmissionText))
+                    {
+                        <span class="content-label">💬 Nội dung bài làm:</span>
+                        <div class="content-text">@submission.SubmissionText</div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(submission.FilePath))
+                    {
+                        <a href="@Url.Action("DownloadSubmissionFile", "Lecturer", new { id = submission.SubmissionID })"
+                           class="file-download">
+                            📥 Tải xuống file bài nộp
+                        </a>
+                    }
+                </div>
+
+                <!-- Grading Form -->
+                @if (isGraded)
+                {
+                    <div class="graded-display" id="graded-@submission.SubmissionID">
+                        <div>
+                            <strong style="color: #155724;">Điểm số:</strong>
+                            <div class="graded-score">@submission.Score / 10</div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(submission.Feedback))
+                        {
+                            <div>
+                                <strong style="color: #155724;">Nhận xét:</strong>
+                                <div class="graded-feedback">@submission.Feedback</div>
+                            </div>
+                        }
+                        <button class="edit-grade-btn" onclick="toggleGradeForm(@submission.SubmissionID)">
+                            ✏️ Chỉnh sửa điểm
+                        </button>
+                    </div>
+                }
+
+                <form class="grading-form"
+                      id="form-@submission.SubmissionID"
+                      style="@(isGraded ? "display: none;" : "")"
+                      asp-action="SaveGrade"
+                      asp-controller="Lecturer"
+                      method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="submissionId" value="@submission.SubmissionID" />
+                    <input type="hidden" name="assignmentId" value="@Model.AssignmentID" />
+
+                    <div class="form-row">
+                        <label class="form-label">Điểm số:</label>
+                        <div>
+                            <div class="score-input-group">
+                                <input type="number"
+                                       name="score"
+                                       class="score-input"
+                                       min="0"
+                                       max="10"
+                                       step="0.5"
+                                       value="@(submission.Score ?? 0)"
+                                       required />
+                                <span class="score-unit">/ 10 điểm</span>
+                            </div>
+                            <div class="quick-scores" style="margin-top: 10px;">
+                                <button type="button" class="quick-score-btn" onclick="setScore(@submission.SubmissionID, 10)">10</button>
+                                <button type="button" class="quick-score-btn" onclick="setScore(@submission.SubmissionID, 9)">9</button>
+                                <button type="button" class="quick-score-btn" onclick="setScore(@submission.SubmissionID, 8)">8</button>
+                                <button type="button" class="quick-score-btn" onclick="setScore(@submission.SubmissionID, 7)">7</button>
+                                <button type="button" class="quick-score-btn" onclick="setScore(@submission.SubmissionID, 6)">6</button>
+                                <button type="button" class="quick-score-btn" onclick="setScore(@submission.SubmissionID, 5)">5</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Nhận xét:</label>
+                        <textarea name="feedback"
+                          class="feedback-textarea"
+                          placeholder="Nhập nhận xét cho sinh viên...">@submission.Feedback</textarea>
+                    </div>
+
+                    <button type="submit" class="submit-grade-btn">
+                        💾 Lưu điểm
+                    </button>
+                </form>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="no-submissions">
+            <h3>📭 Chưa có bài nộp</h3>
+            <p>Chưa có sinh viên nào nộp bài tập này.</p>
+        </div>
+    }
+</div>
+<script src="~/js/GradeAssinment.js" asp-append-version="true"></script>

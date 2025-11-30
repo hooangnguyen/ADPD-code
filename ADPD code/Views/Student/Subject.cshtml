@@ -1,0 +1,299 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Môn học - StudentMS</title>
+    <link href="~/css/subject.css" rel="stylesheet" />     
+</head>
+<body>
+            <!-- Success/Error Messages -->
+            <!-- <div class="alert alert-success">
+                <span>✓</span>
+                <span>Thông báo thành công!</span>
+            </div> -->
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title">📚 Môn học của tôi</div>
+                <div class="semester-info">
+                    Học kỳ: HK1 | Năm học: 2024-2025
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="summary-number" id="totalCourses">6</div>
+                    <div class="summary-label">Tổng môn học</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-number" id="totalCredits">18</div>
+                    <div class="summary-label">Tổng tín chỉ</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-number" id="avgScore">7.8</div>
+                    <div class="summary-label">Điểm TB học kỳ</div>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <form id="filterForm">
+                    <div class="filter-grid">
+                        <div class="filter-item">
+                            <label class="filter-label">Tìm kiếm môn học</label>
+                            <input type="text" id="searchInput" class="filter-input"
+                                   placeholder="Nhập tên môn học hoặc mã môn...">
+                        </div>
+                        <div class="filter-item">
+                            <label class="filter-label">Học kỳ</label>
+                            <select id="semesterFilter" class="filter-select">
+                                <option value="">Tất cả</option>
+                                <option value="1" selected>Học kỳ 1</option>
+                                <option value="2">Học kỳ 2</option>
+                                <option value="3">Học kỳ 3</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label class="filter-label">Năm học</label>
+                            <select id="yearFilter" class="filter-select">
+                                <option value="">Tất cả</option>
+                                <option value="2024-2025" selected>2024-2025</option>
+                                <option value="2023-2024">2023-2024</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <button type="button" class="btn-filter" onclick="filterCourses()">🔍 Tìm kiếm</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Course Table -->
+            <div class="course-table-container">
+                <table class="course-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Môn học</th>
+                            <th style="width: 20%;">Giảng viên</th>
+                            <th style="width: 10%; text-align: center;">Tín chỉ</th>
+                            <th style="width: 15%; text-align: center;">Điểm số</th>
+                            <th style="width: 25%; text-align: right;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="courseTableBody">
+                        <!-- Course Row 1 -->
+                        <tr data-semester="1" data-year="2024-2025" data-name="lập trình web" data-code="cs301">
+                            <td>
+                                <div class="course-name">Lập trình Web</div>
+                                <div class="course-code">Mã môn: CS301</div>
+                            </td>
+                            <td>
+                                <div class="lecturer-name">TS. Nguyễn Văn B</div>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="credits-badge">3 TC</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="score-display score-excellent">8.5</span>
+                            </td>
+                            <td style="text-align: right;">
+                                <button class="btn-action btn-detail" onclick="viewCourseDetail(1)">📖 Chi tiết</button>
+                                <button class="btn-action btn-assignment" onclick="viewAssignments(1)">📝 Bài tập</button>
+                            </td>
+                        </tr>
+
+                        <!-- Course Row 2 -->
+                        <tr data-semester="1" data-year="2024-2025" data-name="cơ sở dữ liệu" data-code="cs302">
+                            <td>
+                                <div class="course-name">Cơ sở dữ liệu</div>
+                                <div class="course-code">Mã môn: CS302</div>
+                            </td>
+                            <td>
+                                <div class="lecturer-name">ThS. Trần Thị C</div>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="credits-badge">3 TC</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="score-display score-good">7.8</span>
+                            </td>
+                            <td style="text-align: right;">
+                                <button class="btn-action btn-detail" onclick="viewCourseDetail(2)">📖 Chi tiết</button>
+                                <button class="btn-action btn-assignment" onclick="viewAssignments(2)">📝 Bài tập</button>
+                            </td>
+                        </tr>
+
+                        <!-- Course Row 3 -->
+                        <tr data-semester="1" data-year="2024-2025" data-name="mạng máy tính" data-code="cs303">
+                            <td>
+                                <div class="course-name">Mạng máy tính</div>
+                                <div class="course-code">Mã môn: CS303</div>
+                            </td>
+                            <td>
+                                <div class="lecturer-name">TS. Lê Văn D</div>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="credits-badge">3 TC</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="score-display score-average">6.5</span>
+                            </td>
+                            <td style="text-align: right;">
+                                <button class="btn-action btn-detail" onclick="viewCourseDetail(3)">📖 Chi tiết</button>
+                                <button class="btn-action btn-assignment" onclick="viewAssignments(3)">📝 Bài tập</button>
+                            </td>
+                        </tr>
+
+                        <!-- Course Row 4 -->
+                        <tr data-semester="1" data-year="2024-2025" data-name="lập trình di động" data-code="cs304">
+                            <td>
+                                <div class="course-name">Lập trình di động</div>
+                                <div class="course-code">Mã môn: CS304</div>
+                            </td>
+                            <td>
+                                <div class="lecturer-name">ThS. Phạm Văn E</div>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="credits-badge">4 TC</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="score-display score-good">7.2</span>
+                            </td>
+                            <td style="text-align: right;">
+                                <button class="btn-action btn-detail" onclick="viewCourseDetail(4)">📖 Chi tiết</button>
+                                <button class="btn-action btn-assignment" onclick="viewAssignments(4)">📝 Bài tập</button>
+                            </td>
+                        </tr>
+
+                        <!-- Course Row 5 -->
+                        <tr data-semester="1" data-year="2024-2025" data-name="trí tuệ nhân tạo" data-code="cs305">
+                            <td>
+                                <div class="course-name">Trí tuệ nhân tạo</div>
+                                <div class="course-code">Mã môn: CS305</div>
+                            </td>
+                            <td>
+                                <div class="lecturer-name">TS. Hoàng Văn F</div>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="credits-badge">3 TC</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="score-display score-excellent">9.0</span>
+                            </td>
+                            <td style="text-align: right;">
+                                <button class="btn-action btn-detail" onclick="viewCourseDetail(5)">📖 Chi tiết</button>
+                                <button class="btn-action btn-assignment" onclick="viewAssignments(5)">📝 Bài tập</button>
+                            </td>
+                        </tr>
+
+                        <!-- Course Row 6 -->
+                        <tr data-semester="1" data-year="2024-2025" data-name="an toàn thông tin" data-code="cs306">
+                            <td>
+                                <div class="course-name">An toàn thông tin</div>
+                                <div class="course-code">Mã môn: CS306</div>
+                            </td>
+                            <td>
+                                <div class="lecturer-name">ThS. Đỗ Thị G</div>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="credits-badge">2 TC</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="score-display score-none">Chưa có</span>
+                            </td>
+                            <td style="text-align: right;">
+                                <button class="btn-action btn-detail" onclick="viewCourseDetail(6)">📖 Chi tiết</button>
+                                <button class="btn-action btn-assignment" onclick="viewAssignments(6)">📝 Bài tập</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+    <script>
+        // Filter courses
+        function filterCourses() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const semester = document.getElementById('semesterFilter').value;
+            const year = document.getElementById('yearFilter').value;
+            const rows = document.querySelectorAll('#courseTableBody tr');
+
+            let visibleCount = 0;
+            let totalCredits = 0;
+            let totalScore = 0;
+            let scoreCount = 0;
+
+            rows.forEach(row => {
+                const courseName = row.dataset.name;
+                const courseCode = row.dataset.code;
+                const rowSemester = row.dataset.semester;
+                const rowYear = row.dataset.year;
+
+                let show = true;
+
+                // Filter by search
+                if (searchText && !courseName.includes(searchText) && !courseCode.includes(searchText)) {
+                    show = false;
+                }
+
+                // Filter by semester
+                if (semester && rowSemester !== semester) {
+                    show = false;
+                }
+
+                // Filter by year
+                if (year && rowYear !== year) {
+                    show = false;
+                }
+
+                row.style.display = show ? '' : 'none';
+
+                if (show) {
+                    visibleCount++;
+                    // Calculate stats
+                    const creditsText = row.querySelector('.credits-badge').textContent;
+                    const credits = parseInt(creditsText.match(/\d+/)[0]);
+                    totalCredits += credits;
+
+                    const scoreText = row.querySelector('.score-display').textContent.trim();
+                    if (scoreText !== 'Chưa có') {
+                        const score = parseFloat(scoreText);
+                        totalScore += score;
+                        scoreCount++;
+                    }
+                }
+            });
+
+            // Update summary
+            document.getElementById('totalCourses').textContent = visibleCount;
+            document.getElementById('totalCredits').textContent = totalCredits;
+            document.getElementById('avgScore').textContent = scoreCount > 0 ? (totalScore / scoreCount).toFixed(2) : '0';
+        }
+
+        // View course detail
+        function viewCourseDetail(courseId) {
+            alert(`Xem chi tiết môn học ID: ${courseId}\n\nChức năng đang phát triển...`);
+            // window.location.href = `/Student/CourseDetail/${courseId}`;
+        }
+
+        // View assignments
+        function viewAssignments(courseId) {
+            alert(`Xem bài tập môn học ID: ${courseId}\n\nChức năng đang phát triển...`);
+            // window.location.href = `/Student/Assignments/${courseId}`;
+        }
+
+        // Active menu
+        document.querySelectorAll('.menu-item a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.querySelectorAll('.menu-item a').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Initialize
+        filterCourses();
+    </script>
+</body>
+</html>

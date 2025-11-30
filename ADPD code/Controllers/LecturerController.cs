@@ -66,7 +66,6 @@ namespace ADPD_code.Controllers
             {
                 return RedirectToAction("Index", "Login");
             }
-
             var lecturerId = HttpContext.Session.GetInt32("LecturerId");
 
             if (lecturerId == null || (id != null && id != lecturerId))
@@ -133,7 +132,6 @@ namespace ADPD_code.Controllers
                     }
                 }
             }
-
             ViewBag.Departments = await _context.Departments.ToListAsync();
             return View(lecturer);
         }
@@ -189,141 +187,281 @@ namespace ADPD_code.Controllers
         // Action quản lý bài tập
         public async Task<IActionResult> Assignments()
         {
+            // Kiểm tra đăng nhập
             if (HttpContext.Session.GetString("Role") != "Lecturer")
             {
                 return RedirectToAction("Index", "Login");
             }
 
-            var lecturerId = HttpContext.Session.GetInt32("LecturerId");
-
-            if (lecturerId == null)
+            var lecturerId = HttpContext.Session.GetInt32("LecturerID");
+            if (!lecturerId.HasValue)
             {
                 return RedirectToAction("Index", "Login");
             }
 
+            // Lấy danh sách bài tập của giảng viên
             var assignments = await _context.Assignments
                 .Include(a => a.Course)
-                .Include(a => a.AssignmentSubmissions)
-                .Where(a => a.LecturerID == lecturerId)
+                .Include(a => a.Lecturer)
+                .Where(a => a.LecturerID == lecturerId.Value)
                 .OrderByDescending(a => a.StartDate)
                 .ToListAsync();
+
+            // Đếm số bài nộp cho mỗi assignment
+            var submissionCounts = new Dictionary<int, int>();
+            var gradedCounts = new Dictionary<int, int>();
+
+            foreach (var assignment in assignments)
+            {
+                var count = await _context.AssignmentSubmissions
+                    .Where(s => s.AssignmentID == assignment.AssignmentID)
+                    .CountAsync();
+
+                var gradedCount = await _context.AssignmentSubmissions
+                    .Where(s => s.AssignmentID == assignment.AssignmentID && s.Score.HasValue && s.Score > 0)
+                    .CountAsync();
+
+                submissionCounts[assignment.AssignmentID] = count;
+                gradedCounts[assignment.AssignmentID] = gradedCount;
+            }
+
+            ViewBag.SubmissionCounts = submissionCounts;
+            ViewBag.GradedCounts = gradedCounts;
 
             return View(assignments);
         }
 
-        // Action tạo bài tập mới
-        [HttpGet]
-        public async Task<IActionResult> CreateAssignment()
+        // GET: Trang chấm điểm
+        public async Task<IActionResult> GradeAssignment(int id)
         {
+            // Kiểm tra đăng nhập
             if (HttpContext.Session.GetString("Role") != "Lecturer")
             {
                 return RedirectToAction("Index", "Login");
             }
 
-            var lecturerId = HttpContext.Session.GetInt32("LecturerId");
-
-            if (lecturerId == null)
+            var lecturerId = HttpContext.Session.GetInt32("LecturerID");
+            if (!lecturerId.HasValue)
             {
                 return RedirectToAction("Index", "Login");
             }
 
-            // Lấy danh sách môn học của giảng viên
-            ViewBag.Courses = await _context.Courses
-                .Where(c => c.LecturerID == lecturerId)
-                .ToListAsync();
-
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateAssignment(Assignment assignment)
-        {
-            if (HttpContext.Session.GetString("Role") != "Lecturer")
-            {
-                return RedirectToAction("Index", "Login");
-            }
-
-            var lecturerId = HttpContext.Session.GetInt32("LecturerId");
-
-            if (lecturerId == null)
-            {
-                return RedirectToAction("Index", "Login");
-            }
-
-            if (ModelState.IsValid)
-            {
-                assignment.LecturerID = lecturerId.Value;
-                _context.Add(assignment);
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "Tạo bài tập thành công!";
-                return RedirectToAction(nameof(Assignments));
-            }
-
-            ViewBag.Courses = await _context.Courses
-                .Where(c => c.LecturerID == lecturerId)
-                .ToListAsync();
-
-            return View(assignment);
-        }
-
-        // Action xem chi tiết bài tập và các bài nộp
-        public async Task<IActionResult> AssignmentDetail(int id)
-        {
-            if (HttpContext.Session.GetString("Role") != "Lecturer")
-            {
-                return RedirectToAction("Index", "Login");
-            }
-
-            var lecturerId = HttpContext.Session.GetInt32("LecturerId");
-
+            // Lấy thông tin bài tập
             var assignment = await _context.Assignments
                 .Include(a => a.Course)
-                .Include(a => a.AssignmentSubmissions)
-                    .ThenInclude(s => s.Student)
-                .Include(a => a.AssignmentAttachments)
-                .FirstOrDefaultAsync(a => a.AssignmentID == id && a.LecturerID == lecturerId);
+                .Include(a => a.Lecturer)
+                .FirstOrDefaultAsync(a => a.AssignmentID == id && a.LecturerID == lecturerId.Value);
 
             if (assignment == null)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "Không tìm thấy bài tập hoặc bạn không có quyền truy cập!";
+                return RedirectToAction("Assignments");
             }
+
+            // Lấy danh sách bài nộp
+            var submissions = await _context.AssignmentSubmissions
+                .Include(s => s.Student)
+                .Include(s => s.Assignment)
+                .Where(s => s.AssignmentID == id)
+                .OrderByDescending(s => s.SubmitDate)
+                .ToListAsync();
+
+            ViewBag.Submissions = submissions;
 
             return View(assignment);
         }
 
-        // Action chấm điểm bài nộp
+        // POST: Lưu điểm
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GradeSubmission(int submissionId, float score, string feedback)
+        public async Task<IActionResult> SaveGrade(int submissionId, int assignmentId, decimal score, string feedback)
+        {
+            // Kiểm tra đăng nhập
+            if (HttpContext.Session.GetString("Role") != "Lecturer")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            var lecturerId = HttpContext.Session.GetInt32("LecturerID");
+            if (!lecturerId.HasValue)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // Validate điểm
+            if (score < 0 || score > 10)
+            {
+                TempData["ErrorMessage"] = "Điểm phải nằm trong khoảng từ 0 đến 10!";
+                return RedirectToAction("GradeAssignment", new { id = assignmentId });
+            }
+
+            // Kiểm tra quyền sở hữu assignment
+            var assignment = await _context.Assignments
+                .FirstOrDefaultAsync(a => a.AssignmentID == assignmentId && a.LecturerID == lecturerId.Value);
+
+            if (assignment == null)
+            {
+                TempData["ErrorMessage"] = "Bạn không có quyền chấm điểm bài tập này!";
+                return RedirectToAction("Assignments");
+            }
+
+            // Lấy submission
+            var submission = await _context.AssignmentSubmissions
+                .FirstOrDefaultAsync(s => s.SubmissionID == submissionId);
+
+            if (submission == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy bài nộp!";
+                return RedirectToAction("GradeAssignment", new { id = assignmentId });
+            }
+
+            // Cập nhật điểm và nhận xét
+            submission.Score = (double?)score;
+            submission.Feedback = feedback;
+
+            _context.AssignmentSubmissions.Update(submission);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Đã chấm điểm thành công cho sinh viên!";
+            return RedirectToAction("GradeAssignment", new { id = assignmentId });
+        }
+
+        // GET: Download file bài nộp của sinh viên
+        public async Task<IActionResult> DownloadSubmissionFile(int id)
+        {
+            // Kiểm tra đăng nhập
+            if (HttpContext.Session.GetString("Role") != "Lecturer")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            var lecturerId = HttpContext.Session.GetInt32("LecturerID");
+            if (!lecturerId.HasValue)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // Lấy submission và kiểm tra quyền
+            var submission = await _context.AssignmentSubmissions
+                .Include(s => s.Assignment)
+                .FirstOrDefaultAsync(s => s.SubmissionID == id);
+
+            if (submission == null || submission.Assignment?.LecturerID != lecturerId.Value)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy file hoặc bạn không có quyền truy cập!";
+                return RedirectToAction("Assignments");
+            }
+
+            if (string.IsNullOrEmpty(submission.FilePath))
+            {
+                TempData["ErrorMessage"] = "Bài nộp không có file đính kèm!";
+                return RedirectToAction("GradeAssignment", new { id = submission.AssignmentID });
+            }
+
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", submission.FilePath.TrimStart('/'));
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                TempData["ErrorMessage"] = "File không tồn tại!";
+                return RedirectToAction("GradeAssignment", new { id = submission.AssignmentID });
+            }
+
+            var fileName = Path.GetFileName(filePath);
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+            var fileExtension = Path.GetExtension(fileName).ToLower();
+
+            string contentType = fileExtension switch
+            {
+                ".pdf" => "application/pdf",
+                ".doc" => "application/msword",
+                ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ".xls" => "application/vnd.ms-excel",
+                ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                ".zip" => "application/zip",
+                ".rar" => "application/x-rar-compressed",
+                _ => "application/octet-stream"
+            };
+
+            return File(fileBytes, contentType, fileName);
+        }
+
+        // GET: Tạo bài tập mới (placeholder)
+        public IActionResult CreateAssignment()
         {
             if (HttpContext.Session.GetString("Role") != "Lecturer")
             {
                 return RedirectToAction("Index", "Login");
             }
 
-            var lecturerId = HttpContext.Session.GetInt32("LecturerId");
-
-            var submission = await _context.AssignmentSubmissions
-                .Include(s => s.Assignment)
-                .FirstOrDefaultAsync(s => s.SubmissionID == submissionId && s.Assignment != null && s.Assignment.LecturerID == lecturerId);
-
-            if (submission == null)
-            {
-                return NotFound();
-            }
-
-            submission.Score = score;
-            submission.Feedback = feedback;
-
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Chấm điểm thành công!";
-            return RedirectToAction(nameof(AssignmentDetail), new { id = submission.AssignmentID });
+            // TODO: Implement create assignment form
+            TempData["ErrorMessage"] = "Chức năng đang được phát triển!";
+            return RedirectToAction("Assignments");
         }
 
-        // Helper method
+        // GET: Sửa bài tập (placeholder)
+        public IActionResult EditAssignment(int id)
+        {
+            if (HttpContext.Session.GetString("Role") != "Lecturer")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // TODO: Implement edit assignment form
+            TempData["ErrorMessage"] = "Chức năng đang được phát triển!";
+            return RedirectToAction("Assignments");
+        }
+
+        // POST: Xóa bài tập
+        [HttpGet]
+        public async Task<IActionResult> DeleteAssignment(int id)
+        {
+            if (HttpContext.Session.GetString("Role") != "Lecturer")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            var lecturerId = HttpContext.Session.GetInt32("LecturerID");
+            if (!lecturerId.HasValue)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            var assignment = await _context.Assignments
+                .FirstOrDefaultAsync(a => a.AssignmentID == id && a.LecturerID == lecturerId.Value);
+
+            if (assignment == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy bài tập hoặc bạn không có quyền xóa!";
+                return RedirectToAction("Assignments");
+            }
+
+            // Xóa các submissions liên quan
+            var submissions = await _context.AssignmentSubmissions
+                .Where(s => s.AssignmentID == id)
+                .ToListAsync();
+
+            // Xóa files
+            foreach (var submission in submissions)
+            {
+                if (!string.IsNullOrEmpty(submission.FilePath))
+                {
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", submission.FilePath.TrimStart('/'));
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
+            }
+
+            _context.AssignmentSubmissions.RemoveRange(submissions);
+            _context.Assignments.Remove(assignment);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Đã xóa bài tập thành công!";
+            return RedirectToAction("Assignments");
+        }
+
+        // Add this private method to LecturerController to fix CS0103
         private bool LecturerExists(int id)
         {
             return _context.Lecturers.Any(e => e.LecturerID == id);

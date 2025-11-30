@@ -10,11 +10,6 @@
 
 <link rel="stylesheet" href="~/css/RegisterStudy.css" />
 
-<div class="registration-container">
-    <a href="@Url.Action("Dashboard", "Student")" 
-       class="back-btn"
-       data-partial-url="@Url.Action("Dashboard", "Student", new { partial = true })">← Quay lại Dashboard</a>
-
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success">

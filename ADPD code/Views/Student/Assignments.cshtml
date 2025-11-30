@@ -377,11 +377,13 @@
                             <a href="#" class="btn-secondary">📄 Xem chi tiết</a>
                             @if (!hasSubmitted)
                             {
-                                <a href="#" class="btn-primary">📤 Nộp bài</a>
+                                <a href="@Url.Action("SubmitAssignment", "Student", new { id = assignment.AssignmentID })"
+                                   class="btn-primary">📤 Nộp bài</a>
                             }
                             else if (!isGraded)
                             {
-                                <a href="#" class="btn-primary">✏️ Chỉnh sửa bài nộp</a>
+                                <a href="@Url.Action("SubmitAssignment", "Student", new { id = assignment.AssignmentID })"
+                                   class="btn-primary">✏️ Chỉnh sửa bài nộp</a>
                             }
                         </div>
                     </div>

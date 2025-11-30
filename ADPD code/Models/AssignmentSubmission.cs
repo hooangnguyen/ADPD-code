@@ -20,9 +20,9 @@ namespace ADPD_code.Models
         [StringLength(500)]
         public string? FilePath { get; set; }
 
-        public string? AnswerText { get; set; }
         public double? Score { get; set; }
         public string? Feedback { get; set; }
+        public string? SubmissionText { get; set; } // This line was added
 
         public Assignment? Assignment { get; set; }
         public Student? Student { get; set; }

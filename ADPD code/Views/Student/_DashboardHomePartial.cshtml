@@ -50,7 +50,17 @@
     <div class="content-grid">
         <div class="card">
             <div class="card-header">
-                <h2 class="card-title">Lịch học hôm nay</h2>
+                <div>
+                    <h2 class="card-title">Lịch học hôm nay</h2>
+                    <p style="font-size: 13px; color: #666; margin-top: 4px;">
+                        @{
+                            var displayDate = ViewBag.TodayDate != null ? (DateTime)ViewBag.TodayDate : DateTime.Now;
+                            var dayNames = new[] { "Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy" };
+                            var dayName = dayNames[(int)displayDate.DayOfWeek];
+                        }
+                        @dayName, @displayDate.ToString("dd/MM/yyyy")
+                    </p>
+                </div>
                 <a href="@Url.Action("Schedule", "Student")"
                    class="view-all"
                    data-partial-url="@Url.Action("Schedule", "Student", new { partial = true })">Xem tất cả →</a>
@@ -87,35 +97,7 @@
                                 Không có lịch học hôm nay
                             </td>
                         </tr>
-                    }
-
-                    <tr>
-                        <td>
-                            <div class="subject-name">Lập trình Web</div>
-                            <div class="subject-code">CS301</div>
-                        </td>
-                        <td><span class="time-badge">07:30 - 09:30</span></td>
-                        <td><span class="room-badge">A101</span></td>
-                        <td>TS. Nguyễn Văn B</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="subject-name">Cơ sở dữ liệu</div>
-                            <div class="subject-code">CS302</div>
-                        </td>
-                        <td><span class="time-badge">09:45 - 11:45</span></td>
-                        <td><span class="room-badge">B205</span></td>
-                        <td>ThS. Trần Thị C</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="subject-name">Mạng máy tính</div>
-                            <div class="subject-code">CS303</div>
-                        </td>
-                        <td><span class="time-badge">13:00 - 15:00</span></td>
-                        <td><span class="room-badge">C308</span></td>
-                        <td>TS. Lê Văn D</td>
-                    </tr>
+                    }                             
                 </tbody>
             </table>
         </div>
@@ -157,32 +139,6 @@
                     </div>
                 }
 
-                <div class="notification-item">
-                    <div class="notification-icon info">📢</div>
-                    <div class="notification-content">
-                        <h4>Thông báo lịch thi giữa kỳ</h4>
-                        <p>Lịch thi giữa kỳ đã được cập nhật</p>
-                        <span class="notification-time">2 giờ trước</span>
-                    </div>
-                </div>
-                <div class="notification-item">
-                    <div class="notification-icon success">✅</div>
-                    <div class="notification-content">
-                        <h4>Điểm đã cập nhật</h4>
-                        <p>Điểm môn Lập trình Web đã được công bố</p>
-                        <span class="notification-time">5 giờ trước</span>
-                    </div>
-                </div>
-                <div class="notification-item">
-                    <div class="notification-icon warning">⚠️</div>
-                    <div class="notification-content">
-                        <h4>Bài tập sắp hết hạn</h4>
-                        <p>Bài tập Lập trình Web - Deadline: 28/11/2024</p>
-                        <span class="notification-time">1 ngày trước</span>
-                    </div>
-                </div>
-            </div>
-
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">Thao tác nhanh</h2>
@@ -200,6 +156,12 @@
                         <div class="icon">📊</div>
                         <span>Xem điểm</span>
                     </a>
+                    <a href="@Url.Action("Subject","Student")"
+                       class="action-btn"
+                       data-partial-url="@Url.Action("Subject","Student",new{ partial = true })">
+                       <div class="icon">📚</div>
+                      <span>môn học </span>
+                       </a>    
                     <a href="@Url.Action("Assignments", "Student")"
                        class="action-btn"
                        data-partial-url="@Url.Action("Assignments", "Student", new { partial = true })">

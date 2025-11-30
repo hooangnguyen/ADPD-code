@@ -1,6 +1,7 @@
 ﻿using ADPD_code.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ADPD_code.ViewModels;
 
 namespace ADPD_code.Controllers
 {
@@ -91,6 +92,7 @@ namespace ADPD_code.Controllers
 
             // 6. Lịch học hôm nay từ bảng Timetable
             var today = DateTime.Now.Date;
+            var tomorrow = today.AddDays(1);
             
             // Lấy ClassID của sinh viên từ StudentClass
             var studentClassIds = await _context.StudentClasses
@@ -99,23 +101,28 @@ namespace ADPD_code.Controllers
                 .ToListAsync();
 
             // Lấy lịch học hôm nay từ Timetable
+            // Sử dụng so sánh range để tránh vấn đề với .Date trong EF Core
             var todaySchedule = await _context.Timetable
                 .Include(t => t.Course)
                 .ThenInclude(c => c.Lecturer)
-                .Where(t => studentClassIds.Contains(t.ClassID) && t.StudyDate.Date == today)
+                .Where(t => studentClassIds.Contains(t.ClassID) 
+                    && t.StudyDate >= today 
+                    && t.StudyDate < tomorrow)
                 .OrderBy(t => t.StartTime)
                 .Select(t => new
                 {
                     CourseName = t.Course != null ? t.Course.CourseName : "N/A",
                     CourseCode = t.Course != null ? $"CS{t.Course.CourseID}" : "N/A",
-                    Time = $"{t.StartTime:hh\\:mm} - {t.EndTime:hh\\:mm}",
+                    Time = $"{t.StartTime:HH\\:mm} - {t.EndTime:HH\\:mm}", // Format 24h
                     Room = t.Room ?? "N/A",
-                    LecturerName = t.Course != null && t.Course.Lecturer != null ? t.Course.Lecturer.FullName : "N/A"
+                    LecturerName = t.Course != null && t.Course.Lecturer != null ? t.Course.Lecturer.FullName : "N/A",
+                    StudyDate = t.StudyDate
                 })
                 .ToListAsync();
 
             ViewBag.TodaySchedule = todaySchedule;
             ViewBag.TodayClasses = todaySchedule.Count;
+            ViewBag.TodayDate = today; // Thêm ngày hiện tại vào ViewBag
 
             // 7. Bài tập gần đây (lấy từ Assignment của các môn học sinh viên đã đăng ký)
             var studentCourseIds = enrollments
@@ -180,27 +187,36 @@ namespace ADPD_code.Controllers
         }
 
         // Grades - Xem điểm
-        public Task<IActionResult> Grades(bool partial = false)
+        public async Task<IActionResult> Grades(bool partial = false)
         {
             if (HttpContext.Session.GetString("Role") != "Student")
             {
-                return Task.FromResult<IActionResult>(RedirectToAction("Index", "Login"));
+                return RedirectToAction("Index", "Login");
             }
 
             var studentId = HttpContext.Session.GetInt32("StudentID");
             if (!studentId.HasValue)
             {
-                return Task.FromResult<IActionResult>(RedirectToAction("Index", "Login"));
+                return RedirectToAction("Index", "Login");
             }
 
-            // TODO: Lấy danh sách điểm từ bảng Enrollment
+            // Lấy danh sách điểm từ bảng Enrollment với Include Course và Lecturer
+            var enrollments = await _context.Enrollments
+                .Include(e => e.Course)
+                    .ThenInclude(c => c.Lecturer)
+                .Where(e => e.StudentID == studentId.Value)
+                .OrderByDescending(e => e.AcademicYear)
+                .ThenByDescending(e => e.Semester)
+                .ToListAsync();
+
             ViewBag.StudentId = studentId.Value;
             ViewData["IsPartial"] = partial;
-            return Task.FromResult<IActionResult>(partial ? PartialView() : View());
+
+            return partial ? PartialView(enrollments) : View(enrollments);
         }
 
         // Schedule - Lịch học
-        public IActionResult Schedule(bool partial = false)
+        public async Task<IActionResult> Schedule(bool partial = false)
         {
             if (HttpContext.Session.GetString("Role") != "Student")
             {
@@ -213,30 +229,114 @@ namespace ADPD_code.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            // TODO: Lấy lịch học từ DB
+            // Lấy ClassID của sinh viên
+            var studentClassIds = await _context.StudentClasses
+                .Where(sc => sc.StudentId == studentId.Value)
+                .Select(sc => sc.ClassID)
+                .ToListAsync();
+
+            // Lấy lịch học từ Timetable
+            var timetable = await _context.Timetable
+                .Include(t => t.Course)
+                    .ThenInclude(c => c.Lecturer)
+                .Where(t => studentClassIds.Contains(t.ClassID))
+                .OrderBy(t => t.StudyDate)
+                .ThenBy(t => t.StartTime)
+                .ToListAsync();
+
+            // Lấy danh sách Course từ Timetable
+            var courses = timetable
+                .Where(t => t.Course != null)
+                .Select(t => t.Course!)
+                .Distinct()
+                .OrderBy(c => c.CourseName)
+                .ToList();
+
+            // Truyền thêm thông tin Timetable để hiển thị lịch chi tiết
+            ViewBag.Timetable = timetable;
             ViewBag.StudentId = studentId.Value;
             ViewData["IsPartial"] = partial;
-            return partial ? PartialView() : View();
+
+            return partial ? PartialView(courses) : View(courses);
         }
 
         // Assignments - Bài tập
-        public Task<IActionResult> Assignments(bool partial = false)
+        public async Task<IActionResult> Assignments(bool partial = false)
         {
             if (HttpContext.Session.GetString("Role") != "Student")
             {
-                return Task.FromResult<IActionResult>(RedirectToAction("Index", "Login"));
+                return RedirectToAction("Index", "Login");
             }
 
             var studentId = HttpContext.Session.GetInt32("StudentID");
             if (!studentId.HasValue)
             {
-                return Task.FromResult<IActionResult>(RedirectToAction("Index", "Login"));
+                return RedirectToAction("Index", "Login");
             }
 
-            // TODO: Lấy danh sách bài tập
+            var studentCourseIds = await _context.Enrollments
+                .Where(e => e.StudentID == studentId.Value)
+                .Select(e => e.CourseID)
+                .ToListAsync();
+
+            var assignments = await _context.Assignments
+                .Include(a => a.Course)
+                .Include(a => a.Lecturer)
+                .Where(a => studentCourseIds.Contains(a.CourseID))
+                .OrderByDescending(a => a.EndDate)
+                .ToListAsync();
+
+            var submissions = await _context.AssignmentSubmissions
+                .Where(s => s.StudentID == studentId.Value)
+                .ToListAsync();
+
             ViewBag.StudentId = studentId.Value;
+            ViewBag.Submissions = submissions;
             ViewData["IsPartial"] = partial;
-            return Task.FromResult<IActionResult>(partial ? PartialView() : View());
+
+            return partial ? PartialView(assignments) : View(assignments);
+        }
+
+        // Subject - Danh sách môn học
+        public async Task<IActionResult> Subject(bool partial = false)
+        {
+            if (HttpContext.Session.GetString("Role") != "Student")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            var studentId = HttpContext.Session.GetInt32("StudentID");
+            if (!studentId.HasValue)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            var enrollments = await _context.Enrollments
+                .Include(e => e.Course)
+                .ThenInclude(c => c.Lecturer)
+                .Include(e => e.Student)
+                .ThenInclude(s => s.StudentClasses)
+                .ThenInclude(sc => sc.Class)
+                .Where(e => e.StudentID == studentId.Value)
+                .OrderByDescending(e => e.AcademicYear)
+                .ThenByDescending(e => e.Semester)
+                .ToListAsync();
+
+            var model = enrollments.Select(e => new StudentSubjectViewModel
+            {
+                CourseId = e.CourseID,
+                CourseName = e.Course?.CourseName ?? "N/A",
+                CourseCode = $"CS{e.CourseID}",
+                Credits = e.Course?.Credits ?? 0,
+                LecturerName = e.Course?.Lecturer?.FullName ?? "Chưa phân công",
+                Semester = e.Semester ?? "N/A",
+                AcademicYear = e.AcademicYear ?? "N/A",
+                Score = e.Score,
+                ClassName = e.Student?.StudentClasses?.FirstOrDefault()?.Class?.ClassName ?? "N/A"
+            }).ToList();
+
+            ViewData["IsPartial"] = partial;
+            return partial ? PartialView(model) : View(model);
         }
 
         // RegisterStudy - Đăng ký môn học
@@ -359,6 +459,169 @@ namespace ADPD_code.Controllers
 
             TempData["SuccessMessage"] = $"Đăng ký môn học {course.CourseName} thành công!";
             return RedirectToAction("RegisterStudy", new { partial = partial });
+        }
+        public async Task<IActionResult> SubmitAssignment(int id, bool partial = false)
+        {
+            if (HttpContext.Session.GetString("Role") != "Student")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            var studentId = HttpContext.Session.GetInt32("StudentID");
+            if (!studentId.HasValue)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // Lấy thông tin bài tập
+            var assignment = await _context.Assignments
+                .Include(a => a.Course)
+                .Include(a => a.Lecturer)
+                .FirstOrDefaultAsync(a => a.AssignmentID == id);
+
+            if (assignment == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy bài tập!";
+                return RedirectToAction("Assignments");
+            }
+
+            // Kiểm tra xem sinh viên đã nộp bài chưa
+            var submission = await _context.AssignmentSubmissions
+                .FirstOrDefaultAsync(s => s.AssignmentID == id && s.StudentID == studentId.Value);
+
+            ViewBag.Submission = submission;
+            ViewData["IsPartial"] = partial;
+
+            return View(assignment);
+        }
+
+        // POST: Xử lý nộp bài
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitAssignment(int assignmentId, IFormFile file, string submissionText)
+        {
+            if (HttpContext.Session.GetString("Role") != "Student")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            var studentId = HttpContext.Session.GetInt32("StudentID");
+            if (!studentId.HasValue)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // Validate assignment exists
+            var assignment = await _context.Assignments.FindAsync(assignmentId);
+            if (assignment == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy bài tập!";
+                return RedirectToAction("Assignments");
+            }
+
+            // Check deadline
+            if (DateTime.Now > assignment.EndDate)
+            {
+                TempData["ErrorMessage"] = "Đã quá hạn nộp bài!";
+                return RedirectToAction("SubmitAssignment", new { id = assignmentId });
+            }
+
+            // Kiểm tra xem đã nộp bài chưa
+            var existingSubmission = await _context.AssignmentSubmissions
+                .FirstOrDefaultAsync(s => s.AssignmentID == assignmentId && s.StudentID == studentId.Value);
+
+            // Validate: Nếu chưa submit lần nào thì phải có file
+            if (existingSubmission == null && (file == null || file.Length == 0))
+            {
+                TempData["ErrorMessage"] = "Vui lòng chọn file để nộp bài!";
+                return RedirectToAction("SubmitAssignment", new { id = assignmentId });
+            }
+
+            string filePath = existingSubmission?.FilePath;
+
+            // Xử lý upload file
+            if (file != null && file.Length > 0)
+            {
+                // Validate file type
+                var allowedExtensions = new[] { ".doc", ".docx", ".xls", ".xlsx", ".pdf", ".zip", ".rar" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLower();
+
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    TempData["ErrorMessage"] = "Định dạng file không được hỗ trợ! Chỉ chấp nhận: Word, Excel, PDF, ZIP";
+                    return RedirectToAction("SubmitAssignment", new { id = assignmentId });
+                }
+
+                // Validate file size (10MB max)
+                if (file.Length > 10 * 1024 * 1024)
+                {
+                    TempData["ErrorMessage"] = "File quá lớn! Kích thước tối đa là 10MB";
+                    return RedirectToAction("SubmitAssignment", new { id = assignmentId });
+                }
+
+                // Tạo thư mục lưu file nếu chưa có
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "assignments");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                // Tạo tên file unique
+                var fileName = $"{studentId.Value}_{assignmentId}_{DateTime.Now:yyyyMMddHHmmss}{fileExtension}";
+                var fullPath = Path.Combine(uploadsFolder, fileName);
+
+                // Xóa file cũ nếu có
+                if (!string.IsNullOrEmpty(existingSubmission?.FilePath))
+                {
+                    var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existingSubmission.FilePath.TrimStart('/'));
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        System.IO.File.Delete(oldFilePath);
+                    }
+                }
+
+                // Lưu file mới
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                filePath = $"/uploads/assignments/{fileName}";
+            }
+
+            // Lưu submission mới hoặc cập nhật submission cũ
+            if (existingSubmission == null)
+            {
+                var submission = new Models.AssignmentSubmission
+                {
+                    AssignmentID = assignmentId,
+                    StudentID = studentId.Value,
+                    FilePath = filePath,
+                    SubmissionText = !string.IsNullOrWhiteSpace(submissionText) ? submissionText : null,
+                    SubmitDate = DateTime.Now
+                };
+                _context.AssignmentSubmissions.Add(submission);
+            }
+            else
+            {
+                // Chỉ cập nhật filePath nếu có file mới
+                if (!string.IsNullOrEmpty(filePath))
+                {
+                    existingSubmission.FilePath = filePath;
+                }
+                // Cập nhật nội dung nếu có
+                if (!string.IsNullOrWhiteSpace(submissionText))
+                {
+                    existingSubmission.SubmissionText = submissionText;
+                }
+                existingSubmission.SubmitDate = DateTime.Now;
+                _context.AssignmentSubmissions.Update(existingSubmission);
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Nộp bài thành công!";
+            return RedirectToAction("Assignments");
         }
     }
 }
