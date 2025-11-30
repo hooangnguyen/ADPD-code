@@ -1,12 +1,17 @@
 ﻿@model IEnumerable<ADPD_code.Models.Assignment>
 @{
     ViewData["Title"] = "Quản lý bài tập";
+    var isPartial = ViewData["IsPartial"] as bool? ?? false;
     var submissionCounts = ViewBag.SubmissionCounts as Dictionary<int, int>;
+    Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
 }
 <link rel="stylesheet" href="~/css/Assinments.css" />
 
 <div class="lecturer-assignments-container">
-    <a href="@Url.Action("Dashboard", "Lecturer")" class="back-btn">← Quay lại Dashboard</a>
+    @if (!isPartial)
+    {
+        <a href="@Url.Action("Dashboard", "Lecturer")" class="back-btn">← Quay lại Dashboard</a>
+    }
 
     <div class="page-header">
         <h1>📝 Quản lý Bài tập</h1>

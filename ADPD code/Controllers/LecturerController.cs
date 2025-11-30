@@ -7,24 +7,97 @@ namespace ADPD_code.Controllers
 {
     public class LecturerController : Controller
     {
-        private readonly ApplicationDbContext _context; 
+        private readonly ApplicationDbContext _context;
 
         public LecturerController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public IActionResult Dashboard()
+        public async Task<IActionResult> Dashboard(bool partial = false)
         {
-            if (HttpContext.Session.GetString("Role") != "Lecturer")
+            var role = HttpContext.Session.GetString("Role");
+            if (string.IsNullOrEmpty(role) || !role.Equals("Lecturer", StringComparison.OrdinalIgnoreCase))
             {
                 return RedirectToAction("Index", "Login");
             }
+
+            var lecturerId = HttpContext.Session.GetInt32("LecturerId");
+            if (lecturerId == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // Lấy thông tin giảng viên
+            var lecturer = await _context.Lecturers
+                .FirstOrDefaultAsync(l => l.LecturerID == lecturerId);
+
+            if (lecturer != null)
+            {
+                ViewBag.FullName = lecturer.FullName;
+            }
+
+            // Tính toán thống kê
+            var totalCourses = await _context.Courses
+                .Where(c => c.LecturerID == lecturerId)
+                .CountAsync();
+
+            var totalStudents = await _context.Enrollments
+                .Include(e => e.Course)
+                .Where(e => e.Course.LecturerID == lecturerId)
+                .Select(e => e.StudentID)
+                .Distinct()
+                .CountAsync();
+
+            var pendingAssignments = await _context.AssignmentSubmissions
+                .Include(s => s.Assignment)
+                .Where(s => s.Assignment.LecturerID == lecturerId && (!s.Score.HasValue || s.Score == 0))
+                .CountAsync();
+
+            // Tính số lớp học hôm nay từ Timetable
+            var today = DateTime.Today;
+            var todayClasses = await _context.Timetable
+                .Include(t => t.Course)
+                .Where(t => t.Course.LecturerID == lecturerId && t.StudyDate == today)
+                .CountAsync();
+
+            ViewBag.TotalCourses = totalCourses;
+            ViewBag.TotalStudents = totalStudents;
+            ViewBag.PendingAssignments = pendingAssignments;
+            ViewBag.TodayClasses = todayClasses;
+
+            // Lấy danh sách môn học gần đây
+            var courses = await _context.Courses
+                .Include(c => c.Timetable)
+                    .ThenInclude(t => t.Class)
+                .Include(c => c.Enrollments)
+                .Where(c => c.LecturerID == lecturerId)
+                .OrderByDescending(c => c.CourseID)
+                .Take(3)
+                .ToListAsync();
+
+            var recentCourses = courses.Select(c => new
+            {
+                c.CourseID,
+                c.CourseName,
+                ClassName = c.Timetable?.FirstOrDefault()?.Class?.ClassName ?? "N/A",
+                StudentCount = c.Enrollments?.Count ?? 0
+            }).ToList();
+
+            ViewBag.RecentCourses = recentCourses;
+
+            ViewData["IsPartial"] = partial;
+
+            if (partial)
+            {
+                return PartialView("_DashboardHomePartial");
+            }
+
             return View();
         }
 
         // Action hiển thị profile giảng viên
-        public async Task<IActionResult> Profile()
+        public async Task<IActionResult> Profile(bool partial = false)
         {
             if (HttpContext.Session.GetString("Role") != "Lecturer")
             {
@@ -53,6 +126,13 @@ namespace ADPD_code.Controllers
             if (lecturer == null)
             {
                 return NotFound();
+            }
+
+            ViewData["IsPartial"] = partial;
+
+            if (partial)
+            {
+                return PartialView(lecturer);
             }
 
             return View(lecturer);
@@ -137,7 +217,7 @@ namespace ADPD_code.Controllers
         }
 
         // Action xem danh sách môn học
-        public async Task<IActionResult> Courses()
+        public async Task<IActionResult> Courses(bool partial = false)
         {
             if (HttpContext.Session.GetString("Role") != "Lecturer")
             {
@@ -156,6 +236,13 @@ namespace ADPD_code.Controllers
                     .ThenInclude(e => e.Student)
                 .Where(c => c.LecturerID == lecturerId)
                 .ToListAsync();
+
+            ViewData["IsPartial"] = partial;
+
+            if (partial)
+            {
+                return PartialView(courses);
+            }
 
             return View(courses);
         }
@@ -185,7 +272,7 @@ namespace ADPD_code.Controllers
         }
 
         // Action quản lý bài tập
-        public async Task<IActionResult> Assignments()
+        public async Task<IActionResult> Assignments(bool partial = false)
         {
             // Kiểm tra đăng nhập
             if (HttpContext.Session.GetString("Role") != "Lecturer")
@@ -193,7 +280,7 @@ namespace ADPD_code.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            var lecturerId = HttpContext.Session.GetInt32("LecturerID");
+            var lecturerId = HttpContext.Session.GetInt32("LecturerId"); // ĐÃ SỬA
             if (!lecturerId.HasValue)
             {
                 return RedirectToAction("Index", "Login");
@@ -227,6 +314,12 @@ namespace ADPD_code.Controllers
 
             ViewBag.SubmissionCounts = submissionCounts;
             ViewBag.GradedCounts = gradedCounts;
+            ViewData["IsPartial"] = partial;
+
+            if (partial)
+            {
+                return PartialView(assignments);
+            }
 
             return View(assignments);
         }
@@ -240,7 +333,7 @@ namespace ADPD_code.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            var lecturerId = HttpContext.Session.GetInt32("LecturerID");
+            var lecturerId = HttpContext.Session.GetInt32("LecturerId"); // ĐÃ SỬA
             if (!lecturerId.HasValue)
             {
                 return RedirectToAction("Index", "Login");
@@ -282,7 +375,7 @@ namespace ADPD_code.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            var lecturerId = HttpContext.Session.GetInt32("LecturerID");
+            var lecturerId = HttpContext.Session.GetInt32("LecturerId"); // ĐÃ SỬA
             if (!lecturerId.HasValue)
             {
                 return RedirectToAction("Index", "Login");
@@ -335,7 +428,7 @@ namespace ADPD_code.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            var lecturerId = HttpContext.Session.GetInt32("LecturerID");
+            var lecturerId = HttpContext.Session.GetInt32("LecturerId"); // ĐÃ SỬA
             if (!lecturerId.HasValue)
             {
                 return RedirectToAction("Index", "Login");
@@ -420,7 +513,7 @@ namespace ADPD_code.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            var lecturerId = HttpContext.Session.GetInt32("LecturerID");
+            var lecturerId = HttpContext.Session.GetInt32("LecturerId"); // ĐÃ SỬA
             if (!lecturerId.HasValue)
             {
                 return RedirectToAction("Index", "Login");
@@ -459,6 +552,69 @@ namespace ADPD_code.Controllers
 
             TempData["SuccessMessage"] = "Đã xóa bài tập thành công!";
             return RedirectToAction("Assignments");
+        }
+
+        // Action quản lý điểm danh
+        public async Task<IActionResult> Attendance(bool partial = false)
+        {
+            if (HttpContext.Session.GetString("Role") != "Lecturer")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            var lecturerId = HttpContext.Session.GetInt32("LecturerId");
+            if (lecturerId == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // Lấy danh sách môn học của giảng viên
+            var courses = await _context.Courses
+                .Where(c => c.LecturerID == lecturerId)
+                .ToListAsync();
+
+            ViewBag.Courses = courses;
+            ViewData["IsPartial"] = partial;
+
+            if (partial)
+            {
+                return PartialView();
+            }
+
+            return View();
+        }
+
+        // Action quản lý sinh viên
+        public async Task<IActionResult> Students(bool partial = false)
+        {
+            if (HttpContext.Session.GetString("Role") != "Lecturer")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            var lecturerId = HttpContext.Session.GetInt32("LecturerId");
+            if (lecturerId == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // Lấy danh sách sinh viên từ các môn học mà giảng viên dạy
+            var students = await _context.Enrollments
+                .Include(e => e.Student)
+                .Include(e => e.Course)
+                .Where(e => e.Course.LecturerID == lecturerId)
+                .Select(e => e.Student)
+                .Distinct()
+                .ToListAsync();
+
+            ViewData["IsPartial"] = partial;
+
+            if (partial)
+            {
+                return PartialView("InformationStudent", students);
+            }
+
+            return View("InformationStudent", students);
         }
 
         // Add this private method to LecturerController to fix CS0103

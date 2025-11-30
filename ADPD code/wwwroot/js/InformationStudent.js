@@ -1,0 +1,247 @@
+﻿
+        // Dữ liệu mẫu sinh viên
+    const students = [
+    {id: 1, mssv: '2021600001', name: 'Nguyễn Văn An', class: 'CNTT01-K65', email: 'annv@student.edu.vn', phone: '0912345671', dob: '15/03/2003', gender: 'Nam', address: 'Hà Nội', gpa: 3.45, attendance: 92, absent: 3, status: 'active' },
+    {id: 2, mssv: '2021600002', name: 'Trần Thị Bình', class: 'CNTT01-K65', email: 'binhtt@student.edu.vn', phone: '0912345672', dob: '22/05/2003', gender: 'Nữ', address: 'Hải Phòng', gpa: 3.78, attendance: 95, absent: 2, status: 'active' },
+    {id: 3, mssv: '2021600003', name: 'Lê Văn Cường', class: 'CNTT02-K65', email: 'cuonglv@student.edu.vn', phone: '0912345673', dob: '10/07/2003', gender: 'Nam', address: 'Hà Nội', gpa: 3.21, attendance: 88, absent: 5, status: 'active' },
+    {id: 4, mssv: '2021600004', name: 'Phạm Thị Dung', class: 'CNTT02-K65', email: 'dungpt@student.edu.vn', phone: '0912345674', dob: '18/09/2003', gender: 'Nữ', address: 'Nam Định', gpa: 3.56, attendance: 90, absent: 4, status: 'active' },
+    {id: 5, mssv: '2021600005', name: 'Hoàng Văn Em', class: 'CNTT01-K65', email: 'emhv@student.edu.vn', phone: '0912345675', dob: '05/11/2003', gender: 'Nam', address: 'Hà Nội', gpa: 3.12, attendance: 85, absent: 6, status: 'active' },
+    {id: 6, mssv: '2021600006', name: 'Vũ Thị Phương', class: 'CNTT03-K65', email: 'phuongvt@student.edu.vn', phone: '0912345676', dob: '30/01/2003', gender: 'Nữ', address: 'Thái Bình', gpa: 3.67, attendance: 93, absent: 3, status: 'active' },
+    {id: 7, mssv: '2021600007', name: 'Đặng Văn Giang', class: 'CNTT03-K65', email: 'giangdv@student.edu.vn', phone: '0912345677', dob: '12/04/2003', gender: 'Nam', address: 'Hà Nội', gpa: 3.34, attendance: 87, absent: 5, status: 'active' },
+    {id: 8, mssv: '2021600008', name: 'Bùi Thị Hoa', class: 'CNTT02-K65', email: 'hoabt@student.edu.vn', phone: '0912345678', dob: '25/06/2003', gender: 'Nữ', address: 'Hưng Yên', gpa: 3.89, attendance: 97, absent: 1, status: 'active' },
+    {id: 9, mssv: '2021600009', name: 'Ngô Văn Hùng', class: 'CNTT01-K65', email: 'hungnv@student.edu.vn', phone: '0912345679', dob: '08/08/2003', gender: 'Nam', address: 'Hà Nội', gpa: 2.98, attendance: 82, absent: 7, status: 'active' },
+    {id: 10, mssv: '2021600010', name: 'Đinh Thị Lan', class: 'CNTT03-K65', email: 'landt@student.edu.vn', phone: '0912345680', dob: '19/12/2003', gender: 'Nữ', address: 'Bắc Ninh', gpa: 3.45, attendance: 91, absent: 4, status: 'active' },
+    {id: 11, mssv: '2021600011', name: 'Trịnh Văn Minh', class: 'CNTT02-K65', email: 'minhtv@student.edu.vn', phone: '0912345681', dob: '14/02/2003', gender: 'Nam', address: 'Hà Nội', gpa: 3.23, attendance: 86, absent: 6, status: 'active' },
+    {id: 12, mssv: '2021600012', name: 'Lý Thị Nga', class: 'CNTT01-K65', email: 'galt@student.edu.vn', phone: '0912345682', dob: '27/10/2003', gender: 'Nữ', address: 'Vĩnh Phúc', gpa: 3.71, attendance: 94, absent: 2, status: 'active' }
+    ];
+
+    let filteredStudents = [...students];
+
+    function renderTable() {
+            const tbody = document.getElementById('studentTableBody');
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const classFilter = document.getElementById('classFilter').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+
+            filteredStudents = students.filter(student => {
+                const matchSearch = student.name.toLowerCase().includes(searchTerm) ||
+    student.mssv.includes(searchTerm) ||
+    student.email.toLowerCase().includes(searchTerm);
+    const matchClass = !classFilter || student.class === classFilter;
+    const matchStatus = !statusFilter || student.status === statusFilter;
+    return matchSearch && matchClass && matchStatus;
+            });
+
+    // Re-sort the filtered list
+    if (currentSortColumn !== undefined && sortDirection[currentSortColumn]) {
+        filteredStudents = sortData(filteredStudents, currentSortColumn, sortDirection[currentSortColumn]);
+            }
+
+    tbody.innerHTML = '';
+
+            filteredStudents.forEach((student, index) => {
+                const row = document.createElement('tr');
+                row.onclick = () => showStudentDetail(student);
+
+                const nameParts = student.name.split(' ').filter(n => n.length > 0);
+    let initials = '';
+                if (nameParts.length > 1) {
+        initials = nameParts[0][0] + nameParts[nameParts.length - 1][0];
+                } else if (nameParts.length === 1) {
+        initials = nameParts[0][0];
+                }
+
+
+    row.innerHTML = `
+    <td>${index + 1}</td>
+    <td><div class="student-avatar">${initials}</div></td>
+    <td><strong>${student.mssv}</strong></td>
+    <td>${student.name}</td>
+    <td>${student.class}</td>
+    <td>${student.email}</td>
+    <td>${student.phone}</td>
+    <td><strong>${student.gpa.toFixed(2)}</strong></td>
+    <td><strong>${student.attendance}%</strong></td>
+    <td>
+        <span class="status-badge ${student.status === 'active' ? 'status-active' : 'status-inactive'}">
+            ${student.status === 'active' ? 'Đang học' : 'Nghỉ học'}
+        </span>
+    </td>
+    `;
+    tbody.appendChild(row);
+            });
+
+    updateStats();
+        }
+
+    function updateStats() {
+            const total = filteredStudents.length;
+            const active = filteredStudents.filter(s => s.status === 'active').length;
+
+    let avgAttendance = 0;
+    let classCount = 0;
+
+            if (total > 0) {
+                const sumAttendance = filteredStudents.reduce((sum, s) => sum + s.attendance, 0);
+    avgAttendance = Math.round(sumAttendance / total);
+                const classes = [...new Set(filteredStudents.map(s => s.class))];
+    classCount = classes.length;
+            }
+
+    document.getElementById('totalStudents').textContent = total;
+    document.getElementById('activeStudents').textContent = active;
+    document.getElementById('avgAttendance').textContent = avgAttendance + '%';
+    document.getElementById('classCount').textContent = classCount;
+        }
+
+    function showStudentDetail(student) {
+            const modal = document.getElementById('studentModal');
+            
+            const nameParts = student.name.split(' ').filter(n => n.length > 0);
+    let initials = '';
+            if (nameParts.length > 1) {
+        initials = nameParts[0][0] + nameParts[nameParts.length - 1][0];
+            } else if (nameParts.length === 1) {
+        initials = nameParts[0][0];
+            }
+
+    document.getElementById('modalAvatar').textContent = initials;
+    document.getElementById('modalMSSV').textContent = student.mssv;
+    document.getElementById('modalName').textContent = student.name;
+    document.getElementById('modalClass').textContent = student.class;
+    document.getElementById('modalDOB').textContent = student.dob;
+    document.getElementById('modalGender').textContent = student.gender;
+    document.getElementById('modalEmail').textContent = student.email;
+    document.getElementById('modalPhone').textContent = student.phone;
+    document.getElementById('modalAddress').textContent = student.address;
+    document.getElementById('modalStatus').innerHTML = `
+    <span class="status-badge ${student.status === 'active' ? 'status-active' : 'status-inactive'}">
+        ${student.status === 'active' ? 'Đang học' : 'Nghỉ học'}
+    </span>
+    `;
+    document.getElementById('modalGPA').textContent = student.gpa.toFixed(2);
+    document.getElementById('modalAttendance').textContent = student.attendance + '%';
+    document.getElementById('modalAbsent').textContent = student.absent;
+
+    modal.style.display = 'block';
+        }
+
+    function closeModal() {
+        document.getElementById('studentModal').style.display = 'none';
+        }
+
+    window.onclick = function(event) {
+            const modal = document.getElementById('studentModal');
+    if (event.target === modal) {
+        closeModal();
+            }
+        }
+
+    function exportToExcel() {
+            // Cảnh báo nếu thư viện XLSX chưa được thêm
+            if (typeof XLSX === 'undefined') {
+        alert('Lỗi: Cần phải thêm thư viện XLSX (ví dụ: cdnjs) vào thẻ <head> để chức năng Xuất Excel hoạt động.');
+    return;
+            }
+
+            const data = filteredStudents.map((student, index) => ({
+        'STT': index + 1,
+    'MSSV': student.mssv,
+    'Họ và tên': student.name,
+    'Lớp': student.class,
+    'Ngày sinh': student.dob,
+    'Giới tính': student.gender,
+    'Email': student.email,
+    'Số điện thoại': student.phone,
+    'Địa chỉ': student.address,
+    'Điểm TB': student.gpa,
+    'Tỷ lệ tham dự (%)': student.attendance,
+    'Số buổi vắng': student.absent,
+    'Trạng thái': student.status === 'active' ? 'Đang học' : 'Nghỉ học'
+            }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+
+    // Tự động điều chỉnh độ rộng cột
+    const colWidths = [
+    {wch: 5 },  // STT
+    {wch: 12 }, // MSSV
+    {wch: 25 }, // Họ và tên
+    {wch: 15 }, // Lớp
+    {wch: 12 }, // Ngày sinh
+    {wch: 10 }, // Giới tính
+    {wch: 30 }, // Email
+    {wch: 15 }, // SĐT
+    {wch: 30 }, // Địa chỉ
+    {wch: 10 }, // Điểm TB
+    {wch: 18 }, // Tỷ lệ tham dự
+    {wch: 15 }, // Số buổi vắng
+    {wch: 12 }  // Trạng thái
+    ];
+    ws['!cols'] = colWidths;
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Danh sách sinh viên');
+
+    const fileName = `Danh_sach_sinh_vien_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    alert(`✅ Đã xuất file Excel thành công! Tên file: ${fileName}`);
+        }
+
+    let sortDirection = { };
+    let currentSortColumn;
+
+    function sortData(data, columnIndex, direction) {
+            return [...data].sort((a, b) => {
+        let aVal, bVal;
+
+    switch(columnIndex) {
+                    case 2: aVal = a.mssv; bVal = b.mssv; break;
+    case 3: aVal = a.name; bVal = b.name; break;
+    case 4: aVal = a.class; bVal = b.class; break;
+    case 7: aVal = a.gpa; bVal = b.gpa; break;
+    case 8: aVal = a.attendance; bVal = b.attendance; break;
+    default: return 0;
+                }
+
+    // Normalize undefined/null
+    if (aVal === undefined || aVal === null) aVal = '';
+    if (bVal === undefined || bVal === null) bVal = '';
+
+    let cmp = 0;
+    const isNumber = (columnIndex === 7 || columnIndex === 8); // Chỉ cột GPA và Attendance là số
+
+    if (isNumber) {
+        cmp = parseFloat(aVal) - parseFloat(bVal);
+                } else {
+        // So sánh chuỗi (có hỗ trợ tiếng Việt)
+        cmp = String(aVal).localeCompare(String(bVal), 'vi', { sensitivity: 'base' });
+                }
+
+    return direction === 'asc' ? cmp : -cmp;
+            });
+        }
+
+    function sortTable(columnIndex) {
+            // Cập nhật hướng sắp xếp
+            if (columnIndex === currentSortColumn) {
+        sortDirection[columnIndex] = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
+            } else {
+        currentSortColumn = columnIndex;
+    sortDirection[columnIndex] = 'asc';
+            }
+
+    // (Thêm code để cập nhật biểu tượng ↕ ▲ ▼ trên tiêu đề nếu cần)
+
+    renderTable();
+        }
+
+    // Wire up search/filter events
+    document.getElementById('searchInput').addEventListener('input', renderTable);
+    document.getElementById('classFilter').addEventListener('change', renderTable);
+    document.getElementById('statusFilter').addEventListener('change', renderTable);
+
+        // Initial render
+        document.addEventListener('DOMContentLoaded', () => {
+        renderTable();
+        });

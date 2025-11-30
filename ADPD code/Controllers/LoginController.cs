@@ -87,7 +87,7 @@ namespace ADPD_code.Controllers
             }
             else if (account.LecturerID.HasValue && account.Lecturer != null)
             {
-                HttpContext.Session.SetInt32("LecturerID", account.LecturerID.Value);
+                HttpContext.Session.SetInt32("LecturerId", account.LecturerID.Value);
                 fullName = account.Lecturer.FullName ?? username;
             }
             else if (account.Role == "Admin")
