@@ -1,27 +1,4 @@
-﻿<!--
-Pseudocode / Plan (detailed):
-
-1. Ensure HTML structure is properly closed:
-   - Add closing </script>, </body>, and </html> tags at the end of the file.
-
-2. Complete and stabilize the JavaScript:
-   - Finish the `sortTable(columnIndex)` function:
-     - Determine which field to sort by based on columnIndex.
-     - Normalize values for comparison (strings vs numbers).
-     - Use localeCompare for strings, numeric comparison for numbers.
-     - Respect ascending/descending order tracked in `sortDirection`.
-     - Toggle `sortDirection` for the clicked column.
-     - Re-render the table after sorting.
-
-   - Add event listeners:
-     - Call `renderTable()` on `input` for search and `change` for filters.
-     - Ensure initial `renderTable()` is invoked once the script loads.
-
-3. Keep the rest of the file content unchanged except for adding closing tags and completed JS so that the HTML linter errors about missing end tags are resolved.
-
-4. Place this pseudocode as a top HTML comment so the file remains self-contained and the plan is visible for maintenance.
--->
-
+﻿
 <!DOCTYPE html>
 <html lang="vi">
 <head>

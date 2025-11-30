@@ -437,10 +437,24 @@ namespace ADPD_code.Controllers
             }
 
             // Kiểm tra môn học có tồn tại không
-            var course = await _context.Courses.FindAsync(courseId);
+            var course = await _context.Courses
+                .Include(c => c.Enrollments)
+                .FirstOrDefaultAsync(c => c.CourseID == courseId);
+            
             if (course == null)
             {
                 TempData["ErrorMessage"] = "Môn học không tồn tại!";
+                return RedirectToAction("RegisterStudy", new { partial = partial });
+            }
+
+            // Kiểm tra slot còn trống không
+            const int maxStudents = 50; // Giới hạn sinh viên mỗi lớp
+            var enrolledCount = course.Enrollments?.Count ?? 0;
+            var availableSeats = maxStudents - enrolledCount;
+
+            if (availableSeats <= 0)
+            {
+                TempData["ErrorMessage"] = $"Môn học {course.CourseName} đã hết slot! Vui lòng chọn môn học khác.";
                 return RedirectToAction("RegisterStudy", new { partial = partial });
             }
 

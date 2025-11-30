@@ -3,238 +3,711 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Điểm danh Sinh viên</title>
+    <title>Quản lý Sinh viên</title>
+    <link href="~/css/exercisedetails.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        /* CSS tối thiểu để hiển thị layout cơ bản nếu file external CSS không tồn tại */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+        }
 
-    <link rel="stylesheet" href="~/css/Attendance.css" />
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #666;
+            margin-top: 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background-color: #f0f0ff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+            .stat-card h3 {
+                color: #667eea;
+                margin: 0;
+                font-size: 2em;
+            }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+        }
+
+        .search-container {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+        }
+
+        #searchInput {
+            border: none;
+            outline: none;
+            padding: 5px;
+            flex-grow: 1;
+        }
+
+        .filter-select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .action-buttons button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        .btn-save {
+            background-color: #4CAF50;
+        }
+
+            .btn-save:hover {
+                background-color: #45a049;
+            }
+
+        .btn-excel {
+            background-color: #2196F3;
+        }
+
+            .btn-excel:hover {
+                background-color: #0b7dda;
+            }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        #studentTable {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            background-color: #fff;
+        }
+
+            #studentTable th, #studentTable td {
+                padding: 12px 15px;
+                border-bottom: 1px solid #eee;
+            }
+
+            #studentTable thead th {
+                background-color: #667eea;
+                color: white;
+                cursor: pointer;
+            }
+
+            #studentTable tbody tr:hover {
+                background-color: #f1f1f1;
+                cursor: pointer;
+            }
+
+        .student-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #a3b3ed;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background-color: #e6ffed;
+            color: #38a169;
+        }
+
+        .status-inactive {
+            background-color: #ffe8e6;
+            color: #e53e3e;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 700px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+            .close-btn:hover, .close-btn:focus {
+                color: #000;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+        .student-detail {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .student-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .student-info {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .info-group label {
+            display: block;
+            font-size: 0.8em;
+            color: #667eea;
+            margin-bottom: 2px;
+            font-weight: bold;
+        }
+
+        .info-group p {
+            margin: 0;
+            font-size: 1em;
+            color: #333;
+        }
+
+        .attendance-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            text-align: center;
+        }
+
+        .mini-stat h4 {
+            font-size: 1.5em;
+            color: #38a169;
+            margin: 5px 0;
+        }
+
+        .mini-stat p {
+            color: #666;
+            margin: 0;
+            font-size: 0.9em;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎓 Hệ thống Điểm danh Sinh viên</h1>
-            <div class="class-info">
-                <div class="info-card">
-                    <label>Môn học</label>
-                    <select id="subject">
-                        <option>Lập trình Web</option>
-                        <option>Cơ sở dữ liệu</option>
-                        <option>Mạng máy tính</option>
-                        <option>Trí tuệ nhân tạo</option>
-                    </select>
-                </div>
-                <div class="info-card">
-                    <label>Lớp</label>
-                    <select id="class">
-                        <option>CNTT01-K65</option>
-                        <option>CNTT02-K65</option>
-                        <option>CNTT03-K65</option>
-                    </select>
-                </div>
-                <div class="info-card">
-                    <label>Ngày điểm danh</label>
-                    <input type="date" id="date" value="">
-                </div>
-                <div class="info-card">
-                    <label>Buổi học</label>
-                    <select id="session">
-                        <option>Buổi 1 (7:00-9:00)</option>
-                        <option>Buổi 2 (9:15-11:15)</option>
-                        <option>Buổi 3 (13:00-15:00)</option>
-                        <option>Buổi 4 (15:15-17:15)</option>
-                    </select>
-                </div>
+            <h1>📚 Quản lý Sinh viên</h1>
+            <p>Danh sách toàn bộ sinh viên đang được quản lý</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 id="totalStudents">0</h3>
+                <p>Tổng số sinh viên</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="activeStudents">0</h3>
+                <p>Đang học</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="avgAttendance">0%</h3>
+                <p>Tỷ lệ tham dự TB</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="classCount">0</h3>
+                <p>Số lớp</p>
             </div>
         </div>
 
-        <div class="controls">
-            <div class="stats">
-                <div class="stat-card">
-                    <h3 id="totalStudents">45</h3>
-                    <p>Tổng số sinh viên</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="presentCount">0</h3>
-                    <p>Có mặt</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="absentCount">0</h3>
-                    <p>Vắng mặt</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="attendanceRate">0%</h3>
-                    <p>Tỷ lệ tham dự</p>
-                </div>
+        <div class="toolbar">
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên, MSSV, email...">
             </div>
 
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm theo tên, MSSV...">
-                <select id="filterStatus">
-                    <option value="">Tất cả trạng thái</option>
-                    <option value="present">Có mặt</option>
-                    <option value="absent">Vắng mặt</option>
-                    <option value="pending">Chưa điểm danh</option>
-                </select>
-            </div>
+            <select class="filter-select" id="classFilter">
+                <option value="">Tất cả lớp</option>
+                <option value="CNTT01-K65">CNTT01-K65</option>
+                <option value="CNTT02-K65">CNTT02-K65</option>
+                <option value="CNTT03-K65">CNTT03-K65</option>
+            </select>
+
+            <select class="filter-select" id="statusFilter">
+                <option value="">Tất cả trạng thái</option>
+                <option value="active">Đang học</option>
+                <option value="inactive">Nghỉ học</option>
+            </select>
 
             <div class="action-buttons">
-                <button class="btn btn-primary" onclick="markAllPresent()">✓ Điểm danh tất cả</button>
-                <button class="btn btn-success" onclick="saveAttendance()">💾 Lưu điểm danh</button>
-                <button class="btn btn-danger" onclick="resetAttendance()">↺ Làm mới</button>
+                <button class="btn btn-save" onclick="saveData()">
+                    💾 Lưu dữ liệu
+                </button>
+                <button class="btn btn-excel" onclick="exportToExcel()">
+                    📊 Xuất Excel
+                </button>
             </div>
         </div>
 
         <div class="table-container">
-            <table id="attendanceTable">
+            <table id="studentTable">
                 <thead>
                     <tr>
-                        <th>STT</th>
-                        <th>MSSV</th>
-                        <th>Họ và tên</th>
-                        <th class="checkbox-cell">Có mặt</th>
-                        <th class="checkbox-cell">Vắng</th>
+                        <th onclick="sortTable(0)">STT</th>
+                        <th onclick="sortTable(1)">Avatar</th>
+                        <th onclick="sortTable(2)">MSSV <span class="sort-indicator" data-col="2">↕</span></th>
+                        <th onclick="sortTable(3)">Họ và tên <span class="sort-indicator" data-col="3">↕</span></th>
+                        <th onclick="sortTable(4)">Lớp <span class="sort-indicator" data-col="4">↕</span></th>
+                        <th onclick="sortTable(5)">Email</th>
+                        <th onclick="sortTable(6)">SĐT</th>
+                        <th onclick="sortTable(7)">Điểm TB <span class="sort-indicator" data-col="7">↕</span></th>
+                        <th onclick="sortTable(8)">Tỷ lệ tham dự <span class="sort-indicator" data-col="8">↕</span></th>
                         <th>Trạng thái</th>
-                        <th>Ghi chú</th>
                     </tr>
                 </thead>
-                <tbody id="studentList">
+                <tbody id="studentTableBody">
                 </tbody>
             </table>
         </div>
     </div>
 
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Thông tin chi tiết sinh viên</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="student-detail">
+                    <div class="student-photo" id="modalAvatar">SV</div>
+                    <div class="student-info">
+                        <div class="info-group">
+                            <label>Mã số sinh viên</label>
+                            <p id="modalMSSV">-</p>
+                        </div>
+                        <div class="info-group">
+                            <label>Họ và tên</label>
+                            <p id="modalName">-</p>
+                        </div>
+                        <div class="info-group">
+                            <label>Lớp</label>
+                            <p id="modalClass">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
+                    <div class="info-group">
+                        <label>Ngày sinh</label>
+                        <p id="modalDOB">-</p>
+                    </div>
+                    <div class="info-group">
+                        <label>Giới tính</label>
+                        <p id="modalGender">-</p>
+                    </div>
+                    <div class="info-group">
+                        <label>Email</label>
+                        <p id="modalEmail">-</p>
+                    </div>
+                    <div class="info-group">
+                        <label>Số điện thoại</label>
+                        <p id="modalPhone">-</p>
+                    </div>
+                    <div class="info-group">
+                        <label>Địa chỉ</label>
+                        <p id="modalAddress">-</p>
+                    </div>
+                    <div class="info-group">
+                        <label>Trạng thái</label>
+                        <p id="modalStatus">-</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 30px; margin-bottom: 15px; color: #667eea;">📊 Thống kê học tập</h3>
+                <div class="attendance-stats">
+                    <div class="mini-stat">
+                        <h4 id="modalGPA">0</h4>
+                        <p>Điểm trung bình</p>
+                    </div>
+                    <div class="mini-stat">
+                        <h4 id="modalAttendance">0%</h4>
+                        <p>Tỷ lệ tham dự</p>
+                    </div>
+                    <div class="mini-stat">
+                        <h4 id="modalAbsent">0</h4>
+                        <p>Số buổi vắng</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        const students = [
-            { id: 1, mssv: '2021600001', name: 'Nguyễn Văn An' },
-            { id: 2, mssv: '2021600002', name: 'Trần Thị Bình' },
-            { id: 3, mssv: '2021600003', name: 'Lê Văn Cường' },
-            { id: 4, mssv: '2021600004', name: 'Phạm Thị Dung' },
-            { id: 5, mssv: '2021600005', name: 'Hoàng Văn Em' },
-            { id: 6, mssv: '2021600006', name: 'Vũ Thị Phương' },
-            { id: 7, mssv: '2021600007', name: 'Đặng Văn Giang' },
-            { id: 8, mssv: '2021600008', name: 'Bùi Thị Hoa' },
-            { id: 9, mssv: '2021600009', name: 'Ngô Văn Hùng' },
-            { id: 10, mssv: '2021600010', name: 'Đinh Thị Lan' }
-        ];
+                // Dữ liệu mẫu sinh viên
+                const students = [
+                    { id: 1, mssv: '2021600001', name: 'Nguyễn Văn An', class: 'CNTT01-K65', email: 'annv@student.edu.vn', phone: '0912345671', dob: '15/03/2003', gender: 'Nam', address: 'Hà Nội', gpa: 3.45, attendance: 92, absent: 3, status: 'active' },
+                    { id: 2, mssv: '2021600002', name: 'Trần Thị Bình', class: 'CNTT01-K65', email: 'binhtt@student.edu.vn', phone: '0912345672', dob: '22/05/2003', gender: 'Nữ', address: 'Hải Phòng', gpa: 3.78, attendance: 95, absent: 2, status: 'active' },
+                    { id: 3, mssv: '2021600003', name: 'Lê Văn Cường', class: 'CNTT02-K65', email: 'cuonglv@student.edu.vn', phone: '0912345673', dob: '10/07/2003', gender: 'Nam', address: 'Hà Nội', gpa: 3.21, attendance: 88, absent: 5, status: 'active' },
+                    { id: 4, mssv: '2021600004', name: 'Phạm Thị Dung', class: 'CNTT02-K65', email: 'dungpt@student.edu.vn', phone: '0912345674', dob: '18/09/2003', gender: 'Nữ', address: 'Nam Định', gpa: 3.56, attendance: 90, absent: 4, status: 'active' },
+                    { id: 5, mssv: '2021600005', name: 'Hoàng Văn Em', class: 'CNTT01-K65', email: 'emhv@student.edu.vn', phone: '0912345675', dob: '05/11/2003', gender: 'Nam', address: 'Hà Nội', gpa: 3.12, attendance: 85, absent: 6, status: 'active' },
+                    { id: 6, mssv: '2021600006', name: 'Vũ Thị Phương', class: 'CNTT03-K65', email: 'phuongvt@student.edu.vn', phone: '0912345676', dob: '30/01/2003', gender: 'Nữ', address: 'Thái Bình', gpa: 3.67, attendance: 93, absent: 3, status: 'active' },
+                    { id: 7, mssv: '2021600007', name: 'Đặng Văn Giang', class: 'CNTT03-K65', email: 'giangdv@student.edu.vn', phone: '0912345677', dob: '12/04/2003', gender: 'Nam', address: 'Hà Nội', gpa: 3.34, attendance: 87, absent: 5, status: 'active' },
+                    { id: 8, mssv: '2021600008', name: 'Bùi Thị Hoa', class: 'CNTT02-K65', email: 'hoabt@student.edu.vn', phone: '0912345678', dob: '25/06/2003', gender: 'Nữ', address: 'Hưng Yên', gpa: 3.89, attendance: 97, absent: 1, status: 'active' },
+                    { id: 9, mssv: '2021600009', name: 'Ngô Văn Hùng', class: 'CNTT01-K65', email: 'hungnv@student.edu.vn', phone: '0912345679', dob: '08/08/2003', gender: 'Nam', address: 'Hà Nội', gpa: 2.98, attendance: 82, absent: 7, status: 'active' },
+                    { id: 10, mssv: '2021600010', name: 'Đinh Thị Lan', class: 'CNTT03-K65', email: 'landt@student.edu.vn', phone: '0912345680', dob: '19/12/2003', gender: 'Nữ', address: 'Bắc Ninh', gpa: 3.45, attendance: 91, absent: 4, status: 'active' },
+                    { id: 11, mssv: '2021600011', name: 'Trịnh Văn Minh', class: 'CNTT02-K65', email: 'minhtv@student.edu.vn', phone: '0912345681', dob: '14/02/2003', gender: 'Nam', address: 'Hà Nội', gpa: 3.23, attendance: 86, absent: 6, status: 'active' },
+                    { id: 12, mssv: '2021600012', name: 'Lý Thị Nga', class: 'CNTT01-K65', email: 'galt@student.edu.vn', phone: '0912345682', dob: '27/10/2003', gender: 'Nữ', address: 'Vĩnh Phúc', gpa: 3.71, attendance: 94, absent: 2, status: 'active' }
+                ];
 
-        const attendance = {};
+                let filteredStudents = [...students];
+                let currentSortColumn = 2; // MSSV
+                let sortDirection = { 2: 'asc' };
 
-        function initDate() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('date').value = today;
-        }
+                document.addEventListener('DOMContentLoaded', () => {
+                    // Lắng nghe sự kiện từ các bộ lọc và ô tìm kiếm
+                    document.getElementById('searchInput').addEventListener('keyup', renderTable);
+                    document.getElementById('classFilter').addEventListener('change', renderTable);
+                    document.getElementById('statusFilter').addEventListener('change', renderTable);
 
-        function renderStudents() {
-            const tbody = document.getElementById('studentList');
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const filterStatus = document.getElementById('filterStatus').value;
+                    // Khởi tạo bảng lần đầu
+                    renderTable();
+                });
 
-            tbody.innerHTML = '';
+                function renderTable() {
+                    const tbody = document.getElementById('studentTableBody');
+                    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                    const classFilter = document.getElementById('classFilter').value;
+                    const statusFilter = document.getElementById('statusFilter').value;
 
-            students.forEach((student, index) => {
-                const status = attendance[student.id] || 'pending';
+                    // 1. Lọc dữ liệu
+                    let tempStudents = students.filter(student => {
+                        const matchSearch = student.name.toLowerCase().includes(searchTerm) ||
+                                            student.mssv.includes(searchTerm) ||
+                                            student.email.toLowerCase().includes(searchTerm);
+                        const matchClass = !classFilter || student.class === classFilter;
+                        const matchStatus = !statusFilter || student.status === statusFilter;
+                        return matchSearch && matchClass && matchStatus;
+                    });
 
-                if (searchTerm && !student.name.toLowerCase().includes(searchTerm) && !student.mssv.includes(searchTerm)) {
-                    return;
+                    // 2. Áp dụng Sắp xếp
+                    if (currentSortColumn !== -1) {
+                        tempStudents = sortData(tempStudents, currentSortColumn, sortDirection[currentSortColumn]);
+                    }
+
+                    filteredStudents = tempStudents;
+                    tbody.innerHTML = '';
+
+                    // 3. Hiển thị dữ liệu
+                    filteredStudents.forEach((student, index) => {
+                        const row = document.createElement('tr');
+                        row.onclick = () => showStudentDetail(student);
+
+                        const nameParts = student.name.split(' ').filter(n => n.length > 0);
+                        let initials = '';
+                        if (nameParts.length > 1) {
+                            initials = nameParts[0][0] + nameParts[nameParts.length - 1][0];
+                        } else if (nameParts.length === 1) {
+                            initials = nameParts[0][0];
+                        }
+
+                        row.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td><div class="student-avatar">${initials}</div></td>
+                            <td><strong>${student.mssv}</strong></td>
+                            <td>${student.name}</td>
+                            <td>${student.class}</td>
+                            <td>${student.email}</td>
+                            <td>${student.phone}</td>
+                            <td><strong>${student.gpa.toFixed(2)}</strong></td>
+                            <td><strong>${student.attendance}%</strong></td>
+                            <td>
+                                <span class="status-badge ${student.status === 'active' ? 'status-active' : 'status-inactive'}">
+                                    ${student.status === 'active' ? 'Đang học' : 'Nghỉ học'}
+                                </span>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    updateStats();
                 }
 
-                if (filterStatus && status !== filterStatus) {
-                    return;
+                function updateStats() {
+                    const allStudents = filteredStudents;
+                    const total = allStudents.length;
+                    const active = allStudents.filter(s => s.status === 'active').length;
+
+                    let avgAttendance = 0;
+                    let classCount = 0;
+
+                    if (total > 0) {
+                        const sumAttendance = allStudents.reduce((sum, s) => sum + s.attendance, 0);
+                        avgAttendance = Math.round(sumAttendance / total);
+                        const classes = [...new Set(allStudents.map(s => s.class))];
+                        classCount = classes.length;
+                    }
+
+                    document.getElementById('totalStudents').textContent = total;
+                    document.getElementById('activeStudents').textContent = active;
+                    document.getElementById('avgAttendance').textContent = avgAttendance + '%';
+                    document.getElementById('classCount').textContent = classCount;
                 }
 
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${student.mssv}</td>
-                    <td>${student.name}</td>
-                    <td class="checkbox-cell">
-                        <input type="checkbox" ${status === 'present' ? 'checked' : ''}
-                               onchange="markAttendance(${student.id}, 'present')">
-                    </td>
-                    <td class="checkbox-cell">
-                        <input type="checkbox" ${status === 'absent' ? 'checked' : ''}
-                               onchange="markAttendance(${student.id}, 'absent')">
-                    </td>
-                    <td>
-                        <span class="status-badge status-${status}">
-                            ${status === 'present' ? 'Có mặt' : status === 'absent' ? 'Vắng mặt' : 'Chưa điểm danh'}
+                function showStudentDetail(student) {
+                    const modal = document.getElementById('studentModal');
+
+                    const nameParts = student.name.split(' ').filter(n => n.length > 0);
+                    let initials = '';
+                    if (nameParts.length > 1) {
+                        initials = nameParts[0][0] + nameParts[nameParts.length - 1][0];
+                    } else if (nameParts.length === 1) {
+                        initials = nameParts[0][0];
+                    }
+
+                    document.getElementById('modalAvatar').textContent = initials;
+                    document.getElementById('modalMSSV').textContent = student.mssv;
+                    document.getElementById('modalName').textContent = student.name;
+                    document.getElementById('modalClass').textContent = student.class;
+                    document.getElementById('modalDOB').textContent = student.dob;
+                    document.getElementById('modalGender').textContent = student.gender;
+                    document.getElementById('modalEmail').textContent = student.email;
+                    document.getElementById('modalPhone').textContent = student.phone;
+                    document.getElementById('modalAddress').textContent = student.address;
+                    document.getElementById('modalStatus').innerHTML = `
+                        <span class="status-badge ${student.status === 'active' ? 'status-active' : 'status-inactive'}">
+                            ${student.status === 'active' ? 'Đang học' : 'Nghỉ học'}
                         </span>
-                    </td>
-                    <td>
-                        <input type="text" class="note-input" placeholder="Nhập ghi chú..."
-                               id="note-${student.id}">
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
+                    `;
+                    document.getElementById('modalGPA').textContent = student.gpa.toFixed(2);
+                    document.getElementById('modalAttendance').textContent = student.attendance + '%';
+                    document.getElementById('modalAbsent').textContent = student.absent;
 
-            updateStats();
-        }
-
-        function markAttendance(studentId, status) {
-            if (attendance[studentId] === status) {
-                delete attendance[studentId];
-            } else {
-                attendance[studentId] = status;
-            }
-            renderStudents();
-        }
-
-        function markAllPresent() {
-            students.forEach(student => {
-                attendance[student.id] = 'present';
-            });
-            renderStudents();
-        }
-
-        function resetAttendance() {
-            if (confirm('Bạn có chắc muốn làm mới tất cả điểm danh?')) {
-                Object.keys(attendance).forEach(key => delete attendance[key]);
-                renderStudents();
-            }
-        }
-
-        function updateStats() {
-            const total = students.length;
-            const present = Object.values(attendance).filter(s => s === 'present').length;
-            const absent = Object.values(attendance).filter(s => s === 'absent').length;
-            const rate = total > 0 ? Math.round((present / total) * 100) : 0;
-
-            document.getElementById('totalStudents').textContent = total;
-            document.getElementById('presentCount').textContent = present;
-            document.getElementById('absentCount').textContent = absent;
-            document.getElementById('attendanceRate').textContent = rate + '%';
-        }
-
-        function saveAttendance() {
-            const subject = document.getElementById('subject').value;
-            const classInfo = document.getElementById('class').value;
-            const date = document.getElementById('date').value;
-            const session = document.getElementById('session').value;
-
-            const data = {
-                subject,
-                class: classInfo,
-                date,
-                session,
-                attendance,
-                notes: {}
-            };
-
-            students.forEach(student => {
-                const noteInput = document.getElementById(`note-${student.id}`);
-                if (noteInput && noteInput.value) {
-                    data.notes[student.id] = noteInput.value;
+                    modal.style.display = 'block';
                 }
-            });
 
-            console.log('Dữ liệu điểm danh:', data);
-            alert('Đã lưu điểm danh thành công!\n\nMôn: ' + subject + '\nLớp: ' + classInfo + '\nNgày: ' + date);
-        }
+                function closeModal() {
+                    document.getElementById('studentModal').style.display = 'none';
+                }
 
-        document.getElementById('searchInput').addEventListener('input', renderStudents);
-        document.getElementById('filterStatus').addEventListener('change', renderStudents);
+                window.onclick = function(event) {
+                    const modal = document.getElementById('studentModal');
+                    if (event.target === modal) {
+                        closeModal();
+                    }
+                }
 
-        initDate();
-        renderStudents();
+                function exportToExcel() {
+                    const data = filteredStudents.map((student, index) => ({
+                        'STT': index + 1,
+                        'MSSV': student.mssv,
+                        'Họ và tên': student.name,
+                        'Lớp': student.class,
+                        'Ngày sinh': student.dob,
+                        'Giới tính': student.gender,
+                        'Email': student.email,
+                        'Số điện thoại': student.phone,
+                        'Địa chỉ': student.address,
+                        'Điểm TB': student.gpa,
+                        'Tỷ lệ tham dự (%)': student.attendance,
+                        'Số buổi vắng': student.absent,
+                        'Trạng thái': student.status === 'active' ? 'Đang học' : 'Nghỉ học'
+                    }));
+
+                    // Kiểm tra xem thư viện XLSX đã được tải chưa
+                    if (typeof XLSX === 'undefined') {
+                        alert('❌ Lỗi: Thư viện XLSX chưa được tải. Vui lòng kiểm tra lại liên kết script.');
+                        return;
+                    }
+
+                    const ws = XLSX.utils.json_to_sheet(data);
+
+                    // Tự động điều chỉnh độ rộng cột
+                    const colWidths = [
+                        { wch: 5 },  // STT
+                        { wch: 12 }, // MSSV
+                        { wch: 25 }, // Họ và tên
+                        { wch: 15 }, // Lớp
+                        { wch: 12 }, // Ngày sinh
+                        { wch: 10 }, // Giới tính
+                        { wch: 30 }, // Email
+                        { wch: 15 }, // SĐT
+                        { wch: 30 }, // Địa chỉ
+                        { wch: 10 }, // Điểm TB
+                        { wch: 18 }, // Tỷ lệ tham dự
+                        { wch: 15 }, // Số buổi vắng
+                        { wch: 12 }  // Trạng thái
+                    ];
+                    ws['!cols'] = colWidths;
+
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, 'Danh sách sinh viên');
+
+                    const fileName = `Danh_sach_sinh_vien_${new Date().toISOString().split('T')[0]}.xlsx`;
+                    XLSX.writeFile(wb, fileName);
+
+                    alert('✅ Đã xuất file Excel thành công!\nTên file: ' + fileName);
+                }
+
+                function saveData() {
+                    // Tạo object dữ liệu để gửi lên server
+                    const dataToSave = {
+                        students: filteredStudents,
+                        timestamp: new Date().toISOString(),
+                        totalStudents: filteredStudents.length,
+                        summary: {
+                            active: filteredStudents.filter(s => s.status === 'active').length,
+                            inactive: filteredStudents.filter(s => s.status === 'inactive').length,
+                            avgGPA: (filteredStudents.reduce((sum, s) => sum + s.gpa, 0) / filteredStudents.length).toFixed(2),
+                            avgAttendance: Math.round(filteredStudents.reduce((sum, s) => sum + s.attendance, 0) / filteredStudents.length)
+                        }
+                    };
+
+                    // Log dữ liệu ra console (trong thực tế sẽ gửi lên server)
+                    console.log('Dữ liệu cần lưu:', dataToSave);
+
+                    // Hiển thị thông báo thành công
+                    alert(`✅ Đã lưu dữ liệu thành công!
+
+        📊 Thống kê:
+        • Tổng số sinh viên: ${dataToSave.totalStudents}
+        • Đang học: ${dataToSave.summary.active}
+        • Nghỉ học: ${dataToSave.summary.inactive}
+        • Điểm TB trung bình: ${dataToSave.summary.avgGPA}
+        • Tỷ lệ tham dự TB: ${dataToSave.summary.avgAttendance}%
+
+        Thời gian: ${new Date().toLocaleString('vi-VN')}`);
+                }
+
+                function sortData(data, columnIndex, direction) {
+                    return [...data].sort((a, b) => {
+                        let aVal, bVal;
+
+                        switch(columnIndex) {
+                            case 2: aVal = a.mssv; bVal = b.mssv; break;
+                            case 3: aVal = a.name; bVal = b.name; break;
+                            case 4: aVal = a.class; bVal = b.class; break;
+                            case 7: aVal = a.gpa; bVal = b.gpa; break;
+                            case 8: aVal = a.attendance; bVal = b.attendance; break;
+                            default: return 0;
+                        }
+
+                        const isNumeric = typeof aVal === 'number' && typeof bVal === 'number';
+
+                        let comparison = 0;
+                        if (isNumeric) {
+                            comparison = aVal - bVal;
+                        } else {
+                            comparison = aVal.localeCompare(bVal, 'vi', { sensitivity: 'base' });
+                        }
+
+                        return direction === 'asc' ? comparison : -comparison;
+                    });
+                }
+
+                function sortTable(columnIndex) {
+                    // Cập nhật hướng sắp xếp
+                    if (columnIndex === currentSortColumn) {
+                        sortDirection[columnIndex] = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSortColumn = columnIndex;
+                        sortDirection[columnIndex] = 'asc';
+                    }
+
+                    // Cập nhật biểu tượng sắp xếp
+                    document.querySelectorAll('.sort-indicator').forEach(span => {
+                        span.textContent = '↕';
+                    });
+
+                    const currentIndicator = document.querySelector(`.sort-indicator[data-col="${columnIndex}"]`);
+                    if (currentIndicator) {
+                        currentIndicator.textContent = sortDirection[columnIndex] === 'asc' ? '▲' : '▼';
+                    }
+
+                    renderTable();
+                }
     </script>
 </body>
 </html>

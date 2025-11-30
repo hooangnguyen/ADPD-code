@@ -1,0 +1,363 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết Bài tập</title>
+    <link href="~/css/exercisedetails.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="breadcrumb">
+                <a href="#">📚 Môn học</a> /
+                <a href="#">Lập trình Web</a> /
+                <span>Bài tập 1</span>
+            </div>
+            <h1>📝 Bài tập 1: Thiết kế website bán hàng</h1>
+            <div class="header-meta">
+                <div class="meta-item">
+                    <span>📅</span>
+                    <span>Giao: 15/11/2024</span>
+                </div>
+                <div class="meta-item">
+                    <span>⏰</span>
+                    <span>Hạn nộp: 30/11/2024 23:59</span>
+                </div>
+                <div class="meta-item">
+                    <span>👥</span>
+                    <span>Lớp: CNTT01-K65</span>
+                </div>
+                <div class="meta-item">
+                    <span class="status-badge status-ongoing">Đang mở</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="main-content">
+                <!-- Mô tả bài tập -->
+                <div class="section">
+                    <h2 class="section-title">
+                        <span>📋</span>
+                        Mô tả bài tập
+                    </h2>
+                    <div class="description-box">
+                        <p style="margin-bottom: 15px;">
+                            Sinh viên thực hiện thiết kế và xây dựng một website bán hàng hoàn chỉnh sử dụng HTML, CSS, JavaScript và ASP.NET MVC.
+                        </p>
+                        <p style="margin-bottom: 15px;">
+                            Website cần có các chức năng cơ bản như: hiển thị danh sách sản phẩm, tìm kiếm, giỏ hàng, đăng nhập/đăng ký, và quản lý đơn hàng.
+                        </p>
+                        <p>
+                            Bài tập nhằm đánh giá khả năng tích hợp kiến thức về frontend, backend và database của sinh viên.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Yêu cầu -->
+                <div class="section">
+                    <h2 class="section-title">
+                        <span>✅</span>
+                        Yêu cầu chi tiết
+                    </h2>
+                    <ul class="requirement-list">
+                        <li class="requirement-item">
+                            <span class="requirement-icon">•</span>
+                            <span class="requirement-text">Giao diện responsive, hoạt động tốt trên mobile và desktop</span>
+                        </li>
+                        <li class="requirement-item">
+                            <span class="requirement-icon">•</span>
+                            <span class="requirement-text">Sử dụng Entity Framework để quản lý database</span>
+                        </li>
+                        <li class="requirement-item">
+                            <span class="requirement-icon">•</span>
+                            <span class="requirement-text">Implement chức năng giỏ hàng với Session hoặc Cookie</span>
+                        </li>
+                        <li class="requirement-item">
+                            <span class="requirement-icon">•</span>
+                            <span class="requirement-text">Có chức năng tìm kiếm và lọc sản phẩm theo danh mục</span>
+                        </li>
+                        <li class="requirement-item">
+                            <span class="requirement-icon">•</span>
+                            <span class="requirement-text">Áp dụng kiến thức về Authentication và Authorization</span>
+                        </li>
+                        <li class="requirement-item">
+                            <span class="requirement-icon">•</span>
+                            <span class="requirement-text">Code sạch, có comment và tuân theo coding convention</span>
+                        </li>
+                        <li class="requirement-item">
+                            <span class="requirement-icon">•</span>
+                            <span class="requirement-text">Viết README.md hướng dẫn cài đặt và chạy project</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Tài liệu đính kèm -->
+                <div class="section">
+                    <h2 class="section-title">
+                        <span>📎</span>
+                        Tài liệu đính kèm
+                    </h2>
+                    <ul class="attachment-list">
+                        <li class="attachment-item" onclick="downloadFile('requirement.pdf')">
+                            <div class="file-icon">📄</div>
+                            <div class="file-info">
+                                <div class="file-name">Yêu cầu chi tiết bài tập.pdf</div>
+                                <div class="file-size">2.5 MB</div>
+                            </div>
+                        </li>
+                        <li class="attachment-item" onclick="downloadFile('template.zip')">
+                            <div class="file-icon">📦</div>
+                            <div class="file-info">
+                                <div class="file-name">Template dự án.zip</div>
+                                <div class="file-size">15.8 MB</div>
+                            </div>
+                        </li>
+                        <li class="attachment-item" onclick="downloadFile('database.sql')">
+                            <div class="file-icon">💾</div>
+                            <div class="file-info">
+                                <div class="file-name">Database schema.sql</div>
+                                <div class="file-size">125 KB</div>
+                            </div>
+                        </li>
+                        <li class="attachment-item" onclick="downloadFile('guide.docx')">
+                            <div class="file-icon">📝</div>
+                            <div class="file-info">
+                                <div class="file-name">Hướng dẫn làm bài.docx</div>
+                                <div class="file-size">890 KB</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Nộp bài -->
+                <div class="section">
+                    <h2 class="section-title">
+                        <span>📤</span>
+                        Nộp bài làm
+                    </h2>
+
+                    <div class="submission-box" onclick="document.getElementById('fileUpload').click()">
+                        <div class="upload-icon">☁️</div>
+                        <h3 style="color: #667eea; margin-bottom: 10px;">Tải file lên</h3>
+                        <p style="color: #6c757d; margin-bottom: 15px;">Kéo thả file vào đây hoặc nhấn để chọn file</p>
+                        <p style="color: #6c757d; font-size: 12px;">Hỗ trợ: .zip, .rar, .pdf (Tối đa 50MB)</p>
+                        <input type="file" id="fileUpload" accept=".zip,.rar,.pdf" onchange="handleFileSelect(event)">
+                    </div>
+
+                    <div id="uploadedFiles"></div>
+
+                    <div class="comment-section">
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #495057;">
+                            💬 Ghi chú nộp bài (tuỳ chọn)
+                        </label>
+                        <textarea id="submissionComment" placeholder="Nhập ghi chú của bạn về bài làm..."></textarea>
+                    </div>
+
+                    <div style="margin-top: 20px; display: flex; gap: 15px;">
+                        <button class="btn btn-primary" onclick="submitAssignment()" style="flex: 1;">
+                            📤 Nộp bài
+                        </button>
+                        <button class="btn btn-outline" onclick="saveDraft()">
+                            💾 Lưu nháp
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <!-- Thông tin chung -->
+                <div class="info-card">
+                    <h3>📊 Thông tin chung</h3>
+                    <div class="info-row">
+                        <span class="info-label">Điểm tối đa</span>
+                        <span class="info-value">10 điểm</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Hình thức nộp</span>
+                        <span class="info-value">File nén</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Số lần nộp</span>
+                        <span class="info-value">Không giới hạn</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Đã nộp</span>
+                        <span class="info-value" style="color: #dc3545;">Chưa nộp</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Thời gian còn lại</span>
+                        <span class="info-value" id="timeRemaining">0 ngày</span>
+                    </div>
+                </div>
+
+                <!-- Trạng thái nộp bài -->
+                <div class="info-card">
+                    <h3>📈 Trạng thái lớp</h3>
+                    <div class="info-row">
+                        <span class="info-label">Đã nộp</span>
+                        <span class="info-value" style="color: #28a745;">28/45 (62%)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Chưa nộp</span>
+                        <span class="info-value" style="color: #dc3545;">17/45 (38%)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Đã chấm</span>
+                        <span class="info-value">15/28 (54%)</span>
+                    </div>
+                </div>
+
+                <!-- Điểm số (hiển thị khi đã chấm) -->
+                <div class="grading-info" id="gradingInfo" style="display: none;">
+                    <h4>🎯 Kết quả chấm điểm</h4>
+                    <div class="score-display" id="scoreDisplay">-</div>
+                    <div style="text-align: center; color: #856404; font-size: 14px;">
+                        Nhận xét: <span id="feedback">Tốt</span>
+                    </div>
+                </div>
+
+                <!-- Giảng viên -->
+                <div class="info-card">
+                    <h3>👨‍🏫 Giảng viên</h3>
+                    <div style="text-align: center; padding: 10px 0;">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; margin: 0 auto 10px;">
+                            GV
+                        </div>
+                        <div style="font-weight: 600; color: #212529; margin-bottom: 5px;">
+                            TS. Nguyễn Văn A
+                        </div>
+                        <div style="font-size: 13px; color: #6c757d;">
+                            nguyenvana@university.edu.vn
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+                let uploadedFiles = [];
+
+                // Tính thời gian còn lại
+                function calculateTimeRemaining() {
+                    const deadline = new Date('2024-11-30T23:59:59');
+                    const now = new Date();
+                    const diff = deadline - now;
+
+                    if (diff <= 0) {
+                        document.getElementById('timeRemaining').textContent = 'Đã hết hạn';
+                        document.getElementById('timeRemaining').style.color = '#dc3545';
+                        return;
+                    }
+
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+                    document.getElementById('timeRemaining').textContent = `${days} ngày ${hours} giờ`;
+                }
+
+                // Xử lý chọn file
+                function handleFileSelect(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        if (file.size > 50 * 1024 * 1024) {
+                            alert('❌ File quá lớn! Vui lòng chọn file dưới 50MB');
+                            return;
+                        }
+
+                        uploadedFiles.push(file);
+                        displayUploadedFiles();
+                    }
+                }
+
+                // Hiển thị danh sách file đã chọn
+                function displayUploadedFiles() {
+                    const container = document.getElementById('uploadedFiles');
+                    container.innerHTML = '';
+
+                    uploadedFiles.forEach((file, index) => {
+                        const fileDiv = document.createElement('div');
+                        fileDiv.className = 'uploaded-file';
+                        fileDiv.innerHTML = `
+                            <div class="file-icon">📁</div>
+                            <div class="file-info">
+                                <div class="file-name">${file.name}</div>
+                                <div class="file-size">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                            </div>
+                            <button class="remove-file" onclick="removeFile(${index})">×</button>
+                        `;
+                        container.appendChild(fileDiv);
+                    });
+                }
+
+                // Xóa file
+                function removeFile(index) {
+                    uploadedFiles.splice(index, 1);
+                    displayUploadedFiles();
+                }
+
+                // Nộp bài
+                function submitAssignment() {
+                    if (uploadedFiles.length === 0) {
+                        alert('⚠️ Vui lòng chọn file để nộp!');
+                        return;
+                    }
+
+                    const comment = document.getElementById('submissionComment').value;
+
+                    const formData = {
+                        files: uploadedFiles.map(f => f.name),
+                        comment: comment,
+                        submittedAt: new Date().toISOString()
+                    };
+
+                    console.log('Dữ liệu nộp bài:', formData);
+
+                    // Giả lập việc nộp bài thành công
+                    alert(`✅ Nộp bài thành công!
+
+        📦 File: ${uploadedFiles.map(f => f.name).join(', ')}
+        💬 Ghi chú: ${comment || 'Không có'}
+        ⏰ Thời gian: ${new Date().toLocaleString('vi-VN')}
+
+        Bạn có thể nộp lại bài bất cứ lúc nào trước hạn chót.`);
+
+                    // Cập nhật trạng thái
+                    document.querySelector('.info-value[style*="color: #dc3545"]').textContent = 'Đã nộp';
+                    document.querySelector('.info-value[style*="color: #dc3545"]').style.color = '#28a745';
+                }
+
+                // Lưu nháp
+                function saveDraft() {
+                    const comment = document.getElementById('submissionComment').value;
+
+                    localStorage.setItem('assignmentDraft', JSON.stringify({
+                        files: uploadedFiles.map(f => f.name),
+                        comment: comment,
+                        savedAt: new Date().toISOString()
+                    }));
+
+                    alert('💾 Đã lưu nháp thành công!\n\nBạn có thể tiếp tục làm bài sau.');
+                }
+
+                // Tải file
+                function downloadFile(filename) {
+                    console.log('Đang tải file:', filename);
+                    alert(`📥 Đang tải file: ${filename}\n\nTrong ứng dụng thực tế, file sẽ được tải xuống.`);
+                }
+
+                // Khởi tạo
+                calculateTimeRemaining();
+                setInterval(calculateTimeRemaining, 60000); // Cập nhật mỗi phút
+
+                // Kiểm tra nếu đã có nháp
+                const draft = localStorage.getItem('assignmentDraft');
+                if (draft) {
+                    const draftData = JSON.parse(draft);
+                    document.getElementById('submissionComment').value = draftData.comment;
+                }
+    </script>
+</body>
+</html>

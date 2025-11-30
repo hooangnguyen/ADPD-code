@@ -1,0 +1,362 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giao Bài tập Mới</title>
+    <link href="~/css/AssignHomework.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Giao Bài tập Mới</h1>
+            <p>Tạo và giao bài tập cho sinh viên trong lớp học</p>
+        </div>
+
+        <div class="form-container">
+            <form id="assignmentForm">
+                <!-- Thông tin cơ bản -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <span>📋</span>
+                        Thông tin cơ bản
+                    </h2>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Tiêu đề bài tập <span class="required">*</span>
+                        </label>
+                        <input type="text" class="form-input" id="title" placeholder="Ví dụ: Bài tập 1 - Thiết kế website" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Môn học <span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="subject" required>
+                                <option value="">-- Chọn môn học --</option>
+                                <option value="web">Lập trình Web</option>
+                                <option value="database">Cơ sở dữ liệu</option>
+                                <option value="network">Mạng máy tính</option>
+                                <option value="ai">Trí tuệ nhân tạo</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Lớp học <span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="class" required>
+                                <option value="">-- Chọn lớp --</option>
+                                <option value="CNTT01-K65">CNTT01-K65</option>
+                                <option value="CNTT02-K65">CNTT02-K65</option>
+                                <option value="CNTT03-K65">CNTT03-K65</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Mô tả bài tập <span class="required">*</span>
+                        </label>
+                        <textarea class="form-textarea" id="description" placeholder="Mô tả chi tiết về bài tập, yêu cầu, mục tiêu..." required></textarea>
+                    </div>
+                </div>
+
+                <!-- Thời gian và điểm số -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <span>⏰</span>
+                        Thời gian và điểm số
+                    </h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Ngày giao <span class="required">*</span>
+                            </label>
+                            <input type="datetime-local" class="form-input" id="startDate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Hạn nộp <span class="required">*</span>
+                            </label>
+                            <input type="datetime-local" class="form-input" id="dueDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Điểm tối đa <span class="required">*</span>
+                            </label>
+                            <input type="number" class="form-input score-input" id="maxScore" min="0" max="10" step="0.5" value="10" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Số lần nộp tối đa
+                            </label>
+                            <select class="form-select" id="submissionLimit">
+                                <option value="unlimited">Không giới hạn</option>
+                                <option value="1">1 lần</option>
+                                <option value="2">2 lần</option>
+                                <option value="3">3 lần</option>
+                                <option value="5">5 lần</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Yêu cầu chi tiết -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <span>✅</span>
+                        Yêu cầu chi tiết
+                    </h2>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Danh sách yêu cầu
+                        </label>
+                        <textarea class="form-textarea" id="requirements" placeholder="Nhập từng yêu cầu trên mỗi dòng...&#10;Ví dụ:&#10;- Giao diện responsive&#10;- Sử dụng Entity Framework&#10;- Code có comment"></textarea>
+                    </div>
+                </div>
+
+                <!-- Tài liệu đính kèm -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <span>📎</span>
+                        Tài liệu đính kèm
+                    </h2>
+
+                    <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+                        <div class="upload-icon">☁️</div>
+                        <h3 style="color: #667eea; margin-bottom: 10px;">Tải tài liệu lên</h3>
+                        <p style="color: #6c757d; margin-bottom: 10px;">Kéo thả file vào đây hoặc nhấn để chọn</p>
+                        <p style="color: #6c757d; font-size: 12px;">Hỗ trợ: PDF, Word, Excel, ZIP, RAR, ảnh (Tối đa 50MB/file)</p>
+                        <input type="file" id="fileInput" multiple onchange="handleFiles(event)">
+                    </div>
+
+                    <div class="file-list" id="fileList"></div>
+
+                    <div class="info-box">
+                        <p>💡 <strong>Gợi ý:</strong> Bạn có thể đính kèm tài liệu hướng dẫn, template, database mẫu, hoặc bất kỳ tài liệu nào cần thiết cho bài tập.</p>
+                    </div>
+                </div>
+
+                <!-- Cài đặt nâng cao -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <span>⚙️</span>
+                        Cài đặt nâng cao
+                    </h2>
+
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="allowLate" checked>
+                            <label for="allowLate">Cho phép nộp muộn (có thể bị trừ điểm)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="showScore" checked>
+                            <label for="showScore">Hiển thị điểm ngay sau khi chấm</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="allowResubmit" checked>
+                            <label for="allowResubmit">Cho phép nộp lại bài</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="sendNotification" checked>
+                            <label for="sendNotification">Gửi thông báo cho sinh viên</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="requireComment">
+                            <label for="requireComment">Bắt buộc sinh viên nhập ghi chú khi nộp</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nút hành động -->
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-outline" onclick="saveDraft()">
+                        💾 Lưu nháp
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="previewAssignment()">
+                        👁️ Xem trước
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        📤 Giao bài tập
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+                let uploadedFiles = [];
+
+                // Khởi tạo ngày mặc định
+                function initDates() {
+                    const now = new Date();
+                    const startDate = now.toISOString().slice(0, 16);
+                    document.getElementById('startDate').value = startDate;
+
+                    // Hạn nộp mặc định là 2 tuần sau
+                    const dueDate = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+                    document.getElementById('dueDate').value = dueDate.toISOString().slice(0, 16);
+                }
+
+                // Xử lý upload files
+                function handleFiles(event) {
+                    const files = Array.from(event.target.files);
+
+                    files.forEach(file => {
+                        if (file.size > 50 * 1024 * 1024) {
+                            alert('❌ File "' + file.name + '" quá lớn! Vui lòng chọn file dưới 50MB');
+                            return;
+                        }
+                        uploadedFiles.push(file);
+                    });
+
+                    displayFiles();
+                }
+
+                // Hiển thị danh sách files
+                function displayFiles() {
+                    const fileList = document.getElementById('fileList');
+                    fileList.innerHTML = '';
+
+                    uploadedFiles.forEach((file, index) => {
+                        const fileDiv = document.createElement('div');
+                        fileDiv.className = 'file-item';
+                        fileDiv.innerHTML = `
+                            <div class="file-icon">📄</div>
+                            <div class="file-info">
+                                <div class="file-name">${file.name}</div>
+                                <div class="file-size">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                            </div>
+                            <button type="button" class="remove-btn" onclick="removeFile(${index})">×</button>
+                        `;
+                        fileList.appendChild(fileDiv);
+                    });
+                }
+
+                // Xóa file
+                function removeFile(index) {
+                    uploadedFiles.splice(index, 1);
+                    displayFiles();
+                }
+
+                // Lưu nháp
+                function saveDraft() {
+                    const formData = collectFormData();
+                    localStorage.setItem('assignmentDraft', JSON.stringify(formData));
+                    alert('💾 Đã lưu nháp thành công!\n\nBạn có thể tiếp tục chỉnh sửa sau.');
+                }
+
+                // Xem trước
+                function previewAssignment() {
+                    const formData = collectFormData();
+
+                    if (!formData.title || !formData.subject || !formData.class || !formData.description) {
+                        alert('⚠️ Vui lòng điền đầy đủ thông tin bắt buộc!');
+                        return;
+                    }
+
+                    console.log('Xem trước bài tập:', formData);
+
+                    alert(`👁️ XEM TRƯỚC BÀI TẬP
+
+        📝 Tiêu đề: ${formData.title}
+        📚 Môn học: ${formData.subject}
+        👥 Lớp: ${formData.class}
+        📅 Hạn nộp: ${new Date(formData.dueDate).toLocaleString('vi-VN')}
+        🎯 Điểm: ${formData.maxScore}
+
+        Trong ứng dụng thực tế, đây sẽ mở modal xem trước giao diện bài tập.`);
+                }
+
+                // Thu thập dữ liệu form
+                function collectFormData() {
+                    return {
+                        title: document.getElementById('title').value,
+                        subject: document.getElementById('subject').value,
+                        class: document.getElementById('class').value,
+                        description: document.getElementById('description').value,
+                        startDate: document.getElementById('startDate').value,
+                        dueDate: document.getElementById('dueDate').value,
+                        maxScore: document.getElementById('maxScore').value,
+                        submissionLimit: document.getElementById('submissionLimit').value,
+                        requirements: document.getElementById('requirements').value,
+                        files: uploadedFiles.map(f => ({ name: f.name, size: f.size })),
+                        settings: {
+                            allowLate: document.getElementById('allowLate').checked,
+                            showScore: document.getElementById('showScore').checked,
+                            allowResubmit: document.getElementById('allowResubmit').checked,
+                            sendNotification: document.getElementById('sendNotification').checked,
+                            requireComment: document.getElementById('requireComment').checked
+                        },
+                        createdAt: new Date().toISOString()
+                    };
+                }
+
+                // Submit form
+                document.getElementById('assignmentForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const formData = collectFormData();
+
+                    // Validate
+                    if (!formData.title || !formData.subject || !formData.class || !formData.description) {
+                        alert('⚠️ Vui lòng điền đầy đủ thông tin bắt buộc!');
+                        return;
+                    }
+
+                    if (new Date(formData.dueDate) <= new Date(formData.startDate)) {
+                        alert('⚠️ Hạn nộp phải sau ngày giao bài!');
+                        return;
+                    }
+
+                    console.log('Dữ liệu bài tập:', formData);
+
+                    // Giả lập gửi dữ liệu
+                    alert(`✅ Đã giao bài tập thành công!
+
+        📝 ${formData.title}
+        📚 Môn: ${formData.subject}
+        👥 Lớp: ${formData.class}
+        📅 Hạn nộp: ${new Date(formData.dueDate).toLocaleString('vi-VN')}
+        🎯 Điểm: ${formData.maxScore}
+        📎 Tài liệu: ${uploadedFiles.length} file
+
+        ${formData.settings.sendNotification ? '📧 Đã gửi thông báo cho sinh viên' : ''}`);
+
+                    // Xóa form sau khi gửi thành công
+                    // document.getElementById('assignmentForm').reset();
+                    // uploadedFiles = [];
+                    // displayFiles();
+                });
+
+                // Khôi phục nháp nếu có
+                window.onload = function() {
+                    initDates();
+
+                    const draft = localStorage.getItem('assignmentDraft');
+                    if (draft) {
+                        const confirmed = confirm('📄 Tìm thấy bản nháp đã lưu. Bạn có muốn khôi phục không?');
+                        if (confirmed) {
+                            const data = JSON.parse(draft);
+                            document.getElementById('title').value = data.title || '';
+                            document.getElementById('subject').value = data.subject || '';
+                            document.getElementById('class').value = data.class || '';
+                            document.getElementById('description').value = data.description || '';
+                            document.getElementById('requirements').value = data.requirements || '';
+                            // ... khôi phục các trường khác
+                        }
+                    }
+                };
+    </script>
+</body>
+</html>
