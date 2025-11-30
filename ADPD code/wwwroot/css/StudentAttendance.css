@@ -1,5 +1,5 @@
-﻿/* Attendance Page Styles - Scoped to avoid conflicts */
-.attendance-page-wrapper {
+/* Student Attendance Page Styles */
+.student-attendance-wrapper {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     width: 100%;
     min-height: 100vh;
@@ -8,7 +8,7 @@
     padding: 20px;
 }
 
-.attendance-page-wrapper::before {
+.student-attendance-wrapper::before {
     content: '';
     position: fixed;
     top: 0;
@@ -22,7 +22,7 @@
     z-index: 0;
 }
 
-.attendance-page-wrapper .container {
+.student-attendance-wrapper .container {
     max-width: 1400px;
     margin: 20px auto;
     background: white;
@@ -45,7 +45,7 @@
     }
 }
 
-.attendance-page-wrapper .header {
+.student-attendance-wrapper .header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 40px 30px;
@@ -53,7 +53,7 @@
     overflow: hidden;
 }
 
-.attendance-page-wrapper .header::before {
+.student-attendance-wrapper .header::before {
     content: '';
     position: absolute;
     top: -50%;
@@ -65,7 +65,7 @@
     animation: float 6s ease-in-out infinite;
 }
 
-.attendance-page-wrapper .header::after {
+.student-attendance-wrapper .header::after {
     content: '';
     position: absolute;
     bottom: -30%;
@@ -86,7 +86,7 @@
     }
 }
 
-.attendance-page-wrapper .header h1 {
+.student-attendance-wrapper .header h1 {
     font-size: 32px;
     margin-bottom: 10px;
     font-weight: 700;
@@ -97,7 +97,7 @@
     gap: 12px;
 }
 
-.attendance-page-wrapper .header p {
+.student-attendance-wrapper .header p {
     opacity: 0.95;
     font-size: 15px;
     position: relative;
@@ -105,7 +105,7 @@
     font-weight: 300;
 }
 
-.attendance-page-wrapper .toolbar {
+.student-attendance-wrapper .toolbar {
     padding: 30px;
     background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
     border-bottom: 1px solid #e9ecef;
@@ -116,7 +116,7 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-.attendance-page-wrapper .filter-group {
+.student-attendance-wrapper .filter-group {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -124,7 +124,7 @@
     min-width: 200px;
 }
 
-.attendance-page-wrapper .filter-group label {
+.student-attendance-wrapper .filter-group label {
     font-size: 13px;
     font-weight: 600;
     color: #495057;
@@ -132,7 +132,7 @@
     letter-spacing: 0.5px;
 }
 
-.attendance-page-wrapper .filter-select {
+.student-attendance-wrapper .filter-select {
     padding: 14px 18px;
     border: 2px solid #e0e0e0;
     border-radius: 10px;
@@ -143,24 +143,24 @@
     font-weight: 500;
 }
 
-.attendance-page-wrapper .filter-select:focus {
+.student-attendance-wrapper .filter-select:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     transform: translateY(-2px);
 }
 
-.attendance-page-wrapper .filter-select:hover {
+.student-attendance-wrapper .filter-select:hover {
     border-color: #667eea;
 }
 
-.attendance-page-wrapper .action-buttons {
+.student-attendance-wrapper .action-buttons {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
 }
 
-.attendance-page-wrapper .btn {
+.student-attendance-wrapper .btn {
     padding: 14px 28px;
     border: none;
     border-radius: 12px;
@@ -176,7 +176,7 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.attendance-page-wrapper .btn::before {
+.student-attendance-wrapper .btn::before {
     content: '';
     position: absolute;
     top: 50%;
@@ -189,47 +189,37 @@
     transition: width 0.6s, height 0.6s;
 }
 
-.attendance-page-wrapper .btn:hover::before {
+.student-attendance-wrapper .btn:hover::before {
     width: 300px;
     height: 300px;
 }
 
-.attendance-page-wrapper .btn:hover {
+.student-attendance-wrapper .btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.25);
 }
 
-.attendance-page-wrapper .btn:active {
+.student-attendance-wrapper .btn:active {
     transform: translateY(-1px);
 }
 
-.attendance-page-wrapper .btn-primary {
+.student-attendance-wrapper .btn-primary {
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
     color: white;
 }
 
-.attendance-page-wrapper .btn-save {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.attendance-page-wrapper .btn-save:disabled {
+.student-attendance-wrapper .btn:disabled {
     background: #ccc;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
 }
 
-.attendance-page-wrapper .btn-save:disabled::before {
+.student-attendance-wrapper .btn:disabled::before {
     display: none;
 }
 
-.attendance-page-wrapper .btn-history {
-    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
-    color: white;
-}
-
-.attendance-page-wrapper .course-info {
+.student-attendance-wrapper .course-info {
     padding: 25px 30px;
     background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
     border-bottom: 1px solid #e9ecef;
@@ -250,7 +240,7 @@
     }
 }
 
-.attendance-page-wrapper .course-info h3 {
+.student-attendance-wrapper .course-info h3 {
     color: #667eea;
     margin: 0;
     font-size: 22px;
@@ -260,23 +250,16 @@
     gap: 10px;
 }
 
-.attendance-page-wrapper .course-info p {
-    color: #6c757d;
-    font-size: 15px;
-    margin: 0;
-    font-weight: 500;
-}
-
-.attendance-page-wrapper .stats-grid {
+.student-attendance-wrapper .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 25px;
     padding: 35px 30px;
     background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
     animation: fadeIn 0.6s ease-out;
 }
 
-.attendance-page-wrapper .stat-card {
+.student-attendance-wrapper .stat-card {
     background: white;
     padding: 25px;
     border-radius: 15px;
@@ -285,9 +268,10 @@
     transition: all 0.3s;
     position: relative;
     overflow: hidden;
+    text-align: center;
 }
 
-.attendance-page-wrapper .stat-card::before {
+.student-attendance-wrapper .stat-card::before {
     content: '';
     position: absolute;
     top: -50%;
@@ -298,49 +282,65 @@
     border-radius: 50%;
 }
 
-.attendance-page-wrapper .stat-card:hover {
+.student-attendance-wrapper .stat-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
-.attendance-page-wrapper .stat-card:nth-child(1) {
+.student-attendance-wrapper .stat-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.student-attendance-wrapper .stat-card.stat-total {
     border-left-color: #667eea;
 }
 
-.attendance-page-wrapper .stat-card:nth-child(2) {
+.student-attendance-wrapper .stat-card.stat-present {
     border-left-color: #28a745;
 }
 
-.attendance-page-wrapper .stat-card:nth-child(3) {
+.student-attendance-wrapper .stat-card.stat-absent {
     border-left-color: #dc3545;
 }
 
-.attendance-page-wrapper .stat-card:nth-child(4) {
+.student-attendance-wrapper .stat-card.stat-excused {
     border-left-color: #ffc107;
 }
 
-.attendance-page-wrapper .stat-card h3 {
+.student-attendance-wrapper .stat-card.stat-rate {
+    border-left-color: #17a2b8;
+}
+
+.student-attendance-wrapper .stat-card h3 {
     font-size: 36px;
     margin-bottom: 8px;
     font-weight: 700;
     position: relative;
     z-index: 1;
+}
+
+.student-attendance-wrapper .stat-card.stat-total h3 {
     color: #667eea;
 }
 
-.attendance-page-wrapper .stat-card:nth-child(2) h3 {
+.student-attendance-wrapper .stat-card.stat-present h3 {
     color: #28a745;
 }
 
-.attendance-page-wrapper .stat-card:nth-child(3) h3 {
+.student-attendance-wrapper .stat-card.stat-absent h3 {
     color: #dc3545;
 }
 
-.attendance-page-wrapper .stat-card:nth-child(4) h3 {
+.student-attendance-wrapper .stat-card.stat-excused h3 {
     color: #ffc107;
 }
 
-.attendance-page-wrapper .stat-card p {
+.student-attendance-wrapper .stat-card.stat-rate h3 {
+    color: #17a2b8;
+}
+
+.student-attendance-wrapper .stat-card p {
     color: #6c757d;
     font-size: 14px;
     font-weight: 600;
@@ -348,15 +348,16 @@
     z-index: 1;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    margin: 0;
 }
 
-.attendance-page-wrapper .table-container {
+.student-attendance-wrapper .table-container {
     padding: 30px;
     overflow-x: auto;
     animation: fadeIn 0.7s ease-out;
 }
 
-.attendance-page-wrapper table {
+.student-attendance-wrapper table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
@@ -366,14 +367,14 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-.attendance-page-wrapper thead {
+.student-attendance-wrapper thead {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     position: sticky;
     top: 0;
     z-index: 10;
 }
 
-.attendance-page-wrapper th {
+.student-attendance-wrapper th {
     padding: 18px 20px;
     text-align: left;
     font-weight: 600;
@@ -384,51 +385,29 @@
     border: none;
 }
 
-.attendance-page-wrapper td {
+.student-attendance-wrapper td {
     padding: 18px 20px;
     border-bottom: 1px solid #f0f0f0;
     font-size: 14px;
     color: #495057;
 }
 
-.attendance-page-wrapper tbody tr {
+.student-attendance-wrapper tbody tr {
     transition: all 0.2s;
     background: white;
 }
 
-.attendance-page-wrapper tbody tr:hover {
+.student-attendance-wrapper tbody tr:hover {
     background: linear-gradient(90deg, #f8f9ff 0%, #ffffff 100%);
     transform: scale(1.01);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
 }
 
-.attendance-page-wrapper tbody tr:last-child td {
+.student-attendance-wrapper tbody tr:last-child td {
     border-bottom: none;
 }
 
-.attendance-page-wrapper .status-select {
-    padding: 10px 14px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    min-width: 160px;
-    transition: all 0.3s;
-    background: white;
-    font-weight: 500;
-}
-
-.attendance-page-wrapper .status-select:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.attendance-page-wrapper .status-select:hover {
-    border-color: #667eea;
-}
-
-.attendance-page-wrapper .status-badge {
+.student-attendance-wrapper .status-badge {
     display: inline-block;
     padding: 6px 14px;
     border-radius: 20px;
@@ -439,27 +418,27 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.attendance-page-wrapper .status-present {
+.student-attendance-wrapper .status-present {
     background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
     color: #155724;
 }
 
-.attendance-page-wrapper .status-absent {
+.student-attendance-wrapper .status-absent {
     background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
     color: #721c24;
 }
 
-.attendance-page-wrapper .status-excused {
+.student-attendance-wrapper .status-excused {
     background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
     color: #856404;
 }
 
-.attendance-page-wrapper .status-pending {
+.student-attendance-wrapper .status-pending {
     background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%);
     color: #383d41;
 }
 
-.attendance-page-wrapper .no-data-message {
+.student-attendance-wrapper .no-data-message {
     padding: 80px 30px;
     text-align: center;
     color: #6c757d;
@@ -467,7 +446,7 @@
     background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
 }
 
-.attendance-page-wrapper .no-data-message::before {
+.student-attendance-wrapper .no-data-message::before {
     content: '📋';
     font-size: 64px;
     display: block;
@@ -475,156 +454,7 @@
     opacity: 0.5;
 }
 
-.attendance-page-wrapper .modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(5px);
-    z-index: 1000;
-    animation: fadeIn 0.3s;
-}
-
-.attendance-page-wrapper .modal-content {
-    position: relative;
-    background: white;
-    max-width: 900px;
-    margin: 50px auto;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-    animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-50px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-.attendance-page-wrapper .modal-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.attendance-page-wrapper .modal-header h2 {
-    font-size: 26px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.attendance-page-wrapper .close-btn {
-    background: rgba(255,255,255,0.2);
-    border: none;
-    color: white;
-    font-size: 28px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s;
-    font-weight: 300;
-}
-
-.attendance-page-wrapper .close-btn:hover {
-    background: rgba(255,255,255,0.3);
-    transform: rotate(90deg) scale(1.1);
-}
-
-.attendance-page-wrapper .modal-body {
-    padding: 30px;
-    overflow-y: auto;
-    flex: 1;
-}
-
-.attendance-page-wrapper .history-content {
-    margin-top: 20px;
-}
-
-.attendance-page-wrapper .history-day {
-    margin-bottom: 30px;
-    padding: 25px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    border-radius: 15px;
-    border-left: 5px solid #667eea;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    transition: all 0.3s;
-}
-
-.attendance-page-wrapper .history-day:hover {
-    transform: translateX(5px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-}
-
-.attendance-page-wrapper .history-day h4 {
-    color: #667eea;
-    margin-bottom: 18px;
-    font-size: 18px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.attendance-page-wrapper .history-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    background: white;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.attendance-page-wrapper .history-table thead {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.attendance-page-wrapper .history-table th {
-    padding: 14px;
-    text-align: left;
-    font-weight: 600;
-    color: white;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.attendance-page-wrapper .history-table td {
-    padding: 14px;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.attendance-page-wrapper .history-table tbody tr:hover {
-    background: #f8f9ff;
-}
-
-.attendance-page-wrapper .history-table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-/* Loading animation */
-.attendance-page-wrapper .loading {
+.student-attendance-wrapper .loading {
     display: inline-block;
     width: 20px;
     height: 20px;
@@ -639,45 +469,41 @@
 }
 
 @media (max-width: 768px) {
-    .attendance-page-wrapper .toolbar {
+    .student-attendance-wrapper .toolbar {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .attendance-page-wrapper .filter-group {
+    .student-attendance-wrapper .filter-group {
         width: 100%;
     }
 
-    .attendance-page-wrapper .action-buttons {
+    .student-attendance-wrapper .action-buttons {
         width: 100%;
         flex-direction: column;
     }
 
-    .attendance-page-wrapper .btn {
+    .student-attendance-wrapper .btn {
         width: 100%;
         justify-content: center;
     }
 
-    .attendance-page-wrapper .stats-grid {
+    .student-attendance-wrapper .stats-grid {
         grid-template-columns: 1fr;
     }
 
-    .attendance-page-wrapper .course-info {
+    .student-attendance-wrapper .course-info {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    .attendance-page-wrapper table {
+    .student-attendance-wrapper table {
         font-size: 12px;
     }
 
-    .attendance-page-wrapper th, 
-    .attendance-page-wrapper td {
+    .student-attendance-wrapper th, 
+    .student-attendance-wrapper td {
         padding: 12px 10px;
     }
-
-    .attendance-page-wrapper .modal-content {
-        margin: 20px;
-        max-height: calc(100vh - 40px);
-    }
 }
+

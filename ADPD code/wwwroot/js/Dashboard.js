@@ -119,6 +119,17 @@
             contentHost.style.opacity = '0';
             contentHost.innerHTML = html;
             
+            // Thực thi các script tags trong HTML mới được load
+            const scripts = contentHost.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                Array.from(oldScript.attributes).forEach(attr => {
+                    newScript.setAttribute(attr.name, attr.value);
+                });
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+            
             // Fade in animation
             setTimeout(() => {
                 contentHost.style.transition = 'opacity 0.3s ease-in';

@@ -74,6 +74,13 @@ else
                 </a>
             </li>
             <li class="menu-item">
+                <a href="@Url.Action("Attendance", "Student")"
+                   data-partial-url="@Url.Action("Attendance", "Student", new { partial = true })">
+                    <span class="menu-icon">📋</span>
+                    <span>Điểm danh</span>
+                </a>
+            </li>
+            <li class="menu-item">
                 <a href="@Url.Action("Logout", "Login")">
                     <span class="menu-icon">🚪</span>
                     <span>Đăng xuất</span>

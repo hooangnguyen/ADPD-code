@@ -1,0 +1,343 @@
+@model IEnumerable<ADPD_code.Models.Course>
+@{
+    var isPartial = ViewData["IsPartial"] as bool? ?? false;
+    Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/css/AdminDashboard.css?v=1.0" rel="stylesheet" asp-append-version="true" />
+
+<div class="management-wrapper">
+    <div class="management-header">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+            <div>
+                <h1>
+                    <span>📚</span>
+                    Quản lý Môn học
+                </h1>
+                <p>Thêm, sửa, xóa thông tin môn học</p>
+            </div>
+            <a href="@Url.Action("Dashboard", "Admin")" 
+               class="btn btn-secondary" 
+               style="padding: 10px 20px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;"
+               data-partial-url="@Url.Action("Dashboard", "Admin", new { partial = true })">
+                ← Về Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="management-toolbar">
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên môn học...">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="showCreateModal()">
+            ➕ Thêm môn học
+        </button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Mã môn</th>
+                    <th>Tên môn học</th>
+                    <th>Số tín chỉ</th>
+                    <th>Giảng viên</th>
+                    <th>Mô tả</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="courseTableBody">
+                @{
+                    int index = 1;
+                }
+                @foreach (var course in Model)
+                {
+                    <tr>
+                        <td>@index</td>
+                        <td><strong>@course.CourseID.ToString().PadLeft(5, '0')</strong></td>
+                        <td>@course.CourseName</td>
+                        <td>@course.Credits</td>
+                        <td>@(course.Lecturer?.FullName ?? "Chưa phân công")</td>
+                        <td>@(course.Description ?? "N/A")</td>
+                        <td>
+                            <button type="button" class="btn btn-success" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;" onclick="editCourse(@course.CourseID)">✏️ Sửa</button>
+                            <button type="button" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteCourse(@course.CourseID)">🗑️ Xóa</button>
+                        </td>
+                    </tr>
+                    index++;
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Thêm/Sửa Môn học -->
+<div id="courseModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Thêm Môn học</h2>
+            <button type="button" class="close-btn" onclick="closeModal()">×</button>
+        </div>
+        <form id="courseForm">
+            <div class="modal-body">
+                <input type="hidden" id="courseId" name="CourseID" />
+                <div class="form-group">
+                    <label>Tên môn học *</label>
+                    <input type="text" id="courseName" name="CourseName" required />
+                </div>
+                <div class="form-group">
+                    <label>Số tín chỉ *</label>
+                    <input type="number" id="credits" name="Credits" min="1" max="10" required />
+                </div>
+                <div class="form-group">
+                    <label>Mô tả</label>
+                    <textarea id="description" name="Description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Giảng viên</label>
+                    <select id="lecturerId" name="LecturerID">
+                        <option value="">-- Chọn giảng viên --</option>
+                        @if (ViewBag.Lecturers != null)
+                        {
+                            @foreach (var lecturer in ViewBag.Lecturers)
+                            {
+                                <option value="@lecturer.LecturerID">@lecturer.FullName</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" onclick="closeModal()" style="background: #6c757d; color: white;">Hủy</button>
+                <button type="submit" class="btn btn-primary">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function() {
+        'use strict';
+        
+        window.showCreateModal = function() {
+            console.log('showCreateModal called');
+            const modal = document.getElementById('courseModal');
+            const form = document.getElementById('courseForm');
+            const title = document.getElementById('modalTitle');
+            const courseId = document.getElementById('courseId');
+            
+            if (!modal || !form || !title || !courseId) {
+                console.error('Modal elements not found');
+                alert('Có lỗi xảy ra khi mở form!');
+                return;
+            }
+            
+            title.textContent = 'Thêm Môn học';
+            form.reset();
+            courseId.value = '';
+            modal.style.display = 'block';
+            setTimeout(initFormHandlers, 100);
+        };
+
+        window.editCourse = function(id) {
+            console.log('editCourse called with id:', id);
+            fetch(`/Admin/EditCourse/${id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Edit response:', data);
+                    if (data.success && data.course) {
+                        fillEditForm(data.course);
+                    } else {
+                        alert('❌ ' + (data.message || 'Không tìm thấy môn học'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi tải thông tin môn học!');
+                });
+        };
+
+        function fillEditForm(course) {
+            const modal = document.getElementById('courseModal');
+            const title = document.getElementById('modalTitle');
+            
+            if (!modal || !title) {
+                console.error('Modal elements not found');
+                return;
+            }
+            
+            title.textContent = 'Sửa Môn học';
+            document.getElementById('courseId').value = course.CourseID;
+            document.getElementById('courseName').value = course.CourseName || '';
+            document.getElementById('credits').value = course.Credits || '';
+            document.getElementById('description').value = course.Description || '';
+            if (course.LecturerID) {
+                document.getElementById('lecturerId').value = course.LecturerID;
+            }
+            modal.style.display = 'block';
+            setTimeout(initFormHandlers, 100);
+        }
+
+        window.deleteCourse = function(id) {
+            console.log('deleteCourse called with id:', id);
+            if (!confirm('Bạn có chắc chắn muốn xóa môn học này?')) {
+                return;
+            }
+
+            fetch(`/Admin/DeleteCourse/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(`HTTP ${response.status}: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Delete response:', data);
+                    if (data.success) {
+                        alert('✅ ' + data.message);
+                        location.reload();
+                    } else {
+                        alert('❌ ' + (data.message || 'Có lỗi xảy ra'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi xóa môn học: ' + error.message);
+                });
+        };
+
+        window.closeModal = function() {
+            const modal = document.getElementById('courseModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        function initFormHandlers() {
+            const form = document.getElementById('courseForm');
+            if (form) {
+                if (form.dataset.listenerAttached === 'true') {
+                    return;
+                }
+                
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('Form submit triggered');
+                    
+                    const courseId = document.getElementById('courseId')?.value || '';
+                    const data = {
+                        CourseName: document.getElementById('courseName').value,
+                        Credits: parseInt(document.getElementById('credits').value),
+                        Description: document.getElementById('description').value || '',
+                        LecturerID: document.getElementById('lecturerId').value ? parseInt(document.getElementById('lecturerId').value) : null
+                    };
+
+                    let url = '/Admin/CreateCourse';
+                    
+                    if (courseId && courseId !== '' && courseId !== '0') {
+                        url = `/Admin/EditCourse/${parseInt(courseId)}`;
+                        data.CourseID = parseInt(courseId);
+                    }
+
+                    const jsonBody = JSON.stringify(data);
+                    
+                    console.log('Sending data:', data);
+                    console.log('URL:', url);
+                    console.log('JSON string:', jsonBody);
+
+                    if (!jsonBody || jsonBody === '{}') {
+                        alert('Lỗi: Dữ liệu không hợp lệ!');
+                        return false;
+                    }
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        credentials: 'same-origin',
+                        body: jsonBody
+                    })
+                        .then(response => {
+                            console.log('Response status:', response.status);
+                            if (!response.ok) {
+                                return response.text().then(text => {
+                                    console.error('Error response:', text);
+                                    throw new Error(`HTTP ${response.status}: ${text}`);
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Response data:', data);
+                            if (data.success) {
+                                alert('✅ ' + data.message);
+                                closeModal();
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 500);
+                            } else {
+                                alert('❌ ' + (data.message || 'Có lỗi xảy ra'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Có lỗi xảy ra: ' + error.message);
+                        });
+                    
+                    return false;
+                });
+                
+                form.dataset.listenerAttached = 'true';
+            }
+
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('#courseTableBody tr');
+                    
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(searchTerm) ? '' : 'none';
+                    });
+                });
+            }
+
+            window.onclick = function(event) {
+                const modal = document.getElementById('courseModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+        }
+
+        initFormHandlers();
+        setTimeout(initFormHandlers, 200);
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(initFormHandlers, 100);
+            });
+        } else {
+            setTimeout(initFormHandlers, 100);
+        }
+    })();
+</script>

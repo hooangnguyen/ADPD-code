@@ -1,0 +1,339 @@
+@model IEnumerable<ADPD_code.Models.Account>
+@{
+    var isPartial = ViewData["IsPartial"] as bool? ?? false;
+    Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/css/AdminDashboard.css?v=1.0" rel="stylesheet" asp-append-version="true" />
+
+<div class="management-wrapper">
+    <div class="management-header">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+            <div>
+                <h1>
+                    <span>🔐</span>
+                    Quản lý Tài khoản
+                </h1>
+                <p>Tạo và quản lý tài khoản hệ thống</p>
+            </div>
+            <a href="@Url.Action("Dashboard", "Admin")" 
+               class="btn btn-secondary" 
+               style="padding: 10px 20px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;"
+               data-partial-url="@Url.Action("Dashboard", "Admin", new { partial = true })">
+                ← Về Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="management-toolbar">
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Tìm kiếm theo username, role...">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="showCreateModal()">
+            ➕ Tạo tài khoản
+        </button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Sinh viên</th>
+                    <th>Giảng viên</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="accountTableBody">
+                @{
+                    int index = 1;
+                }
+                @foreach (var account in Model)
+                {
+                    <tr>
+                        <td>@index</td>
+                        <td><strong>@account.Username</strong></td>
+                        <td>
+                            <span class="role-badge role-@(account.Role?.ToLower() ?? "")">
+                                @account.Role
+                            </span>
+                        </td>
+                        <td>@(account.Student?.FullName ?? "N/A")</td>
+                        <td>@(account.Lecturer?.FullName ?? "N/A")</td>
+                        <td>
+                            <button type="button" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteAccount(@account.UserID)">🗑️ Xóa</button>
+                        </td>
+                    </tr>
+                    index++;
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Tạo Tài khoản -->
+<div id="accountModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Tạo Tài khoản</h2>
+            <button type="button" class="close-btn" onclick="closeModal()">×</button>
+        </div>
+        <form id="accountForm">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Username *</label>
+                    <input type="text" id="username" name="Username" required />
+                </div>
+                <div class="form-group">
+                    <label>Password *</label>
+                    <input type="password" id="password" name="Password" required />
+                </div>
+                <div class="form-group">
+                    <label>Role *</label>
+                    <select id="role" name="Role" required onchange="toggleUserSelect()">
+                        <option value="">-- Chọn role --</option>
+                        <option value="Student">Student</option>
+                        <option value="Lecturer">Lecturer</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group" id="studentSelectGroup" style="display: none;">
+                    <label>Sinh viên *</label>
+                    <select id="studentId" name="StudentID">
+                        <option value="">-- Chọn sinh viên --</option>
+                        @if (ViewBag.Students != null)
+                        {
+                            @foreach (var student in ViewBag.Students)
+                            {
+                                <option value="@student.StudentId">@student.FullName (@student.StudentId)</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="form-group" id="lecturerSelectGroup" style="display: none;">
+                    <label>Giảng viên *</label>
+                    <select id="lecturerId" name="LecturerID">
+                        <option value="">-- Chọn giảng viên --</option>
+                        @if (ViewBag.Lecturers != null)
+                        {
+                            @foreach (var lecturer in ViewBag.Lecturers)
+                            {
+                                <option value="@lecturer.LecturerID">@lecturer.FullName (@lecturer.LecturerID)</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" onclick="closeModal()" style="background: #6c757d; color: white;">Hủy</button>
+                <button type="submit" class="btn btn-primary">Tạo tài khoản</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function() {
+        'use strict';
+        
+        window.showCreateModal = function() {
+            console.log('showCreateModal called');
+            const modal = document.getElementById('accountModal');
+            const form = document.getElementById('accountForm');
+            
+            if (!modal || !form) {
+                console.error('Modal elements not found');
+                alert('Có lỗi xảy ra khi mở form!');
+                return;
+            }
+            
+            form.reset();
+            document.getElementById('studentSelectGroup').style.display = 'none';
+            document.getElementById('lecturerSelectGroup').style.display = 'none';
+            modal.style.display = 'block';
+            setTimeout(initFormHandlers, 100);
+        };
+
+        window.toggleUserSelect = function() {
+            const role = document.getElementById('role').value;
+            document.getElementById('studentSelectGroup').style.display = role === 'Student' ? 'block' : 'none';
+            document.getElementById('lecturerSelectGroup').style.display = role === 'Lecturer' ? 'block' : 'none';
+        };
+
+        window.deleteAccount = function(id) {
+            console.log('deleteAccount called with id:', id);
+            if (!confirm('Bạn có chắc chắn muốn xóa tài khoản này?')) {
+                return;
+            }
+
+            fetch(`/Admin/DeleteAccount/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(`HTTP ${response.status}: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Delete response:', data);
+                    if (data.success) {
+                        alert('✅ ' + data.message);
+                        location.reload();
+                    } else {
+                        alert('❌ ' + (data.message || 'Có lỗi xảy ra'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi xóa tài khoản: ' + error.message);
+                });
+        };
+
+        window.closeModal = function() {
+            const modal = document.getElementById('accountModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        function initFormHandlers() {
+            const form = document.getElementById('accountForm');
+            if (form) {
+                if (form.dataset.listenerAttached === 'true') {
+                    return;
+                }
+                
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('Form submit triggered');
+                    
+                    const role = document.getElementById('role').value;
+                    const data = {
+                        Username: document.getElementById('username').value,
+                        Password: document.getElementById('password').value,
+                        Role: role,
+                        StudentID: role === 'Student' && document.getElementById('studentId').value ? parseInt(document.getElementById('studentId').value) : null,
+                        LecturerID: role === 'Lecturer' && document.getElementById('lecturerId').value ? parseInt(document.getElementById('lecturerId').value) : null
+                    };
+
+                    const jsonBody = JSON.stringify(data);
+                    
+                    console.log('Sending data:', data);
+                    console.log('JSON string:', jsonBody);
+
+                    if (!jsonBody || jsonBody === '{}') {
+                        alert('Lỗi: Dữ liệu không hợp lệ!');
+                        return false;
+                    }
+
+                    fetch('/Admin/CreateAccount', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        credentials: 'same-origin',
+                        body: jsonBody
+                    })
+                        .then(response => {
+                            console.log('Response status:', response.status);
+                            if (!response.ok) {
+                                return response.text().then(text => {
+                                    console.error('Error response:', text);
+                                    throw new Error(`HTTP ${response.status}: ${text}`);
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Response data:', data);
+                            if (data.success) {
+                                alert('✅ ' + data.message);
+                                closeModal();
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 500);
+                            } else {
+                                alert('❌ ' + (data.message || 'Có lỗi xảy ra'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Có lỗi xảy ra: ' + error.message);
+                        });
+                    
+                    return false;
+                });
+                
+                form.dataset.listenerAttached = 'true';
+            }
+
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('#accountTableBody tr');
+                    
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(searchTerm) ? '' : 'none';
+                    });
+                });
+            }
+
+            window.onclick = function(event) {
+                const modal = document.getElementById('accountModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+        }
+
+        initFormHandlers();
+        setTimeout(initFormHandlers, 200);
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(initFormHandlers, 100);
+            });
+        } else {
+            setTimeout(initFormHandlers, 100);
+        }
+    })();
+</script>
+
+<style>
+    .role-badge {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .role-admin {
+        background: #dc3545;
+        color: white;
+    }
+
+    .role-lecturer {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .role-student {
+        background: #28a745;
+        color: white;
+    }
+</style>

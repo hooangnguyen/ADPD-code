@@ -1,0 +1,195 @@
+@{
+    var isPartial = ViewData["IsPartial"] as bool? ?? false;
+    Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/css/StudentAttendance.css?v=1.0" rel="stylesheet" asp-append-version="true" />
+
+<div class="student-attendance-wrapper">
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span style="font-size: 36px;">📋</span>
+                Lịch sử Điểm danh
+            </h1>
+            <p>Xem lịch sử điểm danh của bạn theo từng môn học</p>
+        </div>
+
+        <div class="toolbar">
+            <div class="filter-group">
+                <label for="courseSelect">Chọn môn học:</label>
+                <select id="courseSelect" class="filter-select">
+                    <option value="">-- Chọn môn học --</option>
+                    @if (ViewBag.Courses != null)
+                    {
+                        @foreach (var course in ViewBag.Courses)
+                        {
+                            <option value="@course.CourseID">@course.CourseName</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="startDate">Từ ngày:</label>
+                <input type="date" id="startDate" class="filter-select" />
+            </div>
+
+            <div class="filter-group">
+                <label for="endDate">Đến ngày:</label>
+                <input type="date" id="endDate" class="filter-select" />
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="loadAttendanceBtn" onclick="loadAttendance()">
+                    <span>🔍</span>
+                    <span>Tìm kiếm</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="courseInfo" class="course-info" style="display: none;">
+            <h3>
+                <span>📚</span>
+                <span id="courseNameDisplay"></span>
+            </h3>
+        </div>
+
+        <div class="stats-grid" id="statsGrid" style="display: none;">
+            <div class="stat-card stat-total">
+                <div class="stat-icon">📊</div>
+                <h3 id="totalDays">0</h3>
+                <p>Tổng số buổi</p>
+            </div>
+            <div class="stat-card stat-present">
+                <div class="stat-icon">✅</div>
+                <h3 id="presentDays">0</h3>
+                <p>Có mặt</p>
+            </div>
+            <div class="stat-card stat-absent">
+                <div class="stat-icon">❌</div>
+                <h3 id="absentDays">0</h3>
+                <p>Vắng</p>
+            </div>
+            <div class="stat-card stat-excused">
+                <div class="stat-icon">⚠️</div>
+                <h3 id="excusedDays">0</h3>
+                <p>Có phép</p>
+            </div>
+            <div class="stat-card stat-rate">
+                <div class="stat-icon">📈</div>
+                <h3 id="attendanceRate">0%</h3>
+                <p>Tỷ lệ tham dự</p>
+            </div>
+        </div>
+
+        <div class="table-container" id="attendanceTableContainer" style="display: none;">
+            <table id="attendanceTable">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Ngày điểm danh</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div id="noDataMessage" class="no-data-message" style="display: none;">
+            <p>Vui lòng chọn môn học và nhấn "Tìm kiếm" để xem lịch sử điểm danh.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function loadAttendance() {
+        const courseId = document.getElementById('courseSelect').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (!courseId) {
+            alert('Vui lòng chọn môn học!');
+            return;
+        }
+
+        const loadBtn = document.getElementById('loadAttendanceBtn');
+        const originalText = loadBtn.innerHTML;
+        loadBtn.innerHTML = '<span class="loading"></span> Đang tải...';
+        loadBtn.disabled = true;
+
+        let url = `/Student/GetMyAttendance?courseId=${courseId}`;
+        if (startDate) url += `&startDate=${startDate}`;
+        if (endDate) url += `&endDate=${endDate}`;
+
+        document.getElementById('attendanceTableBody').innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 40px;"><div class="loading" style="margin: 0 auto;"></div><p style="margin-top: 15px; color: #6c757d;">Đang tải dữ liệu...</p></td></tr>';
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                loadBtn.innerHTML = originalText;
+                loadBtn.disabled = false;
+
+                if (data.success) {
+                    displayAttendance(data);
+                    document.getElementById('courseNameDisplay').textContent = data.courseName;
+                    document.getElementById('courseInfo').style.display = 'flex';
+                    document.getElementById('attendanceTableContainer').style.display = 'block';
+                    document.getElementById('statsGrid').style.display = 'grid';
+                    document.getElementById('noDataMessage').style.display = 'none';
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                loadBtn.innerHTML = originalText;
+                loadBtn.disabled = false;
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi tải dữ liệu!');
+            });
+    }
+
+    function displayAttendance(data) {
+        const stats = data.statistics;
+        
+        // Cập nhật thống kê
+        document.getElementById('totalDays').textContent = stats.totalDays;
+        document.getElementById('presentDays').textContent = stats.presentDays;
+        document.getElementById('absentDays').textContent = stats.absentDays;
+        document.getElementById('excusedDays').textContent = stats.excusedDays;
+        document.getElementById('attendanceRate').textContent = stats.attendanceRate + '%';
+
+        // Hiển thị bảng
+        const tbody = document.getElementById('attendanceTableBody');
+        tbody.innerHTML = '';
+
+        if (data.history.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 40px; color: #6c757d;">Chưa có dữ liệu điểm danh</td></tr>';
+            return;
+        }
+
+        data.history.forEach((record, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td><strong>${record.dateDisplay}</strong></td>
+                <td>
+                    <span class="status-badge status-${getStatusClass(record.status)}">
+                        ${record.status}
+                    </span>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function getStatusClass(status) {
+        switch (status) {
+            case 'Có mặt': return 'present';
+            case 'Vắng': return 'absent';
+            case 'Có phép': return 'excused';
+            default: return 'pending';
+        }
+    }
+</script>
+

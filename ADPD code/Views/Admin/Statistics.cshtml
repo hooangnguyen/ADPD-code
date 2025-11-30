@@ -1,0 +1,122 @@
+@{
+    var isPartial = ViewData["IsPartial"] as bool? ?? false;
+    Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/css/AdminDashboard.css?v=1.0" rel="stylesheet" asp-append-version="true" />
+
+<div class="management-wrapper">
+    <div class="management-header">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+            <div>
+                <h1>
+                    <span>📊</span>
+                    Thống kê & Báo cáo
+                </h1>
+                <p>Xem báo cáo tổng quan hệ thống</p>
+            </div>
+            <a href="@Url.Action("Dashboard", "Admin")" 
+               class="btn btn-secondary" 
+               style="padding: 10px 20px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;"
+               data-partial-url="@Url.Action("Dashboard", "Admin", new { partial = true })">
+                ← Về Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="stats-grid" style="padding: 30px;">
+        <div class="stat-card stat-students">
+            <div class="stat-icon">🎓</div>
+            <h3>@(ViewBag.TotalStudents ?? 0)</h3>
+            <p>Tổng số sinh viên</p>
+        </div>
+        <div class="stat-card stat-lecturers">
+            <div class="stat-icon">👩‍🏫</div>
+            <h3>@(ViewBag.TotalLecturers ?? 0)</h3>
+            <p>Tổng số giảng viên</p>
+        </div>
+        <div class="stat-card stat-courses">
+            <div class="stat-icon">📚</div>
+            <h3>@(ViewBag.TotalCourses ?? 0)</h3>
+            <p>Tổng số môn học</p>
+        </div>
+        <div class="stat-card stat-classes">
+            <div class="stat-icon">🏫</div>
+            <h3>@(ViewBag.TotalClasses ?? 0)</h3>
+            <p>Tổng số lớp học</p>
+        </div>
+        <div class="stat-card stat-attendance">
+            <div class="stat-icon">📋</div>
+            <h3>@(ViewBag.TotalAttendance ?? 0)</h3>
+            <p>Tổng số buổi điểm danh</p>
+        </div>
+        <div class="stat-card stat-rate">
+            <div class="stat-icon">📈</div>
+            <h3>@(ViewBag.AttendanceRate ?? 0)%</h3>
+            <p>Tỷ lệ tham dự</p>
+        </div>
+        <div class="stat-card stat-score">
+            <div class="stat-icon">⭐</div>
+            <h3>@(ViewBag.AvgScore ?? 0)</h3>
+            <p>Điểm trung bình</p>
+        </div>
+    </div>
+
+    <div style="padding: 30px;">
+        <h2 style="margin-bottom: 20px; color: #333;">Thống kê theo Khoa</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên khoa</th>
+                        <th>Số giảng viên</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int index = 1;
+                    }
+                    @if (ViewBag.Departments != null)
+                    {
+                        @foreach (var dept in ViewBag.Departments)
+                        {
+                            <tr>
+                                <td>@index</td>
+                                <td>@dept.DepartmentName</td>
+                                <td>@dept.LecturerCount</td>
+                            </tr>
+                            index++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stat-card.stat-attendance {
+        border-left-color: #6f42c1;
+    }
+
+    .stat-card.stat-attendance h3 {
+        color: #6f42c1;
+    }
+
+    .stat-card.stat-rate {
+        border-left-color: #17a2b8;
+    }
+
+    .stat-card.stat-rate h3 {
+        color: #17a2b8;
+    }
+
+    .stat-card.stat-score {
+        border-left-color: #ffc107;
+    }
+
+    .stat-card.stat-score h3 {
+        color: #ffc107;
+    }
+</style>
+

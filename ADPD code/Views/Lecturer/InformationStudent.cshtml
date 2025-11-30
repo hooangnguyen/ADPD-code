@@ -2,12 +2,15 @@
     var isPartial = ViewData["IsPartial"] as bool? ?? false;
     Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
 }
-     <link rel="stylesheet" href="~/css/Information.css" />
-    <body>
-}
+<link rel="stylesheet" href="~/css/Information.css?v=2.0" asp-append-version="true" />
+
+<div class="student-management-wrapper">
     <div class="container">
         <div class="header">
-            <h1>📚 Quản lý Sinh viên</h1>
+            <h1>
+                <span style="font-size: 36px;">📚</span>
+                Quản lý Sinh viên
+            </h1>
             <p>Danh sách toàn bộ sinh viên đang được quản lý</p>
         </div>
 
@@ -38,15 +41,19 @@
 
             <select class="filter-select" id="classFilter">
                 <option value="">Tất cả lớp</option>
-                <option value="CNTT01-K65">CNTT01-K65</option>
-                <option value="CNTT02-K65">CNTT02-K65</option>
-                <option value="CNTT03-K65">CNTT03-K65</option>
+                @if (ViewBag.Classes != null)
+                {
+                    @foreach (var className in ViewBag.Classes)
+                    {
+                        <option value="@className">@className</option>
+                    }
+                }
             </select>
 
             <select class="filter-select" id="statusFilter">
                 <option value="">Tất cả trạng thái</option>
-                <option value="active">Đang học</option>
-                <option value="inactive">Nghỉ học</option>
+                <option value="Đang học">Đang học</option>
+                <option value="Nghỉ học">Nghỉ học</option>
             </select>
 
             <button class="btn btn-excel" onclick="exportToExcel()">
@@ -65,7 +72,7 @@
                         <th onclick="sortTable(4)">Lớp ↕</th>
                         <th onclick="sortTable(5)">Email</th>
                         <th onclick="sortTable(6)">SĐT</th>
-                        <th onclick="sortTable(7)">Điểm TB</th>
+                        <th onclick="sortTable(7)">Điểm TB ↕</th>
                         <th onclick="sortTable(8)">Tỷ lệ tham dự ↕</th>
                         <th>Trạng thái</th>
                     </tr>
@@ -149,23 +156,11 @@
     </div>
 
     <script>
-        // Dữ liệu mẫu sinh viên
-        const students = [
-            { id: 1, mssv: '2021600001', name: 'Nguyễn Văn An', class: 'CNTT01-K65', email: 'annv@student.edu.vn', phone: '0912345671', dob: '15/03/2003', gender: 'Nam', address: 'Hà Nội', gpa: 3.45, attendance: 92, absent: 3, status: 'active' },
-            { id: 2, mssv: '2021600002', name: 'Trần Thị Bình', class: 'CNTT01-K65', email: 'binhtt@student.edu.vn', phone: '0912345672', dob: '22/05/2003', gender: 'Nữ', address: 'Hải Phòng', gpa: 3.78, attendance: 95, absent: 2, status: 'active' },
-            { id: 3, mssv: '2021600003', name: 'Lê Văn Cường', class: 'CNTT02-K65', email: 'cuonglv@student.edu.vn', phone: '0912345673', dob: '10/07/2003', gender: 'Nam', address: 'Hà Nội', gpa: 3.21, attendance: 88, absent: 5, status: 'active' },
-            { id: 4, mssv: '2021600004', name: 'Phạm Thị Dung', class: 'CNTT02-K65', email: 'dungpt@student.edu.vn', phone: '0912345674', dob: '18/09/2003', gender: 'Nữ', address: 'Nam Định', gpa: 3.56, attendance: 90, absent: 4, status: 'active' },
-            { id: 5, mssv: '2021600005', name: 'Hoàng Văn Em', class: 'CNTT01-K65', email: 'emhv@student.edu.vn', phone: '0912345675', dob: '05/11/2003', gender: 'Nam', address: 'Hà Nội', gpa: 3.12, attendance: 85, absent: 6, status: 'active' },
-            { id: 6, mssv: '2021600006', name: 'Vũ Thị Phương', class: 'CNTT03-K65', email: 'phuongvt@student.edu.vn', phone: '0912345676', dob: '30/01/2003', gender: 'Nữ', address: 'Thái Bình', gpa: 3.67, attendance: 93, absent: 3, status: 'active' },
-            { id: 7, mssv: '2021600007', name: 'Đặng Văn Giang', class: 'CNTT03-K65', email: 'giangdv@student.edu.vn', phone: '0912345677', dob: '12/04/2003', gender: 'Nam', address: 'Hà Nội', gpa: 3.34, attendance: 87, absent: 5, status: 'active' },
-            { id: 8, mssv: '2021600008', name: 'Bùi Thị Hoa', class: 'CNTT02-K65', email: 'hoabt@student.edu.vn', phone: '0912345678', dob: '25/06/2003', gender: 'Nữ', address: 'Hưng Yên', gpa: 3.89, attendance: 97, absent: 1, status: 'active' },
-            { id: 9, mssv: '2021600009', name: 'Ngô Văn Hùng', class: 'CNTT01-K65', email: 'hungnv@student.edu.vn', phone: '0912345679', dob: '08/08/2003', gender: 'Nam', address: 'Hà Nội', gpa: 2.98, attendance: 82, absent: 7, status: 'active' },
-            { id: 10, mssv: '2021600010', name: 'Đinh Thị Lan', class: 'CNTT03-K65', email: 'landt@student.edu.vn', phone: '0912345680', dob: '19/12/2003', gender: 'Nữ', address: 'Bắc Ninh', gpa: 3.45, attendance: 91, absent: 4, status: 'active' },
-            { id: 11, mssv: '2021600011', name: 'Trịnh Văn Minh', class: 'CNTT02-K65', email: 'minhtv@student.edu.vn', phone: '0912345681', dob: '14/02/2003', gender: 'Nam', address: 'Hà Nội', gpa: 3.23, attendance: 86, absent: 6, status: 'active' },
-            { id: 12, mssv: '2021600012', name: 'Lý Thị Nga', class: 'CNTT01-K65', email: 'galt@student.edu.vn', phone: '0912345682', dob: '27/10/2003', gender: 'Nữ', address: 'Vĩnh Phúc', gpa: 3.71, attendance: 94, absent: 2, status: 'active' }
-        ];
+        // Dữ liệu sinh viên từ server
+        const students = @Html.Raw(Json.Serialize(ViewBag.Students ?? new List<object>()));
 
         let filteredStudents = [...students];
+        let sortDirection = {};
 
         function renderTable() {
             const tbody = document.getElementById('studentTableBody');
@@ -174,35 +169,52 @@
             const statusFilter = document.getElementById('statusFilter').value;
 
             filteredStudents = students.filter(student => {
-                const matchSearch = student.name.toLowerCase().includes(searchTerm) ||
-                                  student.mssv.includes(searchTerm) ||
-                                  student.email.toLowerCase().includes(searchTerm);
-                const matchClass = !classFilter || student.class === classFilter;
-                const matchStatus = !statusFilter || student.status === statusFilter;
+                const matchSearch = (student.fullName || '').toLowerCase().includes(searchTerm) ||
+                                  (student.mssv || '').includes(searchTerm) ||
+                                  (student.email || '').toLowerCase().includes(searchTerm);
+                const matchClass = !classFilter || (student.allClasses && student.allClasses.includes(classFilter));
+                const matchStatus = !statusFilter || (student.status || '') === statusFilter;
                 return matchSearch && matchClass && matchStatus;
             });
 
             tbody.innerHTML = '';
 
+            if (filteredStudents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px; color: #6c757d;">Không tìm thấy sinh viên nào</td></tr>';
+                updateStats();
+                return;
+            }
+
             filteredStudents.forEach((student, index) => {
                 const row = document.createElement('tr');
                 row.onclick = () => showStudentDetail(student);
+                row.style.cursor = 'pointer';
 
-                const initials = student.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+                const nameParts = (student.fullName || '').split(' ').filter(n => n.length > 0);
+                let initials = '';
+                if (nameParts.length > 1) {
+                    initials = nameParts[0][0] + nameParts[nameParts.length - 1][0];
+                } else if (nameParts.length === 1) {
+                    initials = nameParts[0][0];
+                }
+
+                const className = student.allClasses && student.allClasses.length > 0 
+                    ? student.allClasses[0] 
+                    : 'N/A';
 
                 row.innerHTML = `
                     <td>${index + 1}</td>
                     <td><div class="student-avatar">${initials}</div></td>
-                    <td><strong>${student.mssv}</strong></td>
-                    <td>${student.name}</td>
-                    <td>${student.class}</td>
-                    <td>${student.email}</td>
-                    <td>${student.phone}</td>
-                    <td><strong>${student.gpa.toFixed(2)}</strong></td>
-                    <td><strong>${student.attendance}%</strong></td>
+                    <td><strong>${student.mssv || 'N/A'}</strong></td>
+                    <td>${student.fullName || 'N/A'}</td>
+                    <td>${className}</td>
+                    <td>${student.email || 'N/A'}</td>
+                    <td>${student.phone || 'N/A'}</td>
+                    <td><strong>${(student.gpa || 0).toFixed(2)}</strong></td>
+                    <td><strong>${(student.attendanceRate || 0).toFixed(1)}%</strong></td>
                     <td>
-                        <span class="status-badge ${student.status === 'active' ? 'status-active' : 'status-inactive'}">
-                            ${student.status === 'active' ? 'Đang học' : 'Nghỉ học'}
+                        <span class="status-badge ${(student.status || '') === 'Đang học' ? 'status-active' : 'status-inactive'}">
+                            ${student.status || 'N/A'}
                         </span>
                     </td>
                 `;
@@ -214,10 +226,10 @@
 
         function updateStats() {
             const total = filteredStudents.length;
-            const active = filteredStudents.filter(s => s.status === 'active').length;
+            const active = filteredStudents.filter(s => (s.status || '') === 'Đang học').length;
             const avgAttendance = total > 0 ?
-                Math.round(filteredStudents.reduce((sum, s) => sum + s.attendance, 0) / total) : 0;
-            const classes = [...new Set(filteredStudents.map(s => s.class))].length;
+                Math.round(filteredStudents.reduce((sum, s) => sum + (s.attendanceRate || 0), 0) / total * 10) / 10 : 0;
+            const classes = [...new Set(filteredStudents.flatMap(s => s.allClasses || []))].length;
 
             document.getElementById('totalStudents').textContent = total;
             document.getElementById('activeStudents').textContent = active;
@@ -227,25 +239,33 @@
 
         function showStudentDetail(student) {
             const modal = document.getElementById('studentModal');
-            const initials = student.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+            const nameParts = (student.fullName || '').split(' ').filter(n => n.length > 0);
+            let initials = '';
+            if (nameParts.length > 1) {
+                initials = nameParts[0][0] + nameParts[nameParts.length - 1][0];
+            } else if (nameParts.length === 1) {
+                initials = nameParts[0][0];
+            }
 
             document.getElementById('modalAvatar').textContent = initials;
-            document.getElementById('modalMSSV').textContent = student.mssv;
-            document.getElementById('modalName').textContent = student.name;
-            document.getElementById('modalClass').textContent = student.class;
-            document.getElementById('modalDOB').textContent = student.dob;
-            document.getElementById('modalGender').textContent = student.gender;
-            document.getElementById('modalEmail').textContent = student.email;
-            document.getElementById('modalPhone').textContent = student.phone;
-            document.getElementById('modalAddress').textContent = student.address;
+            document.getElementById('modalMSSV').textContent = student.mssv || '-';
+            document.getElementById('modalName').textContent = student.fullName || '-';
+            document.getElementById('modalClass').textContent = (student.allClasses && student.allClasses.length > 0) 
+                ? student.allClasses.join(', ') 
+                : '-';
+            document.getElementById('modalDOB').textContent = student.dob || '-';
+            document.getElementById('modalGender').textContent = student.gender || '-';
+            document.getElementById('modalEmail').textContent = student.email || '-';
+            document.getElementById('modalPhone').textContent = student.phone || '-';
+            document.getElementById('modalAddress').textContent = student.address || '-';
             document.getElementById('modalStatus').innerHTML = `
-                <span class="status-badge ${student.status === 'active' ? 'status-active' : 'status-inactive'}">
-                    ${student.status === 'active' ? 'Đang học' : 'Nghỉ học'}
+                <span class="status-badge ${(student.status || '') === 'Đang học' ? 'status-active' : 'status-inactive'}">
+                    ${student.status || 'N/A'}
                 </span>
             `;
-            document.getElementById('modalGPA').textContent = student.gpa.toFixed(2);
-            document.getElementById('modalAttendance').textContent = student.attendance + '%';
-            document.getElementById('modalAbsent').textContent = student.absent;
+            document.getElementById('modalGPA').textContent = (student.gpa || 0).toFixed(2);
+            document.getElementById('modalAttendance').textContent = (student.attendanceRate || 0).toFixed(1) + '%';
+            document.getElementById('modalAbsent').textContent = student.totalAbsent || 0;
 
             modal.style.display = 'block';
         }
@@ -262,50 +282,36 @@
         }
 
         function exportToExcel() {
+            if (typeof XLSX === 'undefined') {
+                alert('❌ Lỗi: Thư viện XLSX chưa được tải. Vui lòng kiểm tra lại liên kết script.');
+                return;
+            }
+
             const data = filteredStudents.map((student, index) => ({
                 'STT': index + 1,
-                'MSSV': student.mssv,
-                'Họ và tên': student.name,
-                'Lớp': student.class,
-                'Ngày sinh': student.dob,
-                'Giới tính': student.gender,
-                'Email': student.email,
-                'Số điện thoại': student.phone,
-                'Địa chỉ': student.address,
-                'Điểm TB': student.gpa,
-                'Tỷ lệ tham dự (%)': student.attendance,
-                'Số buổi vắng': student.absent,
-                'Trạng thái': student.status === 'active' ? 'Đang học' : 'Nghỉ học'
+                'MSSV': student.mssv || 'N/A',
+                'Họ và tên': student.fullName || 'N/A',
+                'Lớp': (student.allClasses && student.allClasses.length > 0) ? student.allClasses.join(', ') : 'N/A',
+                'Ngày sinh': student.dob || 'N/A',
+                'Giới tính': student.gender || 'N/A',
+                'Email': student.email || 'N/A',
+                'Số điện thoại': student.phone || 'N/A',
+                'Địa chỉ': student.address || 'N/A',
+                'Điểm TB': student.gpa || 0,
+                'Tỷ lệ tham dự (%)': student.attendanceRate || 0,
+                'Số buổi vắng': student.totalAbsent || 0,
+                'Trạng thái': student.status || 'N/A'
             }));
 
             const ws = XLSX.utils.json_to_sheet(data);
-
-            // Tự động điều chỉnh độ rộng cột
-            const colWidths = [
-                { wch: 5 },  // STT
-                { wch: 12 }, // MSSV
-                { wch: 25 }, // Họ và tên
-                { wch: 15 }, // Lớp
-                { wch: 12 }, // Ngày sinh
-                { wch: 10 }, // Giới tính
-                { wch: 30 }, // Email
-                { wch: 15 }, // SĐT
-                { wch: 30 }, // Địa chỉ
-                { wch: 10 }, // Điểm TB
-                { wch: 18 }, // Tỷ lệ tham dự
-                { wch: 15 }, // Số buổi vắng
-                { wch: 12 }  // Trạng thái
-            ];
-            ws['!cols'] = colWidths;
-
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Danh sách sinh viên');
 
             const fileName = `Danh_sach_sinh_vien_${new Date().toISOString().split('T')[0]}.xlsx`;
             XLSX.writeFile(wb, fileName);
+            alert('✅ Đã xuất file Excel thành công!');
         }
 
-        let sortDirection = {};
         function sortTable(columnIndex) {
             const direction = sortDirection[columnIndex] || 'asc';
 
@@ -314,37 +320,30 @@
 
                 switch(columnIndex) {
                     case 2: aVal = a.mssv; bVal = b.mssv; break;
-                    case 3: aVal = a.name; bVal = b.name; break;
-                    case 4: aVal = a.class; bVal = b.class; break;
-                    case 7: aVal = a.gpa; bVal = b.gpa; break;
-                    case 8: aVal = a.attendance; bVal = b.attendance; break;
-                    default:
-                        // If column not sortable, keep order
-                        return 0;
+                    case 3: aVal = a.fullName; bVal = b.fullName; break;
+                    case 4: aVal = (a.allClasses && a.allClasses.length > 0) ? a.allClasses[0] : ''; 
+                            bVal = (b.allClasses && b.allClasses.length > 0) ? b.allClasses[0] : ''; 
+                            break;
+                    case 7: aVal = a.gpa || 0; bVal = b.gpa || 0; break;
+                    case 8: aVal = a.attendanceRate || 0; bVal = b.attendanceRate || 0; break;
+                    default: return 0;
                 }
 
-                // Normalize undefined/null
                 if (aVal === undefined || aVal === null) aVal = '';
                 if (bVal === undefined || bVal === null) bVal = '';
 
-                // Determine comparison
                 let cmp = 0;
                 const isNumber = typeof aVal === 'number' && typeof bVal === 'number';
                 if (isNumber) {
                     cmp = aVal - bVal;
                 } else {
-                    // Compare as strings (case-insensitive)
-                    const sa = String(aVal).toLowerCase();
-                    const sb = String(bVal).toLowerCase();
-                    cmp = sa.localeCompare(sb);
+                    cmp = String(aVal).toLowerCase().localeCompare(String(bVal).toLowerCase());
                 }
 
                 return direction === 'asc' ? cmp : -cmp;
             });
 
-            // Toggle sort direction for next click
             sortDirection[columnIndex] = direction === 'asc' ? 'desc' : 'asc';
-
             renderTable();
         }
 
@@ -356,6 +355,4 @@
         // Initial render
         renderTable();
     </script>
-</body>
-
-
+</div>

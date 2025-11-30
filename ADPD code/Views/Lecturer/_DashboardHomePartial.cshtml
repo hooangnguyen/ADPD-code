@@ -69,7 +69,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (ViewBag.RecentCourses != null)
+                    @if (ViewBag.RecentCourses != null && ((IEnumerable<dynamic>)ViewBag.RecentCourses).Any())
                     {
                         @foreach (var course in ViewBag.RecentCourses as IEnumerable<dynamic>)
                         {
@@ -94,48 +94,8 @@
                     else
                     {
                         <tr>
-                            <td>
-                                <div class="course-name">Lập trình Web</div>
-                            </td>
-                            <td><span class="course-badge">CNPM01</span></td>
-                            <td>45 SV</td>
-                            <td>
-                                <div class="action-btns">
-                                    <a href="@Url.Action("CourseDetail", "Lecturer", new { id = 1 })" class="btn-sm btn-view">Xem</a>
-                                    <a href="@Url.Action("Courses", "Lecturer")" 
-                                       class="btn-sm btn-edit"
-                                       data-partial-url="@Url.Action("Courses", "Lecturer", new { partial = true })">Quản lý</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="course-name">Cơ sở dữ liệu</div>
-                            </td>
-                            <td><span class="course-badge">CNPM02</span></td>
-                            <td>38 SV</td>
-                            <td>
-                                <div class="action-btns">
-                                    <a href="@Url.Action("CourseDetail", "Lecturer", new { id = 1 })" class="btn-sm btn-view">Xem</a>
-                                    <a href="@Url.Action("Courses", "Lecturer")" 
-                                       class="btn-sm btn-edit"
-                                       data-partial-url="@Url.Action("Courses", "Lecturer", new { partial = true })">Quản lý</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="course-name">Trí tuệ nhân tạo</div>
-                            </td>
-                            <td><span class="course-badge">KHMT01</span></td>
-                            <td>42 SV</td>
-                            <td>
-                                <div class="action-btns">
-                                    <a href="@Url.Action("CourseDetail", "Lecturer", new { id = 1 })" class="btn-sm btn-view">Xem</a>
-                                    <a href="@Url.Action("Courses", "Lecturer")" 
-                                       class="btn-sm btn-edit"
-                                       data-partial-url="@Url.Action("Courses", "Lecturer", new { partial = true })">Quản lý</a>
-                                </div>
+                            <td colspan="4" style="text-align: center; padding: 30px; color: #999;">
+                                <p>Chưa có môn học nào được phân công</p>
                             </td>
                         </tr>
                     }
@@ -151,7 +111,7 @@
                        class="view-all"
                        data-partial-url="@Url.Action("Assignments", "Lecturer", new { partial = true })">Xem tất cả →</a>
                 </div>
-                @if (ViewBag.RecentSubmissions != null)
+                @if (ViewBag.RecentSubmissions != null && ((IEnumerable<dynamic>)ViewBag.RecentSubmissions).Any())
                 {
                     @foreach (var submission in ViewBag.RecentSubmissions as IEnumerable<dynamic>)
                     {
@@ -167,29 +127,8 @@
                 }
                 else
                 {
-                    <div class="submission-item">
-                        <div class="submission-info">
-                            <h4>BT1: Lập trình C++</h4>
-                            <p>Nguyễn Văn A - CNPM01</p>
-                            <span class="submission-time">2 giờ trước</span>
-                        </div>
-                        <span class="status-badge pending">Chưa chấm</span>
-                    </div>
-                    <div class="submission-item">
-                        <div class="submission-info">
-                            <h4>BT2: Cơ sở dữ liệu</h4>
-                            <p>Trần Thị B - CNPM02</p>
-                            <span class="submission-time">5 giờ trước</span>
-                        </div>
-                        <span class="status-badge graded">Đã chấm: 8.5</span>
-                    </div>
-                    <div class="submission-item">
-                        <div class="submission-info">
-                            <h4>BT1: AI Project</h4>
-                            <p>Lê Văn C - KHMT01</p>
-                            <span class="submission-time">1 ngày trước</span>
-                        </div>
-                        <span class="status-badge late">Nộp muộn</span>
+                    <div style="padding: 30px; text-align: center; color: #999;">
+                        <p>Chưa có bài nộp nào</p>
                     </div>
                 }
             </div>
@@ -199,7 +138,7 @@
                     <h2 class="card-title">Lịch dạy hôm nay</h2>
                 </div>
                 <div class="schedule-timeline">
-                    @if (ViewBag.TodaySchedule != null)
+                    @if (ViewBag.TodaySchedule != null && ((IEnumerable<dynamic>)ViewBag.TodaySchedule).Any())
                     {
                         @foreach (var schedule in ViewBag.TodaySchedule as IEnumerable<dynamic>)
                         {
@@ -214,19 +153,8 @@
                     }
                     else
                     {
-                        <div class="schedule-item">
-                            <div class="schedule-time">07:30 - 09:30</div>
-                            <div class="schedule-details">
-                                <h4>Lập trình Web</h4>
-                                <p>Lớp CNPM01 - Phòng A101</p>
-                            </div>
-                        </div>
-                        <div class="schedule-item">
-                            <div class="schedule-time">13:00 - 15:00</div>
-                            <div class="schedule-details">
-                                <h4>Cơ sở dữ liệu</h4>
-                                <p>Lớp CNPM02 - Phòng B205</p>
-                            </div>
+                        <div style="padding: 30px; text-align: center; color: #999;">
+                            <p>Không có lịch dạy hôm nay</p>
                         </div>
                     }
                 </div>

@@ -1,0 +1,97 @@
+@{
+    var isPartial = ViewData["IsPartial"] as bool? ?? false;
+}
+
+<link href="~/css/AdminDashboard.css?v=1.0" rel="stylesheet" asp-append-version="true" />
+
+<div class="admin-dashboard-wrapper">
+    <div class="dashboard-header">
+        <h1>
+            <span style="font-size: 36px;">🏠</span>
+            Bảng điều khiển Quản trị
+        </h1>
+        <p>Quản lý toàn bộ hệ thống từ đây</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card stat-students">
+            <div class="stat-icon">🎓</div>
+            <h3>@(ViewBag.TotalStudents ?? 0)</h3>
+            <p>Sinh viên</p>
+        </div>
+        <div class="stat-card stat-lecturers">
+            <div class="stat-icon">👩‍🏫</div>
+            <h3>@(ViewBag.TotalLecturers ?? 0)</h3>
+            <p>Giảng viên</p>
+        </div>
+        <div class="stat-card stat-courses">
+            <div class="stat-icon">📚</div>
+            <h3>@(ViewBag.TotalCourses ?? 0)</h3>
+            <p>Môn học</p>
+        </div>
+        <div class="stat-card stat-classes">
+            <div class="stat-icon">🏫</div>
+            <h3>@(ViewBag.TotalClasses ?? 0)</h3>
+            <p>Lớp học</p>
+        </div>
+        <div class="stat-card stat-accounts">
+            <div class="stat-icon">🔐</div>
+            <h3>@(ViewBag.TotalAccounts ?? 0)</h3>
+            <p>Tài khoản</p>
+        </div>
+        <div class="stat-card stat-enrollments">
+            <div class="stat-icon">📝</div>
+            <h3>@(ViewBag.ActiveEnrollments ?? 0)</h3>
+            <p>Đăng ký học</p>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <h2>Thao tác nhanh</h2>
+        <div class="actions-grid">
+            <a href="@Url.Action("Students", "Admin")"
+               class="action-card"
+               data-partial-url="@Url.Action("Students", "Admin", new { partial = true })">
+                <div class="action-icon">🎓</div>
+                <h3>Quản lý Sinh viên</h3>
+                <p>Thêm, sửa, xóa sinh viên</p>
+            </a>
+            <a href="@Url.Action("Lecturers", "Admin")"
+               class="action-card"
+               data-partial-url="@Url.Action("Lecturers", "Admin", new { partial = true })">
+                <div class="action-icon">👩‍🏫</div>
+                <h3>Quản lý Giảng viên</h3>
+                <p>Thêm, sửa, xóa giảng viên</p>
+            </a>
+            <a href="@Url.Action("Courses", "Admin")"
+               class="action-card"
+               data-partial-url="@Url.Action("Courses", "Admin", new { partial = true })">
+                <div class="action-icon">📚</div>
+                <h3>Quản lý Môn học</h3>
+                <p>Thêm, sửa, xóa môn học</p>
+            </a>
+            <a href="@Url.Action("Classes", "Admin")"
+               class="action-card"
+               data-partial-url="@Url.Action("Classes", "Admin", new { partial = true })">
+                <div class="action-icon">🏫</div>
+                <h3>Quản lý Lớp học</h3>
+                <p>Thêm, sửa, xóa lớp học</p>
+            </a>
+            <a href="@Url.Action("Accounts", "Admin")"
+               class="action-card"
+               data-partial-url="@Url.Action("Accounts", "Admin", new { partial = true })">
+                <div class="action-icon">🔐</div>
+                <h3>Quản lý Tài khoản</h3>
+                <p>Tạo và quản lý tài khoản</p>
+            </a>
+            <a href="@Url.Action("Statistics", "Admin")"
+               class="action-card"
+               data-partial-url="@Url.Action("Statistics", "Admin", new { partial = true })">
+                <div class="action-icon">📊</div>
+                <h3>Thống kê & Báo cáo</h3>
+                <p>Xem báo cáo hệ thống</p>
+            </a>
+        </div>
+    </div>
+</div>
+

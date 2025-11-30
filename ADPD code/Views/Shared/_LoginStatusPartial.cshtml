@@ -17,6 +17,11 @@
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                 <!-- Update the asp-page values to match your Razor Pages paths -->
                 <li><a class="dropdown-item" asp-page="/User/Profile">Hồ sơ (@role)</a></li>
+                @if (role == "Admin")
+                {
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="@Url.Action("Dashboard", "Admin")">⚙️ Trang quản trị</a></li>
+                }
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" asp-page="/Login/Logout">Đăng xuất</a></li>
             </ul>

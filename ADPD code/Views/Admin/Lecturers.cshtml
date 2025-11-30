@@ -1,0 +1,343 @@
+@model IEnumerable<ADPD_code.Models.Lecturer>
+@{
+    var isPartial = ViewData["IsPartial"] as bool? ?? false;
+    Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/css/AdminDashboard.css?v=1.0" rel="stylesheet" asp-append-version="true" />
+
+<div class="management-wrapper">
+    <div class="management-header">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+            <div>
+                <h1>
+                    <span>👩‍🏫</span>
+                    Quản lý Giảng viên
+                </h1>
+                <p>Thêm, sửa, xóa thông tin giảng viên</p>
+            </div>
+            <a href="@Url.Action("Dashboard", "Admin")" 
+               class="btn btn-secondary" 
+               style="padding: 10px 20px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;"
+               data-partial-url="@Url.Action("Dashboard", "Admin", new { partial = true })">
+                ← Về Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="management-toolbar">
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên, email...">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="showCreateModal()">
+            ➕ Thêm giảng viên
+        </button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Mã GV</th>
+                    <th>Họ và tên</th>
+                    <th>Email</th>
+                    <th>SĐT</th>
+                    <th>Khoa</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="lecturerTableBody">
+                @{
+                    int index = 1;
+                }
+                @foreach (var lecturer in Model)
+                {
+                    <tr>
+                        <td>@index</td>
+                        <td><strong>@lecturer.LecturerID.ToString().PadLeft(5, '0')</strong></td>
+                        <td>@lecturer.FullName</td>
+                        <td>@lecturer.Email</td>
+                        <td>@lecturer.Phone</td>
+                        <td>@(lecturer.Department?.DepartmentName ?? "N/A")</td>
+                        <td>
+                            <button type="button" class="btn btn-success" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;" onclick="editLecturer(@lecturer.LecturerID)">✏️ Sửa</button>
+                            <button type="button" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteLecturer(@lecturer.LecturerID)">🗑️ Xóa</button>
+                        </td>
+                    </tr>
+                    index++;
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Thêm/Sửa Giảng viên -->
+<div id="lecturerModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Thêm Giảng viên</h2>
+            <button type="button" class="close-btn" onclick="closeModal()">×</button>
+        </div>
+        <form id="lecturerForm">
+            <div class="modal-body">
+                <input type="hidden" id="lecturerId" name="LecturerID" />
+                <div class="form-group">
+                    <label>Họ và tên *</label>
+                    <input type="text" id="fullName" name="FullName" required />
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="email" name="Email" required />
+                </div>
+                <div class="form-group">
+                    <label>Số điện thoại</label>
+                    <input type="tel" id="phone" name="Phone" />
+                </div>
+                <div class="form-group">
+                    <label>Khoa</label>
+                    <select id="departmentId" name="DepartmentID">
+                        <option value="">-- Chọn khoa --</option>
+                        @if (ViewBag.Departments != null)
+                        {
+                            @foreach (var dept in ViewBag.Departments)
+                            {
+                                <option value="@dept.DepartmentID">@dept.DepartmentName</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" onclick="closeModal()" style="background: #6c757d; color: white;">Hủy</button>
+                <button type="submit" class="btn btn-primary">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function() {
+        'use strict';
+        
+        window.showCreateModal = function() {
+            console.log('showCreateModal called');
+            const modal = document.getElementById('lecturerModal');
+            const form = document.getElementById('lecturerForm');
+            const title = document.getElementById('modalTitle');
+            const lecturerId = document.getElementById('lecturerId');
+            
+            if (!modal || !form || !title || !lecturerId) {
+                console.error('Modal elements not found');
+                alert('Có lỗi xảy ra khi mở form!');
+                return;
+            }
+            
+            title.textContent = 'Thêm Giảng viên';
+            form.reset();
+            lecturerId.value = '';
+            modal.style.display = 'block';
+            setTimeout(initFormHandlers, 100);
+        };
+
+        window.editLecturer = function(id) {
+            console.log('editLecturer called with id:', id);
+            fetch(`/Admin/EditLecturer/${id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Edit response:', data);
+                    if (data.success && data.lecturer) {
+                        fillEditForm(data.lecturer);
+                    } else {
+                        alert('❌ ' + (data.message || 'Không tìm thấy giảng viên'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi tải thông tin giảng viên!');
+                });
+        };
+
+        function fillEditForm(lecturer) {
+            const modal = document.getElementById('lecturerModal');
+            const title = document.getElementById('modalTitle');
+            
+            if (!modal || !title) {
+                console.error('Modal elements not found');
+                return;
+            }
+            
+            title.textContent = 'Sửa Giảng viên';
+            document.getElementById('lecturerId').value = lecturer.LecturerID;
+            document.getElementById('fullName').value = lecturer.FullName || '';
+            document.getElementById('email').value = lecturer.Email || '';
+            document.getElementById('phone').value = lecturer.Phone || '';
+            if (lecturer.DepartmentID) {
+                document.getElementById('departmentId').value = lecturer.DepartmentID;
+            }
+            modal.style.display = 'block';
+            setTimeout(initFormHandlers, 100);
+        }
+
+        window.deleteLecturer = function(id) {
+            console.log('deleteLecturer called with id:', id);
+            if (!confirm('Bạn có chắc chắn muốn xóa giảng viên này?')) {
+                return;
+            }
+
+            fetch(`/Admin/DeleteLecturer/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(`HTTP ${response.status}: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Delete response:', data);
+                    if (data.success) {
+                        alert('✅ ' + data.message);
+                        location.reload();
+                    } else {
+                        alert('❌ ' + (data.message || 'Có lỗi xảy ra'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi xóa giảng viên: ' + error.message);
+                });
+        };
+
+        window.closeModal = function() {
+            const modal = document.getElementById('lecturerModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        function initFormHandlers() {
+            const form = document.getElementById('lecturerForm');
+            if (form) {
+                if (form.dataset.listenerAttached === 'true') {
+                    return;
+                }
+                
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('Form submit triggered');
+                    
+                    const lecturerId = document.getElementById('lecturerId')?.value || '';
+                    const data = {
+                        FullName: document.getElementById('fullName').value,
+                        Email: document.getElementById('email').value,
+                        Phone: document.getElementById('phone').value || '',
+                        DepartmentID: document.getElementById('departmentId').value ? parseInt(document.getElementById('departmentId').value) : null
+                    };
+
+                    let url = '/Admin/CreateLecturer';
+                    
+                    if (lecturerId && lecturerId !== '' && lecturerId !== '0') {
+                        url = `/Admin/EditLecturer/${parseInt(lecturerId)}`;
+                        data.LecturerID = parseInt(lecturerId);
+                    }
+
+                    const jsonBody = JSON.stringify(data);
+                    
+                    console.log('Sending data:', data);
+                    console.log('URL:', url);
+                    console.log('JSON string:', jsonBody);
+
+                    if (!jsonBody || jsonBody === '{}') {
+                        alert('Lỗi: Dữ liệu không hợp lệ!');
+                        return false;
+                    }
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        credentials: 'same-origin',
+                        body: jsonBody
+                    })
+                        .then(response => {
+                            console.log('Response status:', response.status);
+                            if (!response.ok) {
+                                return response.text().then(text => {
+                                    console.error('Error response:', text);
+                                    throw new Error(`HTTP ${response.status}: ${text}`);
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Response data:', data);
+                            if (data.success) {
+                                alert('✅ ' + data.message);
+                                closeModal();
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 500);
+                            } else {
+                                alert('❌ ' + (data.message || 'Có lỗi xảy ra'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Có lỗi xảy ra: ' + error.message);
+                        });
+                    
+                    return false;
+                });
+                
+                form.dataset.listenerAttached = 'true';
+            }
+
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('#lecturerTableBody tr');
+                    
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(searchTerm) ? '' : 'none';
+                    });
+                });
+            }
+
+            window.onclick = function(event) {
+                const modal = document.getElementById('lecturerModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+        }
+
+        initFormHandlers();
+        setTimeout(initFormHandlers, 200);
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(initFormHandlers, 100);
+            });
+        } else {
+            setTimeout(initFormHandlers, 100);
+        }
+    })();
+</script>

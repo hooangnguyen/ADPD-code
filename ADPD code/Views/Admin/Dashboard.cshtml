@@ -1,65 +1,97 @@
-﻿<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Hệ thống Quản lý Sinh viên</title>
-    <link rel="stylesheet" href="~/css/Home.css" />
-</head>
-<body>
-
-    <!-- Top / Hero -->
-    <section class="hero" id="admin-hero">
-        <div class="hero-content">
-            <h1>👋 Chào mừng Quản trị viên (Admin)</h1>
-            <p>Bạn đang đăng nhập với quyền cao nhất. Quản lý hệ thống từ đây.</p>
-        </div>
-    </section>
-
-    <!-- Admin features (match site theme) -->
-    <section class="features" id="admin-features">
-        <div class="features-container">
-            <h2 class="section-title">Bảng điều khiển Quản trị</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">👥</div>
-                    <h3>Quản lý Tài khoản</h3>
-                    <p>Thêm, sửa, xóa tài khoản sinh viên và giảng viên.</p>
-                    <a href="@Url.Action("Index", "AccountManagement")" class="btn btn-register">Truy cập</a>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">📚</div>
-                    <h3>Quản lý Môn học</h3>
-                    <p>Quản lý danh sách môn học, lớp học và phân công giảng dạy.</p>
-                    <a href="@Url.Action("Index", "CourseManagement")" class="btn btn-register">Truy cập</a>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>Thống kê & Báo cáo</h3>
-                    <p>Xem báo cáo tổng quan và xuất dữ liệu hệ thống.</p>
-                    <a href="@Url.Action("Index", "Reports")" class="btn btn-register">Xem báo cáo</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer (same as Home) -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-links">
-                <a href="@Url.Action("Index", "Home")">Trang chủ</a>
-                <a href="@Url.Action("Index", "Register")">Đăng ký</a>
-                <a href="#">Chính sách</a>
-                <a href="#">Liên hệ</a>
-            </div>
-            <p>&copy; 2024 Hệ thống Quản lý Sinh viên. All rights reserved.</p>
-        </div>
-    </footer>
-
-@section Scripts {
-    <script src="~/js/Home.js"></script>
+﻿@{
+    Layout = null;
+    var isPartial = ViewData["IsPartial"] as bool? ?? false;
 }
-</body>
-</html>
+
+@if (isPartial)
+{
+    @await Html.PartialAsync("_DashboardHomePartial")
+}
+else
+{
+    <link rel="stylesheet" href="~/css/AdminDashboard.css" asp-append-version="true" />
+    <body>
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="@Url.Action("Dashboard", "Admin")" class="sidebar-logo">
+                    ⚙️ AdminMS
+                </a>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-avatar">👤</div>
+                <div class="user-info">
+                    <h3>Quản trị viên</h3>
+                    <p>Administrator</p>
+                </div>
+            </div>
+
+            <ul class="menu">
+                <li class="menu-item">
+                    <a href="@Url.Action("Dashboard", "Admin")"
+                       class="active"
+                       data-partial-url="@Url.Action("Dashboard", "Admin", new { partial = true })">
+                        <span class="menu-icon">🏠</span>
+                        <span>Trang chủ</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="@Url.Action("Students", "Admin")"
+                       data-partial-url="@Url.Action("Students", "Admin", new { partial = true })">
+                        <span class="menu-icon">🎓</span>
+                        <span>Quản lý Sinh viên</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="@Url.Action("Lecturers", "Admin")"
+                       data-partial-url="@Url.Action("Lecturers", "Admin", new { partial = true })">
+                        <span class="menu-icon">👩‍🏫</span>
+                        <span>Quản lý Giảng viên</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="@Url.Action("Courses", "Admin")"
+                       data-partial-url="@Url.Action("Courses", "Admin", new { partial = true })">
+                        <span class="menu-icon">📚</span>
+                        <span>Quản lý Môn học</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="@Url.Action("Classes", "Admin")"
+                       data-partial-url="@Url.Action("Classes", "Admin", new { partial = true })">
+                        <span class="menu-icon">🏫</span>
+                        <span>Quản lý Lớp học</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="@Url.Action("Accounts", "Admin")"
+                       data-partial-url="@Url.Action("Accounts", "Admin", new { partial = true })">
+                        <span class="menu-icon">🔐</span>
+                        <span>Quản lý Tài khoản</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="@Url.Action("Statistics", "Admin")"
+                       data-partial-url="@Url.Action("Statistics", "Admin", new { partial = true })">
+                        <span class="menu-icon">📊</span>
+                        <span>Thống kê & Báo cáo</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="@Url.Action("Logout", "Login")">
+                        <span class="menu-icon">🚪</span>
+                        <span>Đăng xuất</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div id="dynamic-content"
+                 data-default-url='@Url.Action("Dashboard", "Admin", new { partial = true })'>
+                @await Html.PartialAsync("_DashboardHomePartial")
+            </div>
+        </main>
+        <script src="~/js/Dashboard.js" asp-append-version="true"></script>
+    </body>
+}

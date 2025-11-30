@@ -297,6 +297,115 @@ namespace ADPD_code.Controllers
             return partial ? PartialView(assignments) : View(assignments);
         }
 
+        // Attendance - Xem điểm danh
+        public async Task<IActionResult> Attendance(bool partial = false)
+        {
+            if (HttpContext.Session.GetString("Role") != "Student")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            var studentId = HttpContext.Session.GetInt32("StudentID");
+            if (!studentId.HasValue)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // Lấy danh sách môn học mà sinh viên đã đăng ký
+            var enrollments = await _context.Enrollments
+                .Include(e => e.Course)
+                    .ThenInclude(c => c.Lecturer)
+                .Where(e => e.StudentID == studentId.Value)
+                .OrderBy(e => e.Course.CourseName)
+                .ToListAsync();
+
+            var courses = enrollments
+                .Where(e => e.Course != null)
+                .Select(e => e.Course!)
+                .Distinct()
+                .ToList();
+
+            ViewBag.Courses = courses;
+            ViewBag.StudentId = studentId.Value;
+            ViewData["IsPartial"] = partial;
+
+            return partial ? PartialView() : View();
+        }
+
+        // API: Lấy lịch sử điểm danh của sinh viên theo môn học
+        [HttpGet]
+        public async Task<IActionResult> GetMyAttendance(int courseId, DateTime? startDate = null, DateTime? endDate = null)
+        {
+            if (HttpContext.Session.GetString("Role") != "Student")
+            {
+                return Json(new { success = false, message = "Không có quyền truy cập" });
+            }
+
+            var studentId = HttpContext.Session.GetInt32("StudentID");
+            if (!studentId.HasValue)
+            {
+                return Json(new { success = false, message = "Chưa đăng nhập" });
+            }
+
+            // Kiểm tra sinh viên có đăng ký môn học này không
+            var enrollment = await _context.Enrollments
+                .Include(e => e.Course)
+                .FirstOrDefaultAsync(e => e.StudentID == studentId.Value && e.CourseID == courseId);
+
+            if (enrollment == null)
+            {
+                return Json(new { success = false, message = "Bạn chưa đăng ký môn học này" });
+            }
+
+            var query = _context.Attendances
+                .Include(a => a.Course)
+                .Where(a => a.StudentID == studentId.Value && a.CourseID == courseId);
+
+            if (startDate.HasValue)
+            {
+                query = query.Where(a => a.Date >= startDate.Value.Date);
+            }
+
+            if (endDate.HasValue)
+            {
+                query = query.Where(a => a.Date <= endDate.Value.Date);
+            }
+
+            var attendanceList = await query
+                .OrderByDescending(a => a.Date)
+                .ToListAsync();
+
+            // Tính thống kê
+            var totalDays = attendanceList.Count;
+            var presentDays = attendanceList.Count(a => a.Status == "Có mặt");
+            var absentDays = attendanceList.Count(a => a.Status == "Vắng");
+            var excusedDays = attendanceList.Count(a => a.Status == "Có phép");
+            var attendanceRate = totalDays > 0 ? Math.Round((double)presentDays / totalDays * 100, 1) : 0;
+
+            var history = attendanceList.Select(a => new
+            {
+                date = a.Date.ToString("yyyy-MM-dd"),
+                dateDisplay = a.Date.ToString("dd/MM/yyyy"),
+                status = a.Status,
+                courseName = a.Course?.CourseName ?? ""
+            }).ToList();
+
+            return Json(new
+            {
+                success = true,
+                courseName = enrollment.Course?.CourseName ?? "",
+                statistics = new
+                {
+                    totalDays,
+                    presentDays,
+                    absentDays,
+                    excusedDays,
+                    attendanceRate
+                },
+                history = history
+            });
+        }
+
         // Subject - Danh sách môn học
         public async Task<IActionResult> Subject(bool partial = false)
         {
