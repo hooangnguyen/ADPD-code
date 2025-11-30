@@ -27,7 +27,7 @@ namespace ADPD_code.Models
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
         public ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
         public ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
-        public ICollection<Timetable>? Timetable { get; set; }
+        public ICollection<Timetable> Timetable { get; set; } = new List<Timetable>();
         public ICollection<AssignmentAttachment> AssignmentAttachments { get; set; } = new List<AssignmentAttachment>();
     }
 }

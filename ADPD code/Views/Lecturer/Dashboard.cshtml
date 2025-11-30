@@ -19,8 +19,8 @@ else
         </div>
 
         <div class="user-profile">
-                <a href="@Url.Action("ProfileLecturer", "Lecturer")"
-                   data-partial-url="@Url.Action("ProfileLecturer", "Lecturer", new { partial = true })">
+                <a href="@Url.Action("Profile", "Lecturer")"
+                   data-partial-url="@Url.Action("Profile", "Lecturer", new { partial = true })">
                 <div class="user-avatar"></div>
                 <div class="user-info">
                     <h3>@(ViewBag.FullName ?? "Giảng viên")</h3>
@@ -42,7 +42,7 @@ else
                 <a href="@Url.Action("Courses", "Lecturer")"
                    data-partial-url="@Url.Action("Courses", "Lecturer", new { partial = true })">
                     <span class="menu-icon">📚</span>
-                    <span>Môn học</span>
+                    <span>lịch dạy </span>
                 </a>
             </li>
             <li class="menu-item">
@@ -60,8 +60,8 @@ else
                 </a>
             </li>
             <li class="menu-item">
-                    <a href="@Url.Action("InformationStudent", "Lecturer")"
-                   data-partial-url="@Url.Action("InformationStudent", "Lecturer", new { partial = true })">
+                    <a href="@Url.Action("Students", "Lecturer")"
+                       data-partial-url="@Url.Action("Students", "Lecturer", new { partial = true })">
                     <span class="menu-icon">🎓</span>
                     <span>Sinh viên</span>
                 </a>

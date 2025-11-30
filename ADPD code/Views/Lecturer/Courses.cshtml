@@ -1,0 +1,675 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch Dạy Giảng Viên</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header Card */
+        .header-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .teacher-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .teacher-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .avatar {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .teacher-details h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .teacher-details p {
+            color: #666;
+            margin: 3px 0;
+        }
+
+        .teacher-right {
+            text-align: right;
+        }
+
+            .teacher-right .label {
+                color: #999;
+                font-size: 13px;
+            }
+
+            .teacher-right .value {
+                color: #333;
+                font-weight: 500;
+            }
+
+        /* Tabs */
+        .tabs-container {
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+            .tab:hover {
+                color: #333;
+            }
+
+            .tab.active {
+                color: #2563eb;
+                border-bottom-color: #2563eb;
+            }
+
+        .tab-content {
+            padding: 25px;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+            .tab-panel.active {
+                display: block;
+            }
+
+        /* Week Selector */
+        .week-selector {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+            .week-selector h2 {
+                font-size: 20px;
+                color: #333;
+            }
+
+            .week-selector select {
+                padding: 10px 15px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                font-size: 14px;
+                cursor: pointer;
+            }
+
+        /* Schedule */
+        .day-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .day-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .day-header h3 {
+                font-size: 16px;
+                color: #333;
+            }
+
+            .day-header .date {
+                font-size: 14px;
+                color: #666;
+            }
+
+        .day-content {
+            padding: 20px;
+        }
+
+        .class-item {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            border-radius: 0 8px 8px 0;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+            .class-item:hover {
+                background: #dbeafe;
+                box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+            }
+
+            .class-item:last-child {
+                margin-bottom: 0;
+            }
+
+        .class-time {
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .class-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .class-info {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            color: #666;
+        }
+
+            .class-info span {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+        .no-class {
+            text-align: center;
+            color: #999;
+            padding: 30px;
+        }
+
+        .detail-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+
+            .detail-btn:hover {
+                background: #1d4ed8;
+            }
+
+        /* Subject Card */
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+            .subject-header h2 {
+                font-size: 20px;
+                color: #333;
+            }
+
+        .subject-count {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .subject-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+            .subject-card:hover {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+
+        .subject-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .subject-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .subject-code {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .status-badge {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .subject-details {
+            margin-bottom: 15px;
+        }
+
+            .subject-details p {
+                font-size: 14px;
+                color: #666;
+                margin-bottom: 8px;
+            }
+
+        .subject-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+            .btn-primary:hover {
+                background: #1d4ed8;
+            }
+
+        .btn-secondary {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+            .btn-secondary:hover {
+                background: #f8f9fa;
+            }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+            .stat-icon.blue {
+                background: #dbeafe;
+                color: #2563eb;
+            }
+
+            .stat-icon.green {
+                background: #d1fae5;
+                color: #059669;
+            }
+
+            .stat-icon.purple {
+                background: #e9d5ff;
+                color: #9333ea;
+            }
+
+        .stat-info .label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-info .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header-card">
+            <div class="teacher-info">
+                <div class="teacher-left">
+                    <div class="avatar">NA</div>
+                    <div class="teacher-details">
+                        <h1>TS. Nguyễn Văn An</h1>
+                        <p>Mã GV: GV001</p>
+                        <p style="font-size: 14px; color: #999;">Khoa Công Nghệ Thông Tin</p>
+                    </div>
+                </div>
+                <div class="teacher-right">
+                    <p class="label">Email</p>
+                    <p class="value">nvan@university.edu.vn</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('schedule')">📅 Lịch Dạy</button>
+                <button class="tab" onclick="showTab('subjects')">📚 Môn Học</button>
+            </div>
+
+            <!-- Tab Lịch Dạy -->
+            <div id="schedule" class="tab-content">
+                <div class="tab-panel active">
+                    <div class="week-selector">
+                        <h2>Lịch Dạy Tuần</h2>
+                        <select>
+                            <option>Tuần trước</option>
+                            <option selected>Tuần hiện tại (25/11 - 01/12)</option>
+                            <option>Tuần sau</option>
+                        </select>
+                    </div>
+
+                    <!-- Thứ Hai -->
+                    <div class="day-card">
+                        <div class="day-header">
+                            <h3>Thứ Hai</h3>
+                            <span class="date">27/11/2024</span>
+                        </div>
+                        <div class="day-content">
+                            <div class="class-item">
+                                <div class="class-time">⏰ 07:00 - 09:00</div>
+                                <div class="class-name">Lập trình Web (IT301)</div>
+                                <div class="class-info">
+                                    <span>📍 Phòng A201</span>
+                                    <span>👥 Lớp CNTT-K16A</span>
+                                    <span>👤 45 sinh viên</span>
+                                </div>
+                                <button class="detail-btn">Chi tiết</button>
+                            </div>
+                            <div class="class-item">
+                                <div class="class-time">⏰ 13:00 - 15:00</div>
+                                <div class="class-name">Cơ sở dữ liệu (IT205)</div>
+                                <div class="class-info">
+                                    <span>📍 Phòng B105</span>
+                                    <span>👥 Lớp CNTT-K16B</span>
+                                    <span>👤 40 sinh viên</span>
+                                </div>
+                                <button class="detail-btn">Chi tiết</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thứ Ba -->
+                    <div class="day-card">
+                        <div class="day-header">
+                            <h3>Thứ Ba</h3>
+                            <span class="date">28/11/2024</span>
+                        </div>
+                        <div class="day-content">
+                            <div class="class-item">
+                                <div class="class-time">⏰ 09:00 - 11:00</div>
+                                <div class="class-name">Lập trình Web (IT301)</div>
+                                <div class="class-info">
+                                    <span>📍 Phòng A201</span>
+                                    <span>👥 Lớp CNTT-K16C</span>
+                                    <span>👤 42 sinh viên</span>
+                                </div>
+                                <button class="detail-btn">Chi tiết</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thứ Tư -->
+                    <div class="day-card">
+                        <div class="day-header">
+                            <h3>Thứ Tư</h3>
+                            <span class="date">29/11/2024</span>
+                        </div>
+                        <div class="day-content">
+                            <div class="class-item">
+                                <div class="class-time">⏰ 07:00 - 09:00</div>
+                                <div class="class-name">Phân tích thiết kế hệ thống (IT401)</div>
+                                <div class="class-info">
+                                    <span>📍 Phòng C301</span>
+                                    <span>👥 Lớp CNTT-K15A</span>
+                                    <span>👤 38 sinh viên</span>
+                                </div>
+                                <button class="detail-btn">Chi tiết</button>
+                            </div>
+                            <div class="class-item">
+                                <div class="class-time">⏰ 15:00 - 17:00</div>
+                                <div class="class-name">Cơ sở dữ liệu (IT205)</div>
+                                <div class="class-info">
+                                    <span>📍 Phòng B105</span>
+                                    <span>👥 Lớp CNTT-K16A</span>
+                                    <span>👤 45 sinh viên</span>
+                                </div>
+                                <button class="detail-btn">Chi tiết</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thứ Năm -->
+                    <div class="day-card">
+                        <div class="day-header">
+                            <h3>Thứ Năm</h3>
+                            <span class="date">30/11/2024</span>
+                        </div>
+                        <div class="day-content">
+                            <div class="no-class">Không có lịch dạy</div>
+                        </div>
+                    </div>
+
+                    <!-- Thứ Sáu -->
+                    <div class="day-card">
+                        <div class="day-header">
+                            <h3>Thứ Sáu</h3>
+                            <span class="date">01/12/2024</span>
+                        </div>
+                        <div class="day-content">
+                            <div class="class-item">
+                                <div class="class-time">⏰ 13:00 - 15:00</div>
+                                <div class="class-name">Phân tích thiết kế hệ thống (IT401)</div>
+                                <div class="class-info">
+                                    <span>📍 Phòng C301</span>
+                                    <span>👥 Lớp CNTT-K15B</span>
+                                    <span>👤 35 sinh viên</span>
+                                </div>
+                                <button class="detail-btn">Chi tiết</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Môn Học -->
+            <div id="subjects" class="tab-content" style="display: none;">
+                <div class="tab-panel">
+                    <div class="subject-header">
+                        <h2>Môn Học Học Kỳ I (2024-2025)</h2>
+                        <div class="subject-count">Tổng: <strong>3</strong> môn học</div>
+                    </div>
+
+                    <div class="subject-card">
+                        <div class="subject-top">
+                            <div>
+                                <div class="subject-title">Lập trình Web</div>
+                                <div class="subject-code">Mã MH: <strong>IT301</strong> | Số tín chỉ: <strong>3</strong></div>
+                            </div>
+                            <span class="status-badge">Đang giảng dạy</span>
+                        </div>
+                        <div class="subject-details">
+                            <p>👥 Lớp: CNTT-K16A, CNTT-K16C (87 sinh viên)</p>
+                            <p>⏰ T2: 7h-9h (A201), T3: 9h-11h (A201)</p>
+                        </div>
+                        <div class="subject-buttons">
+                            <button class="btn-primary">Xem chi tiết</button>
+                            <button class="btn-secondary">Danh sách SV</button>
+                            <button class="btn-secondary">Điểm danh</button>
+                        </div>
+                    </div>
+
+                    <div class="subject-card">
+                        <div class="subject-top">
+                            <div>
+                                <div class="subject-title">Cơ sở dữ liệu</div>
+                                <div class="subject-code">Mã MH: <strong>IT205</strong> | Số tín chỉ: <strong>3</strong></div>
+                            </div>
+                            <span class="status-badge">Đang giảng dạy</span>
+                        </div>
+                        <div class="subject-details">
+                            <p>👥 Lớp: CNTT-K16A, CNTT-K16B (85 sinh viên)</p>
+                            <p>⏰ T2: 13h-15h (B105), T4: 15h-17h (B105)</p>
+                        </div>
+                        <div class="subject-buttons">
+                            <button class="btn-primary">Xem chi tiết</button>
+                            <button class="btn-secondary">Danh sách SV</button>
+                            <button class="btn-secondary">Điểm danh</button>
+                        </div>
+                    </div>
+
+                    <div class="subject-card">
+                        <div class="subject-top">
+                            <div>
+                                <div class="subject-title">Phân tích thiết kế hệ thống</div>
+                                <div class="subject-code">Mã MH: <strong>IT401</strong> | Số tín chỉ: <strong>4</strong></div>
+                            </div>
+                            <span class="status-badge">Đang giảng dạy</span>
+                        </div>
+                        <div class="subject-details">
+                            <p>👥 Lớp: CNTT-K15A, CNTT-K15B (73 sinh viên)</p>
+                            <p>⏰ T4: 7h-9h (C301), T6: 13h-15h (C301)</p>
+                        </div>
+                        <div class="subject-buttons">
+                            <button class="btn-primary">Xem chi tiết</button>
+                            <button class="btn-secondary">Danh sách SV</button>
+                            <button class="btn-secondary">Điểm danh</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue">📚</div>
+                <div class="stat-info">
+                    <p class="label">Tổng môn học</p>
+                    <p class="value">3</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">👥</div>
+                <div class="stat-info">
+                    <p class="label">Tổng sinh viên</p>
+                    <p class="value">245</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">⏰</div>
+                <div class="stat-info">
+                    <p class="label">Tiết dạy/tuần</p>
+                    <p class="value">12</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Ẩn tất cả tab content
+            const scheduleTab = document.getElementById('schedule');
+            const subjectsTab = document.getElementById('subjects');
+
+            scheduleTab.style.display = 'none';
+            subjectsTab.style.display = 'none';
+
+            // Hiện tab được chọn
+            document.getElementById(tabName).style.display = 'block';
+
+            // Cập nhật active class cho tab button
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

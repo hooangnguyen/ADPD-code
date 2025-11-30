@@ -69,7 +69,7 @@ namespace ADPD_code.Controllers
             // Lấy danh sách môn học gần đây
             var courses = await _context.Courses
                 .Include(c => c.Timetable)
-                    .ThenInclude(t => t.Class)
+                .ThenInclude(t => t.Class)
                 .Include(c => c.Enrollments)
                 .Where(c => c.LecturerID == lecturerId)
                 .OrderByDescending(c => c.CourseID)
