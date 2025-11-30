@@ -545,17 +545,29 @@ namespace ADPD_code.Controllers
             return File(fileBytes, contentType, fileName);
         }
 
-        // GET: Tạo bài tập mới (placeholder)
-        public IActionResult CreateAssignment()
+        // GET: Tạo bài tập mới
+        public async Task<IActionResult> CreateAssignment()
         {
             if (HttpContext.Session.GetString("Role") != "Lecturer")
             {
                 return RedirectToAction("Index", "Login");
             }
 
-            // TODO: Implement create assignment form
-            TempData["ErrorMessage"] = "Chức năng đang được phát triển!";
-            return RedirectToAction("Assignments");
+            var lecturerId = HttpContext.Session.GetInt32("LecturerId");
+            if (!lecturerId.HasValue)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // Lấy danh sách môn học của giảng viên
+            var courses = await _context.Courses
+                .Where(c => c.LecturerID == lecturerId.Value)
+                .OrderBy(c => c.CourseName)
+                .ToListAsync();
+
+            ViewBag.Courses = courses;
+
+            return View();
         }
 
         // GET: Sửa bài tập (placeholder)

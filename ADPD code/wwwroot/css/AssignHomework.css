@@ -1,4 +1,5 @@
-﻿* {
+﻿/* Reset cơ bản */
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -9,78 +10,84 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 20px;
+    font-size: 14px; /* Giảm size chữ cơ bản */
 }
 
+/* CONTAINER: Giảm độ rộng từ 1000px xuống 700px */
 .container {
-    max-width: 1000px;
+    max-width: 700px;
     margin: 0 auto;
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    border-radius: 12px; /* Bo góc nhỏ hơn xíu */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
     overflow: hidden;
 }
 
+/* HEADER: Giảm padding */
 .header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 30px;
+    padding: 15px 25px; /* Giảm padding header */
 }
 
     .header h1 {
-        font-size: 28px;
-        margin-bottom: 10px;
+        font-size: 20px; /* Giảm size tiêu đề */
+        margin-bottom: 5px;
     }
 
     .header p {
         opacity: 0.9;
-        font-size: 14px;
+        font-size: 13px;
     }
 
+/* FORM BODY: Giảm khoảng cách bao quanh */
 .form-container {
-    padding: 40px;
+    padding: 25px; /* Giảm từ 40px xuống 25px */
 }
 
 .form-section {
-    margin-bottom: 35px;
+    margin-bottom: 20px; /* Giảm khoảng cách giữa các phần lớn */
 }
 
 .section-title {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     color: #212529;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
     border-bottom: 2px solid #667eea;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
+/* FORM GROUP: Giảm khoảng cách giữa các input */
 .form-group {
-    margin-bottom: 25px;
+    margin-bottom: 15px; /* Giảm từ 25px xuống 15px */
 }
 
 .form-label {
     display: block;
-    font-size: 14px;
+    font-size: 13px; /* Chữ label nhỏ hơn */
     font-weight: 600;
     color: #495057;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
 }
 
 .required {
     color: #dc3545;
-    margin-left: 4px;
+    margin-left: 3px;
 }
 
+/* INPUTS: Làm ô nhập liệu gọn hơn */
 .form-input,
 .form-select,
 .form-textarea {
     width: 100%;
-    padding: 12px 15px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 14px;
+    padding: 8px 12px; /* Giảm độ dày ô nhập liệu */
+    border: 1px solid #ced4da; /* Viền mỏng hơn */
+    border-radius: 6px;
+    font-size: 13px;
     font-family: inherit;
     transition: border-color 0.3s;
 }
@@ -90,174 +97,84 @@ body {
     .form-textarea:focus {
         outline: none;
         border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
 .form-textarea {
-    min-height: 120px;
+    min-height: 80px; /* Giảm chiều cao mặc định textarea */
     resize: vertical;
 }
 
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 15px; /* Giảm khoảng cách giữa 2 cột */
 }
 
+/* UPLOAD ZONE */
 .upload-zone {
     border: 2px dashed #667eea;
-    border-radius: 10px;
-    padding: 30px;
+    border-radius: 8px;
+    padding: 20px; /* Giảm padding vùng upload */
     text-align: center;
     background: #f8f9fa;
     cursor: pointer;
     transition: all 0.3s;
 }
 
-    .upload-zone:hover {
-        background: #e9ecef;
-        border-color: #5568d3;
-    }
-
-    .upload-zone input[type="file"] {
-        display: none;
-    }
-
 .upload-icon {
-    font-size: 48px;
+    font-size: 32px; /* Icon nhỏ lại */
     color: #667eea;
-    margin-bottom: 15px;
-}
-
-.file-list {
-    margin-top: 20px;
-}
-
-.file-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 12px;
-    background: white;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
     margin-bottom: 10px;
 }
 
+/* FILE LIST */
+.file-item {
+    padding: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
 .file-icon {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 18px;
-}
-
-.file-info {
-    flex: 1;
-}
-
-.file-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #212529;
-    margin-bottom: 3px;
-}
-
-.file-size {
-    font-size: 12px;
-    color: #6c757d;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
 }
 
 .remove-btn {
-    background: #dc3545;
-    color: white;
-    border: none;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    transition: background 0.3s;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
 }
 
-    .remove-btn:hover {
-        background: #c82333;
-    }
-
-.checkbox-group {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.checkbox-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-    .checkbox-item:hover {
-        background: #e9ecef;
-    }
-
-    .checkbox-item input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-    }
-
-    .checkbox-item label {
-        cursor: pointer;
-        font-size: 14px;
-        color: #495057;
-    }
-
-.info-box {
-    background: #e7f3ff;
-    border-left: 4px solid #0c5460;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 15px;
-}
-
-    .info-box p {
-        font-size: 13px;
-        color: #0c5460;
-        line-height: 1.6;
-    }
-
+/* BUTTONS */
 .action-buttons {
     display: flex;
-    gap: 15px;
-    margin-top: 40px;
-    padding-top: 30px;
-    border-top: 2px solid #e9ecef;
+    gap: 10px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
 }
 
 .btn {
-    padding: 14px 28px;
+    padding: 10px 20px; /* Nút nhỏ gọn hơn */
     border: none;
-    border-radius: 8px;
-    font-size: 15px;
+    border-radius: 6px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex: 1;
     justify-content: center;
+}
+
+.btn-outline {
+    background: white;
+    color: #667eea;
+    border: 1px solid #667eea;
 }
 
 .btn-primary {
@@ -265,51 +182,37 @@ body {
     color: white;
 }
 
-    .btn-primary:hover {
-        background: #5568d3;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-    }
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-    .btn-secondary:hover {
-        background: #5a6268;
-    }
-
-.btn-outline {
-    background: white;
-    color: #667eea;
-    border: 2px solid #667eea;
-}
-
-    .btn-outline:hover {
-        background: #667eea;
-        color: white;
-    }
-
 .score-input {
-    width: 100px;
+    width: 80px;
     text-align: center;
 }
 
+/* Info Box */
+.info-box {
+    padding: 10px;
+    margin-top: 10px;
+}
+
+    .info-box p {
+        font-size: 12px;
+    }
+
+/* Responsive */
 @media (max-width: 768px) {
+    .container {
+        width: 100%;
+    }
+
     .form-container {
-        padding: 25px;
+        padding: 15px;
     }
 
     .form-row {
         grid-template-columns: 1fr;
+        gap: 10px;
     }
 
     .action-buttons {
         flex-direction: column;
-    }
-
-    .header h1 {
-        font-size: 22px;
     }
 }

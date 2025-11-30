@@ -8,11 +8,6 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>📝 Giao Bài tập Mới</h1>
-            <p>Tạo và giao bài tập cho sinh viên trong lớp học</p>
-        </div>
-
         <div class="form-container">
             <form id="assignmentForm">
                 <!-- Thông tin cơ bản -->
@@ -34,12 +29,15 @@
                             <label class="form-label">
                                 Môn học <span class="required">*</span>
                             </label>
-                            <select class="form-select" id="subject" required>
+                            <select class="form-select" id="subject" name="courseId" required>
                                 <option value="">-- Chọn môn học --</option>
-                                <option value="web">Lập trình Web</option>
-                                <option value="database">Cơ sở dữ liệu</option>
-                                <option value="network">Mạng máy tính</option>
-                                <option value="ai">Trí tuệ nhân tạo</option>
+                                @if (ViewBag.Courses != null)
+                                {
+                                    @foreach (var course in ViewBag.Courses as List<ADPD_code.Models.Course>)
+                                    {
+                                        <option value="@course.CourseID">@course.CourseName</option>
+                                    }
+                                }
                             </select>
                         </div>
 
@@ -146,45 +144,15 @@
                         <p>💡 <strong>Gợi ý:</strong> Bạn có thể đính kèm tài liệu hướng dẫn, template, database mẫu, hoặc bất kỳ tài liệu nào cần thiết cho bài tập.</p>
                     </div>
                 </div>
-
-                <!-- Cài đặt nâng cao -->
-                <div class="form-section">
-                    <h2 class="section-title">
-                        <span>⚙️</span>
-                        Cài đặt nâng cao
-                    </h2>
-
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="allowLate" checked>
-                            <label for="allowLate">Cho phép nộp muộn (có thể bị trừ điểm)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="showScore" checked>
-                            <label for="showScore">Hiển thị điểm ngay sau khi chấm</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="allowResubmit" checked>
-                            <label for="allowResubmit">Cho phép nộp lại bài</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="sendNotification" checked>
-                            <label for="sendNotification">Gửi thông báo cho sinh viên</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="requireComment">
-                            <label for="requireComment">Bắt buộc sinh viên nhập ghi chú khi nộp</label>
-                        </div>
-                    </div>
-                </div>
+               
 
                 <!-- Nút hành động -->
                 <div class="action-buttons">
+                    <a href="@Url.Action("Assignments", "Lecturer")" class="btn btn-outline">
+                        ← Quay lại Quản lý Bài tập
+                    </a>
                     <button type="button" class="btn btn-outline" onclick="saveDraft()">
                         💾 Lưu nháp
-                    </button>
-                    <button type="button" class="btn btn-secondary" onclick="previewAssignment()">
-                        👁️ Xem trước
                     </button>
                     <button type="submit" class="btn btn-primary">
                         📤 Giao bài tập
@@ -254,28 +222,6 @@
                     const formData = collectFormData();
                     localStorage.setItem('assignmentDraft', JSON.stringify(formData));
                     alert('💾 Đã lưu nháp thành công!\n\nBạn có thể tiếp tục chỉnh sửa sau.');
-                }
-
-                // Xem trước
-                function previewAssignment() {
-                    const formData = collectFormData();
-
-                    if (!formData.title || !formData.subject || !formData.class || !formData.description) {
-                        alert('⚠️ Vui lòng điền đầy đủ thông tin bắt buộc!');
-                        return;
-                    }
-
-                    console.log('Xem trước bài tập:', formData);
-
-                    alert(`👁️ XEM TRƯỚC BÀI TẬP
-
-        📝 Tiêu đề: ${formData.title}
-        📚 Môn học: ${formData.subject}
-        👥 Lớp: ${formData.class}
-        📅 Hạn nộp: ${new Date(formData.dueDate).toLocaleString('vi-VN')}
-        🎯 Điểm: ${formData.maxScore}
-
-        Trong ứng dụng thực tế, đây sẽ mở modal xem trước giao diện bài tập.`);
                 }
 
                 // Thu thập dữ liệu form
