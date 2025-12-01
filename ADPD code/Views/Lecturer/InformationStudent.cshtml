@@ -56,9 +56,9 @@
                 <option value="Nghỉ học">Nghỉ học</option>
             </select>
 
-            <button class="btn btn-excel" onclick="exportToExcel()">
+            <a href="/Lecturer/ExportStudentsExcel" class="btn btn-excel">
                 📊 Xuất Excel
-            </button>
+            </a>
         </div>
 
         <div class="table-container">
@@ -279,37 +279,6 @@
             if (event.target === modal) {
                 closeModal();
             }
-        }
-
-        function exportToExcel() {
-            if (typeof XLSX === 'undefined') {
-                alert('❌ Lỗi: Thư viện XLSX chưa được tải. Vui lòng kiểm tra lại liên kết script.');
-                return;
-            }
-
-            const data = filteredStudents.map((student, index) => ({
-                'STT': index + 1,
-                'MSSV': student.mssv || 'N/A',
-                'Họ và tên': student.fullName || 'N/A',
-                'Lớp': (student.allClasses && student.allClasses.length > 0) ? student.allClasses.join(', ') : 'N/A',
-                'Ngày sinh': student.dob || 'N/A',
-                'Giới tính': student.gender || 'N/A',
-                'Email': student.email || 'N/A',
-                'Số điện thoại': student.phone || 'N/A',
-                'Địa chỉ': student.address || 'N/A',
-                'Điểm TB': student.gpa || 0,
-                'Tỷ lệ tham dự (%)': student.attendanceRate || 0,
-                'Số buổi vắng': student.totalAbsent || 0,
-                'Trạng thái': student.status || 'N/A'
-            }));
-
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Danh sách sinh viên');
-
-            const fileName = `Danh_sach_sinh_vien_${new Date().toISOString().split('T')[0]}.xlsx`;
-            XLSX.writeFile(wb, fileName);
-            alert('✅ Đã xuất file Excel thành công!');
         }
 
         function sortTable(columnIndex) {

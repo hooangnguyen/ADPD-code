@@ -1,8 +1,14 @@
 ﻿using ADPD_code.Data;
 using ADPD_code.Models;
 using ADPD_code.Services;
+using ADPD_code.Services.Export;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ADPD_code.Controllers
 {
@@ -10,11 +16,13 @@ namespace ADPD_code.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILecturerAnalyticsService _lecturerAnalyticsService;
+        private readonly IExportService _exportService;
 
-        public LecturerController(ApplicationDbContext context, ILecturerAnalyticsService lecturerAnalyticsService)
+        public LecturerController(ApplicationDbContext context, ILecturerAnalyticsService lecturerAnalyticsService, IExportService exportService)
         {
             _context = context;
             _lecturerAnalyticsService = lecturerAnalyticsService;
+            _exportService = exportService;
         }
 
         public async Task<IActionResult> Dashboard(bool partial = false)
@@ -141,7 +149,7 @@ namespace ADPD_code.Controllers
                 return $"{(int)(timeSpan.TotalDays / 7)} tuần trước";
             if (timeSpan.TotalDays < 365)
                 return $"{(int)(timeSpan.TotalDays / 30)} tháng trước";
-            
+
             return $"{(int)(timeSpan.TotalDays / 365)} năm trước";
         }
 
@@ -877,8 +885,8 @@ namespace ADPD_code.Controllers
                         .Where(c => !string.IsNullOrEmpty(c))
                         .Distinct()
                         .ToList() ?? new List<string?>(),
-                    GPA = g.Where(e => e.Score.HasValue).Any() 
-                        ? Math.Round(g.Where(e => e.Score.HasValue).Average(e => e.Score!.Value), 2) 
+                    GPA = g.Where(e => e.Score.HasValue).Any()
+                        ? Math.Round(g.Where(e => e.Score.HasValue).Average(e => e.Score!.Value), 2)
                         : 0.0,
                     TotalAttendance = _context.Attendances
                         .Count(a => a.StudentID == g.Key && a.Status == "Có mặt"),
@@ -905,8 +913,8 @@ namespace ADPD_code.Controllers
                 ClassName = s.Classes.FirstOrDefault() ?? "N/A",
                 AllClasses = s.Classes,
                 GPA = s.GPA,
-                AttendanceRate = s.TotalDays > 0 
-                    ? Math.Round((double)s.TotalAttendance / s.TotalDays * 100, 1) 
+                AttendanceRate = s.TotalDays > 0
+                    ? Math.Round((double)s.TotalAttendance / s.TotalDays * 100, 1)
                     : 0.0,
                 TotalAbsent = s.TotalAbsent
             }).ToList();
@@ -930,6 +938,61 @@ namespace ADPD_code.Controllers
 
             return View("InformationStudent");
         }
+
+        // Export students to Excel (fixed: inside controller and uses injected _exportService)
+        public async Task<IActionResult> ExportStudentsExcel()
+        {
+            var lecturerId = HttpContext.Session.GetInt32("LecturerId");
+            if (lecturerId == null)
+                return RedirectToAction("Index", "Login");
+
+            var enrollments = await _context.Enrollments
+                .Include(e => e.Student)
+                    .ThenInclude(s => s.StudentClasses)
+                        .ThenInclude(sc => sc.Class)
+                .Include(e => e.Course)
+                .Where(e => e.Course.LecturerID == lecturerId)
+                .ToListAsync();
+
+            int index = 1;
+
+            var exportList = enrollments
+                .GroupBy(e => e.StudentID)
+                .Select(g =>
+                {
+                    var student = g.First().Student;
+
+                    // Attendance
+                    var total = _context.Attendances.Count(a => a.StudentID == g.Key);
+                    var present = _context.Attendances.Count(a => a.StudentID == g.Key && a.Status == "Có mặt");
+                    var rate = total == 0 ? 0 : Math.Round((double)present / total * 100, 2);
+
+                    // GPA
+                    var gpa = g.Any(e => e.Score.HasValue)
+                        ? Math.Round(g.Where(e => e.Score.HasValue).Average(e => e.Score.Value), 2)
+                        : 0;
+
+                    return new StudentExportModel
+                    {
+                        Index = index++,
+                        MSSV = g.Key.ToString().PadLeft(10, '0'),
+                        FullName = student.FullName,
+                        ClassName = student.StudentClasses.FirstOrDefault()?.Class?.ClassName ?? "N/A",
+                        Email = student.Email,
+                        Phone = student.Phone ?? "",
+                        GPA = gpa,
+                        AttendanceRate = rate,
+                        Status = student.Status ?? "Không rõ"
+                    };
+                })
+                .ToList();
+
+            var fileBytes = _exportService.ExportStudentsToExcel(exportList);
+
+            return File(fileBytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "DanhSachSinhVien.xlsx");
+        }
     }
 
     // ViewModel cho điểm danh
@@ -945,5 +1008,5 @@ namespace ADPD_code.Controllers
         public int CourseId { get; set; }
         public DateTime Date { get; set; }
         public List<AttendanceRecord> Records { get; set; } = new List<AttendanceRecord>();
-    }
+    } 
 }

@@ -1,4 +1,4 @@
-﻿using ADPD_code.Data;
+using ADPD_code.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ADPD_code.ViewModels;
@@ -113,7 +113,7 @@ namespace ADPD_code.Controllers
                 {
                     CourseName = t.Course != null ? t.Course.CourseName : "N/A",
                     CourseCode = t.Course != null ? $"CS{t.Course.CourseID}" : "N/A",
-                    Time = $"{t.StartTime:HH\\:mm} - {t.EndTime:HH\\:mm}", // Format 24h
+                    Time = $"{t.StartTime:HH:mm} - {t.EndTime:HH:mm}", // Format 24h
                     Room = t.Room ?? "N/A",
                     LecturerName = t.Course != null && t.Course.Lecturer != null ? t.Course.Lecturer.FullName : "N/A",
                     StudyDate = t.StudyDate
@@ -745,6 +745,80 @@ namespace ADPD_code.Controllers
 
             TempData["SuccessMessage"] = "Nộp bài thành công!";
             return RedirectToAction("Assignments");
+        }
+
+        public async Task<IActionResult> AssignmentDetails(int id, bool partial = false)
+        {
+            // Kiểm tra đăng nhập
+            if (HttpContext.Session.GetString("Role") != "Student")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            var studentId = HttpContext.Session.GetInt32("StudentID");
+            if (!studentId.HasValue)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // Lấy thông tin bài tập với Include đầy đủ
+            var assignment = await _context.Assignments
+                .Include(a => a.Course)
+                .Include(a => a.Lecturer)
+                .Include(a => a.AssignmentAttachments) // Include attachments
+                .FirstOrDefaultAsync(a => a.AssignmentID == id);
+
+            if (assignment == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy bài tập!";
+                return RedirectToAction("Assignments");
+            }
+
+            // Kiểm tra xem sinh viên có đăng ký môn học này không
+            var isEnrolled = await _context.Enrollments
+                .AnyAsync(e => e.StudentID == studentId.Value && e.CourseID == assignment.CourseID);
+
+            if (!isEnrolled)
+            {
+                TempData["ErrorMessage"] = "Bạn không có quyền xem bài tập này!";
+                return RedirectToAction("Assignments");
+            }
+
+            // Lấy thông tin nộp bài của sinh viên (nếu đã nộp)
+            var submission = await _context.AssignmentSubmissions
+                .FirstOrDefaultAsync(s => s.AssignmentID == id && s.StudentID == studentId.Value);
+
+            // Đếm tổng số sinh viên đã đăng ký môn học
+            var totalEnrolled = await _context.Enrollments
+                .CountAsync(e => e.CourseID == assignment.CourseID);
+
+            // Đếm số sinh viên đã nộp bài
+            var submittedCount = await _context.AssignmentSubmissions
+                .Where(s => s.AssignmentID == id)
+                .CountAsync();
+
+            // Đếm số bài đã chấm điểm
+            var gradedCount = await _context.AssignmentSubmissions
+                .Where(s => s.AssignmentID == id && s.Score.HasValue)
+                .CountAsync();
+
+            // Tính thời gian còn lại
+            var timeRemaining = assignment.EndDate - DateTime.Now;
+            var isOverdue = DateTime.Now > assignment.EndDate;
+
+            // Truyền dữ liệu qua ViewBag
+            ViewBag.Submission = submission;
+            ViewBag.TotalEnrolled = totalEnrolled;
+            ViewBag.SubmittedCount = submittedCount;
+            ViewBag.GradedCount = gradedCount;
+            ViewBag.TimeRemaining = timeRemaining;
+            ViewBag.IsOverdue = isOverdue;
+            ViewBag.StudentId = studentId.Value;
+
+            ViewData["IsPartial"] = partial;
+
+            // The user's file is named exercisedetails.cshtml, so let's return that view.
+            return View("exercisedetails", assignment);
         }
     }
 }
