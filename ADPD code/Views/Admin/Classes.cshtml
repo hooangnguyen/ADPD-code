@@ -115,20 +115,20 @@
 <script>
     (function() {
         'use strict';
-        
+
         window.showCreateModal = function() {
             console.log('showCreateModal called');
             const modal = document.getElementById('classModal');
             const form = document.getElementById('classForm');
             const title = document.getElementById('modalTitle');
             const classId = document.getElementById('classId');
-            
+
             if (!modal || !form || !title || !classId) {
                 console.error('Modal elements not found');
                 alert('Có lỗi xảy ra khi mở form!');
                 return;
             }
-            
+
             title.textContent = 'Thêm Lớp học';
             form.reset();
             classId.value = '';
@@ -155,26 +155,28 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi tải thông tin lớp học!');
+                    alert('Có lỗi xảy ra khi tải thông tin lớp học: ' + error.message);
                 });
         };
 
         function fillEditForm(classModel) {
             const modal = document.getElementById('classModal');
             const title = document.getElementById('modalTitle');
-            
+
             if (!modal || !title) {
                 console.error('Modal elements not found');
                 return;
             }
-            
+
             title.textContent = 'Sửa Lớp học';
-            document.getElementById('classId').value = classModel.ClassID;
+
+            // Đặt giá trị cho các field
+            document.getElementById('classId').value = classModel.ClassID || '';
             document.getElementById('className').value = classModel.ClassName || '';
             document.getElementById('majorId').value = classModel.MajorID || '';
             document.getElementById('studyTime').value = classModel.StudyTime || '';
+
             modal.style.display = 'block';
-            setTimeout(initFormHandlers, 100);
         }
 
         window.deleteClass = function(id) {
@@ -222,95 +224,23 @@
 
         function initFormHandlers() {
             const form = document.getElementById('classForm');
-            if (form) {
-                if (form.dataset.listenerAttached === 'true') {
-                    return;
-                }
-                
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    console.log('Form submit triggered');
-                    
-                    const classId = document.getElementById('classId')?.value || '';
-                    const data = {
-                        ClassName: document.getElementById('className').value,
-                        MajorID: parseInt(document.getElementById('majorId').value),
-                        StudyTime: document.getElementById('studyTime').value
-                    };
 
-                    let url = '/Admin/CreateClass';
-                    
-                    if (classId && classId !== '' && classId !== '0') {
-                        url = `/Admin/EditClass/${parseInt(classId)}`;
-                        data.ClassID = parseInt(classId);
-                    }
-
-                    const jsonBody = JSON.stringify(data);
-                    
-                    console.log('Sending data:', data);
-                    console.log('URL:', url);
-                    console.log('JSON string:', jsonBody);
-
-                    if (!jsonBody || jsonBody === '{}') {
-                        alert('Lỗi: Dữ liệu không hợp lệ!');
-                        return false;
-                    }
-
-                    fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        credentials: 'same-origin',
-                        body: jsonBody
-                    })
-                        .then(response => {
-                            console.log('Response status:', response.status);
-                            if (!response.ok) {
-                                return response.text().then(text => {
-                                    console.error('Error response:', text);
-                                    throw new Error(`HTTP ${response.status}: ${text}`);
-                                });
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Response data:', data);
-                            if (data.success) {
-                                alert('✅ ' + data.message);
-                                closeModal();
-                                setTimeout(() => {
-                                    location.reload();
-                                }, 500);
-                            } else {
-                                alert('❌ ' + (data.message || 'Có lỗi xảy ra'));
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Có lỗi xảy ra: ' + error.message);
-                        });
-                    
-                    return false;
-                });
-                
+            if (form && form.dataset.listenerAttached !== 'true') {
+                form.addEventListener('submit', handleFormSubmit);
                 form.dataset.listenerAttached = 'true';
             }
 
             const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
+            if (searchInput && searchInput.dataset.listenerAttached !== 'true') {
                 searchInput.addEventListener('input', function() {
                     const searchTerm = this.value.toLowerCase();
                     const rows = document.querySelectorAll('#classTableBody tr');
-                    
                     rows.forEach(row => {
                         const text = row.textContent.toLowerCase();
                         row.style.display = text.includes(searchTerm) ? '' : 'none';
                     });
                 });
+                searchInput.dataset.listenerAttached = 'true';
             }
 
             window.onclick = function(event) {
@@ -321,15 +251,100 @@
             };
         }
 
-        initFormHandlers();
-        setTimeout(initFormHandlers, 200);
-        
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            console.log('Form submit triggered');
+
+            // Lấy giá trị từ các input
+            const classId = document.getElementById('classId').value.trim();
+            const className = document.getElementById('className').value.trim();
+            const majorId = document.getElementById('majorId').value.trim();
+            const studyTime = document.getElementById('studyTime').value.trim();
+
+            // Validate bắt buộc
+            if (!className) {
+                alert('❌ Vui lòng nhập Tên lớp');
+                return false;
+            }
+            if (!majorId) {
+                alert('❌ Vui lòng chọn Ngành');
+                return false;
+            }
+            if (!studyTime) {
+                alert('❌ Vui lòng chọn Thời gian học');
+                return false;
+            }
+
+            // Tạo object dữ liệu
+            const data = {
+                ClassName: className,
+                MajorID: parseInt(majorId),
+                StudyTime: studyTime
+            };
+
+            // Xác định URL - QUAN TRỌNG!
+            let url = '/Admin/CreateClass';
+
+            // Nếu classId không trống → sửa
+            if (classId && classId !== '0' && classId !== '') {
+                url = `/Admin/EditClass/${parseInt(classId)}`;
+                data.ClassID = parseInt(classId);
+                console.log('🔧 MODE: EDIT - Class ID:', classId);
+            } else {
+                console.log('➕ MODE: CREATE');
+            }
+
+            const jsonBody = JSON.stringify(data);
+            console.log('📤 Sending to:', url);
+            console.log('📦 Data:', data);
+            console.log('📄 JSON:', jsonBody);
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin',
+                body: jsonBody
+            })
+                .then(response => {
+                    console.log('📨 Response status:', response.status);
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            console.error('❌ Error response:', text);
+                            throw new Error(`HTTP ${response.status}: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(responseData => {
+                    console.log('✅ Response data:', responseData);
+                    if (responseData.success) {
+                        alert('✅ ' + responseData.message);
+                        closeModal();
+                        setTimeout(() => {
+                            location.reload();
+                        }, 500);
+                    } else {
+                        alert('❌ ' + (responseData.message || 'Có lỗi xảy ra'));
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Fetch error:', error);
+                    alert('❌ Lỗi: ' + error.message);
+                });
+
+            return false;
+        }
+
+        // Khởi tạo khi DOM sẵn sàng
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(initFormHandlers, 100);
-            });
+            document.addEventListener('DOMContentLoaded', initFormHandlers);
         } else {
-            setTimeout(initFormHandlers, 100);
+            initFormHandlers();
         }
     })();
 </script>

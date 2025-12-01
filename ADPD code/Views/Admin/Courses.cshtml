@@ -119,20 +119,20 @@
 <script>
     (function() {
         'use strict';
-        
+
         window.showCreateModal = function() {
             console.log('showCreateModal called');
             const modal = document.getElementById('courseModal');
             const form = document.getElementById('courseForm');
             const title = document.getElementById('modalTitle');
             const courseId = document.getElementById('courseId');
-            
+
             if (!modal || !form || !title || !courseId) {
                 console.error('Modal elements not found');
                 alert('Có lỗi xảy ra khi mở form!');
                 return;
             }
-            
+
             title.textContent = 'Thêm Môn học';
             form.reset();
             courseId.value = '';
@@ -159,29 +159,29 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi tải thông tin môn học!');
+                    alert('Có lỗi xảy ra khi tải thông tin môn học: ' + error.message);
                 });
         };
 
         function fillEditForm(course) {
             const modal = document.getElementById('courseModal');
             const title = document.getElementById('modalTitle');
-            
+
             if (!modal || !title) {
                 console.error('Modal elements not found');
                 return;
             }
-            
+
             title.textContent = 'Sửa Môn học';
-            document.getElementById('courseId').value = course.CourseID;
+
+            // Đặt giá trị cho các field
+            document.getElementById('courseId').value = course.CourseID || '';
             document.getElementById('courseName').value = course.CourseName || '';
             document.getElementById('credits').value = course.Credits || '';
             document.getElementById('description').value = course.Description || '';
-            if (course.LecturerID) {
-                document.getElementById('lecturerId').value = course.LecturerID;
-            }
+            document.getElementById('lecturerId').value = course.LecturerID || '';
+
             modal.style.display = 'block';
-            setTimeout(initFormHandlers, 100);
         }
 
         window.deleteCourse = function(id) {
@@ -229,96 +229,23 @@
 
         function initFormHandlers() {
             const form = document.getElementById('courseForm');
-            if (form) {
-                if (form.dataset.listenerAttached === 'true') {
-                    return;
-                }
-                
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    console.log('Form submit triggered');
-                    
-                    const courseId = document.getElementById('courseId')?.value || '';
-                    const data = {
-                        CourseName: document.getElementById('courseName').value,
-                        Credits: parseInt(document.getElementById('credits').value),
-                        Description: document.getElementById('description').value || '',
-                        LecturerID: document.getElementById('lecturerId').value ? parseInt(document.getElementById('lecturerId').value) : null
-                    };
 
-                    let url = '/Admin/CreateCourse';
-                    
-                    if (courseId && courseId !== '' && courseId !== '0') {
-                        url = `/Admin/EditCourse/${parseInt(courseId)}`;
-                        data.CourseID = parseInt(courseId);
-                    }
-
-                    const jsonBody = JSON.stringify(data);
-                    
-                    console.log('Sending data:', data);
-                    console.log('URL:', url);
-                    console.log('JSON string:', jsonBody);
-
-                    if (!jsonBody || jsonBody === '{}') {
-                        alert('Lỗi: Dữ liệu không hợp lệ!');
-                        return false;
-                    }
-
-                    fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        credentials: 'same-origin',
-                        body: jsonBody
-                    })
-                        .then(response => {
-                            console.log('Response status:', response.status);
-                            if (!response.ok) {
-                                return response.text().then(text => {
-                                    console.error('Error response:', text);
-                                    throw new Error(`HTTP ${response.status}: ${text}`);
-                                });
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Response data:', data);
-                            if (data.success) {
-                                alert('✅ ' + data.message);
-                                closeModal();
-                                setTimeout(() => {
-                                    location.reload();
-                                }, 500);
-                            } else {
-                                alert('❌ ' + (data.message || 'Có lỗi xảy ra'));
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Có lỗi xảy ra: ' + error.message);
-                        });
-                    
-                    return false;
-                });
-                
+            if (form && form.dataset.listenerAttached !== 'true') {
+                form.addEventListener('submit', handleFormSubmit);
                 form.dataset.listenerAttached = 'true';
             }
 
             const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
+            if (searchInput && searchInput.dataset.listenerAttached !== 'true') {
                 searchInput.addEventListener('input', function() {
                     const searchTerm = this.value.toLowerCase();
                     const rows = document.querySelectorAll('#courseTableBody tr');
-                    
                     rows.forEach(row => {
                         const text = row.textContent.toLowerCase();
                         row.style.display = text.includes(searchTerm) ? '' : 'none';
                     });
                 });
+                searchInput.dataset.listenerAttached = 'true';
             }
 
             window.onclick = function(event) {
@@ -329,15 +256,96 @@
             };
         }
 
-        initFormHandlers();
-        setTimeout(initFormHandlers, 200);
-        
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            console.log('Form submit triggered');
+
+            // Lấy giá trị từ các input
+            const courseId = document.getElementById('courseId').value.trim();
+            const courseName = document.getElementById('courseName').value.trim();
+            const credits = document.getElementById('credits').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const lecturerId = document.getElementById('lecturerId').value.trim();
+
+            // Validate bắt buộc
+            if (!courseName) {
+                alert('❌ Vui lòng nhập Tên môn học');
+                return false;
+            }
+            if (!credits || isNaN(credits) || credits < 1 || credits > 10) {
+                alert('❌ Số tín chỉ phải từ 1 đến 10');
+                return false;
+            }
+
+            // Tạo object dữ liệu
+            const data = {
+                CourseName: courseName,
+                Credits: parseInt(credits),
+                Description: description || '',
+                LecturerID: lecturerId ? parseInt(lecturerId) : null
+            };
+
+            // Xác định URL và thêm CourseID nếu sửa
+            let url = '/Admin/CreateCourse';
+            if (courseId && courseId !== '0') {
+                url = `/Admin/EditCourse/${courseId}`;
+                data.CourseID = parseInt(courseId);
+                console.log('MODE: EDIT - Course ID:', courseId);
+            } else {
+                console.log('MODE: CREATE');
+            }
+
+            const jsonBody = JSON.stringify(data);
+            console.log('📤 Sending to:', url);
+            console.log('📦 Data:', data);
+            console.log('📄 JSON:', jsonBody);
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin',
+                body: jsonBody
+            })
+                .then(response => {
+                    console.log('📨 Response status:', response.status);
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            console.error('❌ Error response:', text);
+                            throw new Error(`HTTP ${response.status}: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(responseData => {
+                    console.log('✅ Response data:', responseData);
+                    if (responseData.success) {
+                        alert('✅ ' + responseData.message);
+                        closeModal();
+                        setTimeout(() => {
+                            location.reload();
+                        }, 500);
+                    } else {
+                        alert('❌ ' + (responseData.message || 'Có lỗi xảy ra'));
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Fetch error:', error);
+                    alert('❌ Lỗi: ' + error.message);
+                });
+
+            return false;
+        }
+
+        // Khởi tạo khi DOM sẵn sàng
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(initFormHandlers, 100);
-            });
+            document.addEventListener('DOMContentLoaded', initFormHandlers);
         } else {
-            setTimeout(initFormHandlers, 100);
+            initFormHandlers();
         }
     })();
 </script>

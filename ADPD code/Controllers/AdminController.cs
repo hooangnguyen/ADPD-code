@@ -473,7 +473,6 @@ namespace ADPD_code.Controllers
                 }
             });
         }
-
         [HttpPost]
         public async Task<IActionResult> EditLecturer(int id, [FromBody] EditLecturerRequest? request)
         {
@@ -482,45 +481,49 @@ namespace ADPD_code.Controllers
                 return Json(new { success = false, message = "Không có quyền truy cập" });
             }
 
-            // Kiểm tra request có null không
-            if (request == null)
+            try
             {
-                try
+                // Kiểm tra ID hợp lệ
+                if (id <= 0)
+                {
+                    return Json(new { success = false, message = "ID giảng viên không hợp lệ" });
+                }
+
+                // Nếu request null, đọc body thủ công
+                if (request == null)
                 {
                     Request.EnableBuffering();
                     Request.Body.Position = 0;
-                    using var reader = new StreamReader(Request.Body, System.Text.Encoding.UTF8, leaveOpen: true);
-                    var body = await reader.ReadToEndAsync();
-                    Request.Body.Position = 0;
-                    
-                    if (string.IsNullOrWhiteSpace(body))
+                    using (var reader = new StreamReader(Request.Body, Encoding.UTF8, leaveOpen: true))
                     {
-                        return Json(new { success = false, message = "Request body rỗng" });
-                    }
-                    
-                    request = JsonSerializer.Deserialize<EditLecturerRequest>(body, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-                    
-                    if (request == null)
-                    {
-                        return Json(new { success = false, message = $"Không thể deserialize request body: {body}" });
+                        var body = await reader.ReadToEndAsync();
+                        Request.Body.Position = 0;
+
+                        if (string.IsNullOrWhiteSpace(body))
+                        {
+                            return Json(new { success = false, message = "Request body rỗng. Vui lòng kiểm tra lại dữ liệu gửi lên." });
+                        }
+
+                        try
+                        {
+                            request = JsonSerializer.Deserialize<EditLecturerRequest>(body, new JsonSerializerOptions
+                            {
+                                PropertyNameCaseInsensitive = true
+                            });
+                        }
+                        catch (Exception jsonEx)
+                        {
+                            return Json(new { success = false, message = $"Lỗi deserialize JSON: {jsonEx.Message}" });
+                        }
                     }
                 }
-                catch (Exception ex)
+
+                if (request == null)
                 {
-                    return Json(new { success = false, message = $"Lỗi khi đọc request body: {ex.Message}" });
+                    return Json(new { success = false, message = "Không thể đọc dữ liệu. Vui lòng thử lại." });
                 }
-            }
 
-            if (id != request.LecturerID)
-            {
-                return Json(new { success = false, message = $"ID không khớp. URL id: {id}, Request id: {request.LecturerID}" });
-            }
-
-            try
-            {
+                // Tìm giảng viên
                 var lecturer = await _context.Lecturers.FindAsync(id);
                 if (lecturer == null)
                 {
@@ -537,7 +540,7 @@ namespace ADPD_code.Controllers
                     return Json(new { success = false, message = "Email không được để trống!" });
                 }
 
-                // Kiểm tra email đã tồn tại chưa (trừ chính giảng viên này)
+                // Kiểm tra email đã tồn tại (trừ chính giảng viên này)
                 var existingEmail = await _context.Lecturers
                     .FirstOrDefaultAsync(l => l.Email == request.Email && l.LecturerID != id);
                 if (existingEmail != null)
@@ -556,17 +559,11 @@ namespace ADPD_code.Controllers
 
                 return Json(new { success = true, message = "Cập nhật giảng viên thành công!" });
             }
-            catch (DbUpdateException dbEx)
-            {
-                var innerEx = dbEx.InnerException?.Message ?? dbEx.Message;
-                return Json(new { success = false, message = $"Lỗi database: {innerEx}" });
-            }
             catch (Exception ex)
             {
                 return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
             }
         }
-
         [HttpPost]
         public async Task<IActionResult> DeleteLecturer(int id)
         {
