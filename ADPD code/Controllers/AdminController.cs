@@ -197,7 +197,6 @@ namespace ADPD_code.Controllers
                 }
             });
         }
-
         [HttpPost]
         public async Task<IActionResult> EditStudent(int id, [FromBody] EditStudentRequest? request)
         {
@@ -206,47 +205,49 @@ namespace ADPD_code.Controllers
                 return Json(new { success = false, message = "Không có quyền truy cập" });
             }
 
-            // Kiểm tra request có null không
-            if (request == null)
+            try
             {
-                // Thử đọc request body thủ công
-                try
+                // Kiểm tra ID hợp lệ
+                if (id <= 0)
+                {
+                    return Json(new { success = false, message = "ID sinh viên không hợp lệ" });
+                }
+
+                // Nếu request null, đọc body thủ công
+                if (request == null)
                 {
                     Request.EnableBuffering();
                     Request.Body.Position = 0;
-                    using var reader = new StreamReader(Request.Body, System.Text.Encoding.UTF8, leaveOpen: true);
-                    var body = await reader.ReadToEndAsync();
-                    Request.Body.Position = 0;
-                    
-                    if (string.IsNullOrWhiteSpace(body))
+                    using (var reader = new StreamReader(Request.Body, Encoding.UTF8, leaveOpen: true))
                     {
-                        return Json(new { success = false, message = "Request body rỗng. Vui lòng kiểm tra lại dữ liệu gửi lên." });
-                    }
-                    
-                    // Thử deserialize thủ công
-                    request = System.Text.Json.JsonSerializer.Deserialize<EditStudentRequest>(body, new System.Text.Json.JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-                    
-                    if (request == null)
-                    {
-                        return Json(new { success = false, message = $"Không thể deserialize request body: {body}" });
+                        var body = await reader.ReadToEndAsync();
+                        Request.Body.Position = 0;
+
+                        if (string.IsNullOrWhiteSpace(body))
+                        {
+                            return Json(new { success = false, message = "Request body rỗng. Vui lòng kiểm tra lại dữ liệu gửi lên." });
+                        }
+
+                        try
+                        {
+                            request = JsonSerializer.Deserialize<EditStudentRequest>(body, new JsonSerializerOptions
+                            {
+                                PropertyNameCaseInsensitive = true
+                            });
+                        }
+                        catch (Exception jsonEx)
+                        {
+                            return Json(new { success = false, message = $"Lỗi deserialize JSON: {jsonEx.Message}" });
+                        }
                     }
                 }
-                catch (Exception ex)
+
+                if (request == null)
                 {
-                    return Json(new { success = false, message = $"Lỗi khi đọc request body: {ex.Message}" });
+                    return Json(new { success = false, message = "Không thể đọc dữ liệu. Vui lòng thử lại." });
                 }
-            }
 
-            if (id != request.StudentId)
-            {
-                return Json(new { success = false, message = $"ID không khớp. URL id: {id}, Request id: {request.StudentId}" });
-            }
-
-            try
-            {
+                // Tìm sinh viên
                 var student = await _context.Students.FindAsync(id);
                 if (student == null)
                 {
@@ -267,7 +268,7 @@ namespace ADPD_code.Controllers
                     return Json(new { success = false, message = "Ngày sinh không được để trống!" });
                 }
 
-                // Kiểm tra email đã tồn tại chưa (trừ chính sinh viên này)
+                // Kiểm tra email đã tồn tại (trừ chính sinh viên này)
                 var existingEmail = await _context.Students
                     .FirstOrDefaultAsync(s => s.Email == request.Email && s.StudentId != id);
                 if (existingEmail != null)
@@ -293,7 +294,7 @@ namespace ADPD_code.Controllers
                 _context.Update(student);
                 await _context.SaveChangesAsync();
 
-                // Cập nhật lớp học
+                // Cập nhật lớp học nếu có
                 if (request.ClassID.HasValue && request.ClassID.Value > 0)
                 {
                     var existingClass = await _context.StudentClasses
@@ -306,11 +307,12 @@ namespace ADPD_code.Controllers
                     }
                     else
                     {
-                        _context.StudentClasses.Add(new StudentClass
+                        var studentClass = new StudentClass
                         {
                             StudentId = id,
                             ClassID = request.ClassID.Value
-                        });
+                        };
+                        _context.StudentClasses.Add(studentClass);
                     }
                     await _context.SaveChangesAsync();
                 }

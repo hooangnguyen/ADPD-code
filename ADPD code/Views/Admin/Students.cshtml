@@ -79,16 +79,17 @@
     </div>
 </div>
 
-<!-- Modal Thêm/Sửa Sinh viên -->
+<!-- Modal Thêm/Sửa Sinh viên Compact -->
 <div id="studentModal" class="modal" style="display: none;">
-    <div class="modal-content">
+    <div class="modal-content compact-modal">
         <div class="modal-header">
-            <h2 id="modalTitle">Thêm Sinh viên</h2>
+            <h2 id="modalTitle">Sửa Sinh viên</h2>
             <button type="button" class="close-btn" onclick="closeModal()">×</button>
         </div>
         <form id="studentForm">
-            <div class="modal-body">
+            <div class="modal-body grid-form">
                 <input type="hidden" id="studentId" name="StudentId" />
+
                 <div class="form-group">
                     <label>Họ và tên *</label>
                     <input type="text" id="fullName" name="FullName" required />
@@ -139,282 +140,317 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn" onclick="closeModal()" style="background: #6c757d; color: white;">Hủy</button>
-                <button type="submit" class="btn btn-primary">Lưu</button>
+                <button type="button" class="btn btn-secondary compact-btn" onclick="closeModal()">Hủy</button>
+                <button type="submit" class="btn btn-primary compact-btn">Lưu</button>
             </div>
         </form>
     </div>
 </div>
 
+<style>
+    /* Modal thu nhỏ */
+    .compact-modal {
+        width: 500px; /* giảm rộng */
+        max-width: 95%;
+        padding: 12px;
+        font-size: 13px;
+        overflow-y: auto; /* scroll khi dài */
+        max-height: 90vh; /* cao tối đa 90% viewport */
+    }
+
+    /* Chia 2 cột */
+    .grid-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 12px;
+    }
+
+        .grid-form .form-group {
+            margin-bottom: 6px;
+        }
+
+            .grid-form .form-group label {
+                font-size: 12px;
+                margin-bottom: 2px;
+                display: block;
+            }
+
+            .grid-form .form-group input,
+            .grid-form .form-group select {
+                width: 100%;
+                padding: 4px 6px;
+                font-size: 12px;
+                box-sizing: border-box;
+            }
+
+    /* Footer */
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 6px;
+        padding-top: 6px;
+    }
+
+    .compact-btn {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+</style>
+
 <script>
-    // Đảm bảo các hàm được định nghĩa ngay lập tức (IIFE)
     (function() {
         'use strict';
-        
-        // Đảm bảo các hàm được định nghĩa trong scope global
+
         window.showCreateModal = function() {
-        console.log('showCreateModal called');
-        const modal = document.getElementById('studentModal');
-        const form = document.getElementById('studentForm');
-        const title = document.getElementById('modalTitle');
-        const studentId = document.getElementById('studentId');
-        
-        if (!modal || !form || !title || !studentId) {
-            console.error('Modal elements not found');
-            alert('Có lỗi xảy ra khi mở form!');
-            return;
-        }
-        
-        title.textContent = 'Thêm Sinh viên';
-        form.reset();
-        studentId.value = '';
-        modal.style.display = 'block';
-        
-        // Re-attach form handler sau khi modal hiển thị
-        setTimeout(initFormHandlers, 100);
-    };
-
-    window.editStudent = function(id) {
-        console.log('editStudent called with id:', id);
-        fetch(`/Admin/EditStudent/${id}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Edit response:', data);
-                if (data.success && data.student) {
-                    fillEditForm(data.student);
-                } else {
-                    alert('❌ ' + (data.message || 'Không tìm thấy sinh viên'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Có lỗi xảy ra khi tải thông tin sinh viên!');
-            });
-    };
-
-    function fillEditForm(student) {
-        const modal = document.getElementById('studentModal');
-        const title = document.getElementById('modalTitle');
-        
-        if (!modal || !title) {
-            console.error('Modal elements not found');
-            return;
-        }
-        
-        title.textContent = 'Sửa Sinh viên';
-        document.getElementById('studentId').value = student.StudentId;
-        document.getElementById('fullName').value = student.FullName || '';
-        document.getElementById('gender').value = student.Gender || '';
-        document.getElementById('dob').value = student.DOB || '';
-        document.getElementById('email').value = student.Email || '';
-        document.getElementById('phone').value = student.Phone || '';
-        document.getElementById('address').value = student.Address || '';
-        document.getElementById('status').value = student.Status || '';
-        if (student.ClassID) {
-            document.getElementById('classId').value = student.ClassID;
-        }
-        modal.style.display = 'block';
-        
-        // Re-attach form handler sau khi modal hiển thị
-        setTimeout(initFormHandlers, 100);
-    }
-
-    window.deleteStudent = function(id) {
-        console.log('deleteStudent called with id:', id);
-        if (!confirm('Bạn có chắc chắn muốn xóa sinh viên này?')) {
-            return;
-        }
-
-        fetch(`/Admin/DeleteStudent/${id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(`HTTP ${response.status}: ${text}`);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Delete response:', data);
-                if (data.success) {
-                    alert('✅ ' + data.message);
-                    location.reload();
-                } else {
-                    alert('❌ ' + (data.message || 'Có lỗi xảy ra'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Có lỗi xảy ra khi xóa sinh viên: ' + error.message);
-            });
-    };
-
-    window.closeModal = function() {
-        const modal = document.getElementById('studentModal');
-        if (modal) {
-            modal.style.display = 'none';
-        }
-    };
-
-    // Đảm bảo DOM đã sẵn sàng trước khi attach event listeners
-    function initFormHandlers() {
-        const form = document.getElementById('studentForm');
-        if (form) {
-            // Kiểm tra xem đã có event listener chưa
-            if (form.dataset.listenerAttached === 'true') {
-                return; // Đã có listener rồi, không cần attach lại
-            }
-            
-            // Attach event listener
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                console.log('Form submit triggered');
-                
-                const formData = new FormData(this);
-                const studentId = document.getElementById('studentId')?.value || '';
-                const classId = document.getElementById('classId')?.value || '';
-                
-                // Validate form
-                const fullName = formData.get('FullName');
-                const email = formData.get('Email');
-                const dob = formData.get('DOB');
-                
-                if (!fullName || !email || !dob) {
-                    alert('Vui lòng điền đầy đủ thông tin bắt buộc (Họ tên, Email, Ngày sinh)!');
-                    return false;
-                }
-
-                const data = {
-                    FullName: fullName,
-                    Gender: formData.get('Gender') || 'Nam',
-                    DOB: dob,
-                    Email: email,
-                    Phone: formData.get('Phone') || '',
-                    Address: formData.get('Address') || '',
-                    Status: formData.get('Status') || 'Đang học',
-                    ClassID: classId && classId !== '' ? parseInt(classId) : null
-                };
-
-                let url = '/Admin/CreateStudent';
-                
-                if (studentId && studentId !== '' && studentId !== '0') {
-                    url = `/Admin/EditStudent/${parseInt(studentId)}`;
-                    data.StudentId = parseInt(studentId);
-                } else {
-                    // Đảm bảo không có StudentId khi tạo mới
-                    if (data.StudentId !== undefined) {
-                        delete data.StudentId;
-                    }
-                }
-
-                const jsonBody = JSON.stringify(data);
-                
-                console.log('Sending data:', data);
-                console.log('URL:', url);
-                console.log('JSON string:', jsonBody);
-                console.log('Body length:', jsonBody.length);
-
-                if (!jsonBody || jsonBody === '{}') {
-                    alert('Lỗi: Dữ liệu không hợp lệ!');
-                    return false;
-                }
-
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    credentials: 'same-origin',
-                    body: jsonBody
-                })
-                    .then(response => {
-                        console.log('Response status:', response.status);
-                        console.log('Response headers:', response.headers);
-                        if (!response.ok) {
-                            return response.text().then(text => {
-                                console.error('Error response:', text);
-                                throw new Error(`HTTP ${response.status}: ${text}`);
-                            });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Response data:', data);
-                        if (data.success) {
-                            alert('✅ ' + data.message);
-                            closeModal();
-                            setTimeout(() => {
-                                location.reload();
-                            }, 500);
-                        } else {
-                            alert('❌ ' + (data.message || 'Có lỗi xảy ra'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Có lỗi xảy ra: ' + error.message);
-                    });
-                
-                return false;
-            });
-            
-            // Đánh dấu đã attach listener
-            form.dataset.listenerAttached = 'true';
-        }
-
-        // Search functionality
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                const rows = document.querySelectorAll('#studentTableBody tr');
-                
-                rows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    row.style.display = text.includes(searchTerm) ? '' : 'none';
-                });
-            });
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
+            console.log('showCreateModal called');
             const modal = document.getElementById('studentModal');
-            if (event.target === modal) {
-                closeModal();
+            const form = document.getElementById('studentForm');
+            const title = document.getElementById('modalTitle');
+            const studentId = document.getElementById('studentId');
+
+            if (!modal || !form || !title || !studentId) {
+                console.error('Modal elements not found');
+                alert('Có lỗi xảy ra khi mở form!');
+                return;
+            }
+
+            title.textContent = 'Thêm Sinh viên';
+            form.reset();
+            studentId.value = '';
+            modal.style.display = 'block';
+            setTimeout(initFormHandlers, 100);
+        };
+
+        window.editStudent = function(id) {
+            console.log('editStudent called with id:', id);
+            fetch(`/Admin/EditStudent/${id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Edit response:', data);
+                    if (data.success && data.student) {
+                        fillEditForm(data.student);
+                    } else {
+                        alert('❌ ' + (data.message || 'Không tìm thấy sinh viên'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi tải thông tin sinh viên: ' + error.message);
+                });
+        };
+
+        function fillEditForm(student) {
+            const modal = document.getElementById('studentModal');
+            const title = document.getElementById('modalTitle');
+
+            if (!modal || !title) {
+                console.error('Modal elements not found');
+                return;
+            }
+
+            title.textContent = 'Sửa Sinh viên';
+
+            // Đặt giá trị cho các field
+            document.getElementById('studentId').value = student.StudentId || '';
+            document.getElementById('fullName').value = student.FullName || '';
+            document.getElementById('gender').value = student.Gender || 'Nam';
+            document.getElementById('dob').value = student.DOB || '';
+            document.getElementById('email').value = student.Email || '';
+            document.getElementById('phone').value = student.Phone || '';
+            document.getElementById('address').value = student.Address || '';
+            document.getElementById('status').value = student.Status || 'Đang học';
+            document.getElementById('classId').value = student.ClassID || '';
+
+            modal.style.display = 'block';
+        }
+
+        window.deleteStudent = function(id) {
+            console.log('deleteStudent called with id:', id);
+            if (!confirm('Bạn có chắc chắn muốn xóa sinh viên này?')) {
+                return;
+            }
+
+            fetch(`/Admin/DeleteStudent/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(`HTTP ${response.status}: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Delete response:', data);
+                    if (data.success) {
+                        alert('✅ ' + data.message);
+                        location.reload();
+                    } else {
+                        alert('❌ ' + (data.message || 'Có lỗi xảy ra'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi xóa sinh viên: ' + error.message);
+                });
+        };
+
+        window.closeModal = function() {
+            const modal = document.getElementById('studentModal');
+            if (modal) {
+                modal.style.display = 'none';
             }
         };
-    }
 
-        // Chạy ngay lập tức khi script được load
-        initFormHandlers();
-        
-        // Chạy lại sau một khoảng thời gian để đảm bảo form đã được render
-        setTimeout(function() {
-            initFormHandlers();
-        }, 200);
-        
-        // Cũng chạy khi DOM sẵn sàng (fallback)
+        function initFormHandlers() {
+            const form = document.getElementById('studentForm');
+
+            if (form && form.dataset.listenerAttached !== 'true') {
+                form.addEventListener('submit', handleFormSubmit);
+                form.dataset.listenerAttached = 'true';
+            }
+
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput && searchInput.dataset.listenerAttached !== 'true') {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('#studentTableBody tr');
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(searchTerm) ? '' : 'none';
+                    });
+                });
+                searchInput.dataset.listenerAttached = 'true';
+            }
+
+            window.onclick = function(event) {
+                const modal = document.getElementById('studentModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            console.log('Form submit triggered');
+
+            // Lấy giá trị từ các input
+            const studentId = document.getElementById('studentId').value.trim();
+            const fullName = document.getElementById('fullName').value.trim();
+            const gender = document.getElementById('gender').value.trim();
+            const dob = document.getElementById('dob').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const status = document.getElementById('status').value.trim();
+            const classId = document.getElementById('classId').value.trim();
+
+            // Validate bắt buộc
+            if (!fullName) {
+                alert('❌ Vui lòng nhập Họ và tên');
+                return false;
+            }
+            if (!email) {
+                alert('❌ Vui lòng nhập Email');
+                return false;
+            }
+            if (!dob) {
+                alert('❌ Vui lòng chọn Ngày sinh');
+                return false;
+            }
+            if (!phone) {
+                alert('❌ Vui lòng nhập Số điện thoại');
+                return false;
+            }
+            if (!address) {
+                alert('❌ Vui lòng nhập Địa chỉ');
+                return false;
+            }
+
+            // Tạo object dữ liệu
+            const data = {
+                FullName: fullName,
+                Gender: gender || 'Nam',
+                DOB: dob,
+                Email: email,
+                Phone: phone,
+                Address: address,
+                Status: status || 'Đang học',
+                ClassID: classId ? parseInt(classId) : null
+            };
+
+            // Xác định URL và thêm StudentId nếu sửa
+            let url = '/Admin/CreateStudent';
+            if (studentId && studentId !== '0') {
+                url = `/Admin/EditStudent/${studentId}`;
+                data.StudentId = parseInt(studentId);
+                console.log('MODE: EDIT - Student ID:', studentId);
+            } else {
+                console.log('MODE: CREATE');
+            }
+
+            const jsonBody = JSON.stringify(data);
+            console.log('📤 Sending to:', url);
+            console.log('📦 Data:', data);
+            console.log('📄 JSON:', jsonBody);
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin',
+                body: jsonBody
+            })
+                .then(response => {
+                    console.log('📨 Response status:', response.status);
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            console.error('❌ Error response:', text);
+                            throw new Error(`HTTP ${response.status}: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(responseData => {
+                    console.log('✅ Response data:', responseData);
+                    if (responseData.success) {
+                        alert('✅ ' + responseData.message);
+                        closeModal();
+                        setTimeout(() => {
+                            location.reload();
+                        }, 500);
+                    } else {
+                        alert('❌ ' + (responseData.message || 'Có lỗi xảy ra'));
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Fetch error:', error);
+                    alert('❌ Lỗi: ' + error.message);
+                });
+
+            return false;
+        }
+
+        // Khởi tạo khi DOM sẵn sàng
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(initFormHandlers, 100);
-            });
+            document.addEventListener('DOMContentLoaded', initFormHandlers);
         } else {
-            // DOM đã sẵn sàng, chạy ngay
-            setTimeout(initFormHandlers, 100);
+            initFormHandlers();
         }
     })();
 </script>
