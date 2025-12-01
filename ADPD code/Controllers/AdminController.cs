@@ -609,215 +609,6 @@ namespace ADPD_code.Controllers
             }
         }
 
-        // ========== QUẢN LÝ MÔN HỌC ==========
-        public async Task<IActionResult> Courses(bool partial = false)
-        {
-            if (HttpContext.Session.GetString("Role") != "Admin")
-            {
-                return RedirectToAction("Index", "Login");
-            }
-
-            var courses = await _context.Courses
-                .Include(c => c.Lecturer)
-                .OrderBy(c => c.CourseName)
-                .ToListAsync();
-
-            ViewBag.Lecturers = await _context.Lecturers.ToListAsync();
-            ViewData["IsPartial"] = partial;
-
-            return partial ? PartialView(courses) : View(courses);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateCourse([FromBody] CreateCourseRequest request)
-        {
-            if (HttpContext.Session.GetString("Role") != "Admin")
-            {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
-            }
-
-            try
-            {
-                // Validate dữ liệu
-                if (string.IsNullOrWhiteSpace(request.CourseName))
-                {
-                    return Json(new { success = false, message = "Tên môn học không được để trống!" });
-                }
-                if (request.Credits <= 0 || request.Credits > 10)
-                {
-                    return Json(new { success = false, message = "Số tín chỉ phải từ 1 đến 10!" });
-                }
-
-                var course = new Course
-                {
-                    CourseName = request.CourseName,
-                    Credits = request.Credits,
-                    Description = request.Description ?? "",
-                    LecturerID = request.LecturerID > 0 ? request.LecturerID : null
-                };
-
-                _context.Courses.Add(course);
-                await _context.SaveChangesAsync();
-
-                return Json(new { success = true, message = "Thêm môn học thành công!" });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
-            }
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> EditCourse(int id)
-        {
-            if (HttpContext.Session.GetString("Role") != "Admin")
-            {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
-            }
-
-            var course = await _context.Courses
-                .Include(c => c.Lecturer)
-                .FirstOrDefaultAsync(c => c.CourseID == id);
-
-            if (course == null)
-            {
-                return Json(new { success = false, message = "Không tìm thấy môn học" });
-            }
-
-            return Json(new { 
-                success = true, 
-                course = new {
-                    CourseID = course.CourseID,
-                    CourseName = course.CourseName,
-                    Credits = course.Credits,
-                    Description = course.Description,
-                    LecturerID = course.LecturerID
-                }
-            });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> EditCourse(int id, [FromBody] EditCourseRequest? request)
-        {
-            if (HttpContext.Session.GetString("Role") != "Admin")
-            {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
-            }
-
-            if (request == null)
-            {
-                try
-                {
-                    Request.EnableBuffering();
-                    Request.Body.Position = 0;
-                    using var reader = new StreamReader(Request.Body, System.Text.Encoding.UTF8, leaveOpen: true);
-                    var body = await reader.ReadToEndAsync();
-                    Request.Body.Position = 0;
-                    
-                    if (string.IsNullOrWhiteSpace(body))
-                    {
-                        return Json(new { success = false, message = "Request body rỗng" });
-                    }
-                    
-                    request = JsonSerializer.Deserialize<EditCourseRequest>(body, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-                    
-                    if (request == null)
-                    {
-                        return Json(new { success = false, message = $"Không thể deserialize request body: {body}" });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    return Json(new { success = false, message = $"Lỗi khi đọc request body: {ex.Message}" });
-                }
-            }
-
-            if (id != request.CourseID)
-            {
-                return Json(new { success = false, message = $"ID không khớp. URL id: {id}, Request id: {request.CourseID}" });
-            }
-
-            try
-            {
-                var course = await _context.Courses.FindAsync(id);
-                if (course == null)
-                {
-                    return Json(new { success = false, message = "Không tìm thấy môn học" });
-                }
-
-                // Validate dữ liệu
-                if (string.IsNullOrWhiteSpace(request.CourseName))
-                {
-                    return Json(new { success = false, message = "Tên môn học không được để trống!" });
-                }
-                if (request.Credits <= 0 || request.Credits > 10)
-                {
-                    return Json(new { success = false, message = "Số tín chỉ phải từ 1 đến 10!" });
-                }
-
-                // Cập nhật thông tin môn học
-                course.CourseName = request.CourseName;
-                course.Credits = request.Credits;
-                course.Description = request.Description ?? course.Description;
-                course.LecturerID = request.LecturerID > 0 ? request.LecturerID : null;
-
-                _context.Update(course);
-                await _context.SaveChangesAsync();
-
-                return Json(new { success = true, message = "Cập nhật môn học thành công!" });
-            }
-            catch (DbUpdateException dbEx)
-            {
-                var innerEx = dbEx.InnerException?.Message ?? dbEx.Message;
-                return Json(new { success = false, message = $"Lỗi database: {innerEx}" });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
-            }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> DeleteCourse(int id)
-        {
-            if (HttpContext.Session.GetString("Role") != "Admin")
-            {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
-            }
-
-            var course = await _context.Courses
-                .Include(c => c.Enrollments)
-                .Include(c => c.Attendances)
-                .Include(c => c.Assignments)
-                .FirstOrDefaultAsync(c => c.CourseID == id);
-
-            if (course == null)
-            {
-                return Json(new { success = false, message = "Không tìm thấy môn học" });
-            }
-
-            try
-            {
-                // Xóa môn học (các bản ghi liên quan sẽ tự động xóa do cascade)
-                _context.Courses.Remove(course);
-                await _context.SaveChangesAsync();
-                
-                return Json(new { success = true, message = "Xóa môn học thành công!" });
-            }
-            catch (DbUpdateException dbEx)
-            {
-                var innerEx = dbEx.InnerException?.Message ?? dbEx.Message;
-                return Json(new { success = false, message = $"Lỗi database: {innerEx}" });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
-            }
-        }
-
         // ========== QUẢN LÝ LỚP HỌC ==========
         public async Task<IActionResult> Classes(bool partial = false)
         {
@@ -838,42 +629,73 @@ namespace ADPD_code.Controllers
             return partial ? PartialView(classes) : View(classes);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> CreateClass()
-        {
-            if (HttpContext.Session.GetString("Role") != "Admin")
-            {
-                return RedirectToAction("Index", "Login");
-            }
-
-            ViewBag.Majors = await _context.Majors.ToListAsync();
-            return PartialView("_CreateClassModal");
-        }
-
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateClass(Class classModel)
+        public async Task<IActionResult> CreateClass()
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
                 return Json(new { success = false, message = "Không có quyền truy cập" });
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    _context.Classes.Add(classModel);
-                    await _context.SaveChangesAsync();
-                    return Json(new { success = true, message = "Thêm lớp học thành công!" });
-                }
-                catch (Exception ex)
-                {
-                    return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
-                }
-            }
+                HttpContext.Request.EnableBuffering();
+                HttpContext.Request.Body.Position = 0;
 
-            return Json(new { success = false, message = "Dữ liệu không hợp lệ" });
+                string body;
+                using (var reader = new StreamReader(HttpContext.Request.Body, Encoding.UTF8, leaveOpen: true))
+                {
+                    body = await reader.ReadToEndAsync();
+                }
+                HttpContext.Request.Body.Position = 0;
+
+                if (string.IsNullOrWhiteSpace(body))
+                {
+                    return Json(new { success = false, message = "Không có dữ liệu gửi lên" });
+                }
+
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var request = JsonSerializer.Deserialize<EditClassRequest>(body, options);
+
+                if (request == null)
+                {
+                    return Json(new { success = false, message = "Lỗi parse JSON" });
+                }
+
+                if (string.IsNullOrWhiteSpace(request.ClassName))
+                {
+                    return Json(new { success = false, message = "Tên lớp không được để trống!" });
+                }
+                if (request.MajorID <= 0)
+                {
+                    return Json(new { success = false, message = "Vui lòng chọn ngành!" });
+                }
+                if (string.IsNullOrWhiteSpace(request.StudyTime))
+                {
+                    return Json(new { success = false, message = "Thời gian học không được để trống!" });
+                }
+
+                if (!DateTime.TryParse(request.StudyTime, out DateTime studyTime))
+                {
+                    return Json(new { success = false, message = "Thời gian học không hợp lệ!" });
+                }
+
+                var classModel = new Class
+                {
+                    ClassName = request.ClassName,
+                    MajorID = request.MajorID,
+                    StudyTime = studyTime
+                };
+
+                _context.Classes.Add(classModel);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Thêm lớp học thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+            }
         }
 
         [HttpGet]
@@ -893,9 +715,11 @@ namespace ADPD_code.Controllers
                 return Json(new { success = false, message = "Không tìm thấy lớp học" });
             }
 
-            return Json(new { 
-                success = true, 
-                classModel = new {
+            return Json(new
+            {
+                success = true,
+                classModel = new
+                {
                     ClassID = classModel.ClassID,
                     ClassName = classModel.ClassName,
                     MajorID = classModel.MajorID,
@@ -905,58 +729,43 @@ namespace ADPD_code.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditClass(int id, [FromBody] EditClassRequest? request)
+        public async Task<IActionResult> EditClasses(int id)
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
                 return Json(new { success = false, message = "Không có quyền truy cập" });
             }
 
-            if (request == null)
-            {
-                try
-                {
-                    Request.EnableBuffering();
-                    Request.Body.Position = 0;
-                    using var reader = new StreamReader(Request.Body, System.Text.Encoding.UTF8, leaveOpen: true);
-                    var body = await reader.ReadToEndAsync();
-                    Request.Body.Position = 0;
-                    
-                    if (string.IsNullOrWhiteSpace(body))
-                    {
-                        return Json(new { success = false, message = "Request body rỗng" });
-                    }
-                    
-                    request = JsonSerializer.Deserialize<EditClassRequest>(body, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-                    
-                    if (request == null)
-                    {
-                        return Json(new { success = false, message = $"Không thể deserialize request body: {body}" });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    return Json(new { success = false, message = $"Lỗi khi đọc request body: {ex.Message}" });
-                }
-            }
-
-            if (id != request.ClassID)
-            {
-                return Json(new { success = false, message = $"ID không khớp. URL id: {id}, Request id: {request.ClassID}" });
-            }
-
             try
             {
-                var classModel = await _context.Classes.FindAsync(id);
-                if (classModel == null)
+                if (id <= 0)
                 {
-                    return Json(new { success = false, message = "Không tìm thấy lớp học" });
+                    return Json(new { success = false, message = "ID lớp học không hợp lệ" });
                 }
 
-                // Validate dữ liệu
+                HttpContext.Request.EnableBuffering();
+                HttpContext.Request.Body.Position = 0;
+
+                string body;
+                using (var reader = new StreamReader(HttpContext.Request.Body, Encoding.UTF8, leaveOpen: true))
+                {
+                    body = await reader.ReadToEndAsync();
+                }
+                HttpContext.Request.Body.Position = 0;
+
+                if (string.IsNullOrWhiteSpace(body))
+                {
+                    return Json(new { success = false, message = "Không có dữ liệu gửi lên" });
+                }
+
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var request = JsonSerializer.Deserialize<EditClassRequest>(body, options);
+
+                if (request == null)
+                {
+                    return Json(new { success = false, message = "Lỗi parse JSON" });
+                }
+
                 if (string.IsNullOrWhiteSpace(request.ClassName))
                 {
                     return Json(new { success = false, message = "Tên lớp không được để trống!" });
@@ -975,7 +784,12 @@ namespace ADPD_code.Controllers
                     return Json(new { success = false, message = "Thời gian học không hợp lệ!" });
                 }
 
-                // Cập nhật thông tin lớp học
+                var classModel = await _context.Classes.FindAsync(id);
+                if (classModel == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy lớp học" });
+                }
+
                 classModel.ClassName = request.ClassName;
                 classModel.MajorID = request.MajorID;
                 classModel.StudyTime = studyTime;
@@ -984,11 +798,6 @@ namespace ADPD_code.Controllers
                 await _context.SaveChangesAsync();
 
                 return Json(new { success = true, message = "Cập nhật lớp học thành công!" });
-            }
-            catch (DbUpdateException dbEx)
-            {
-                var innerEx = dbEx.InnerException?.Message ?? dbEx.Message;
-                return Json(new { success = false, message = $"Lỗi database: {innerEx}" });
             }
             catch (Exception ex)
             {
