@@ -842,6 +842,160 @@ namespace ADPD_code.Controllers
             }
         }
 
+        // ========== QUẢN LÝ MÔN HỌC ==========
+        public async Task<IActionResult> Courses(bool partial = false)
+        {
+            if (HttpContext.Session.GetString("Role") != "Admin")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            var courses = await _context.Courses
+                .Include(c => c.Lecturer)
+                .OrderBy(c => c.CourseName)
+                .ToListAsync();
+
+            ViewBag.Lecturers = await _context.Lecturers.ToListAsync();
+            ViewData["IsPartial"] = partial;
+
+            return partial ? PartialView(courses) : View(courses);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCourse([FromBody] CreateCourseRequest request)
+        {
+            if (HttpContext.Session.GetString("Role") != "Admin")
+            {
+                return Json(new { success = false, message = "Không có quyền truy cập" });
+            }
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request.CourseName))
+                {
+                    return Json(new { success = false, message = "Tên môn học không được để trống!" });
+                }
+                if (request.Credits <= 0)
+                {
+                    return Json(new { success = false, message = "Số tín chỉ phải lớn hơn 0!" });
+                }
+
+                var course = new Course
+                {
+                    CourseName = request.CourseName,
+                    Credits = request.Credits,
+                    Description = request.Description,
+                    LecturerID = request.LecturerID
+                };
+
+                _context.Courses.Add(course);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Thêm môn học thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditCourse(int id)
+        {
+            if (HttpContext.Session.GetString("Role") != "Admin")
+            {
+                return Json(new { success = false, message = "Không có quyền truy cập" });
+            }
+
+            var course = await _context.Courses.FindAsync(id);
+
+            if (course == null)
+            {
+                return Json(new { success = false, message = "Không tìm thấy môn học" });
+            }
+
+            return Json(new
+            {
+                success = true,
+                course = new
+                {
+                    course.CourseID,
+                    course.CourseName,
+                    course.Credits,
+                    course.Description,
+                    course.LecturerID
+                }
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditCourse(int id, [FromBody] EditCourseRequest request)
+        {
+            if (HttpContext.Session.GetString("Role") != "Admin")
+            {
+                return Json(new { success = false, message = "Không có quyền truy cập" });
+            }
+
+            if (id != request.CourseID)
+            {
+                return Json(new { success = false, message = "ID không khớp" });
+            }
+
+            try
+            {
+                var course = await _context.Courses.FindAsync(id);
+                if (course == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy môn học" });
+                }
+
+                course.CourseName = request.CourseName;
+                course.Credits = request.Credits;
+                course.Description = request.Description;
+                course.LecturerID = request.LecturerID;
+
+                _context.Update(course);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Cập nhật môn học thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteCourse(int id)
+        {
+            if (HttpContext.Session.GetString("Role") != "Admin")
+            {
+                return Json(new { success = false, message = "Không có quyền truy cập" });
+            }
+
+            var course = await _context.Courses.FindAsync(id);
+            if (course == null)
+            {
+                return Json(new { success = false, message = "Không tìm thấy môn học" });
+            }
+
+            try
+            {
+                _context.Courses.Remove(course);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Xóa môn học thành công!" });
+            }
+            catch (DbUpdateException dbEx)
+            {
+                var innerEx = dbEx.InnerException?.Message ?? dbEx.Message;
+                return Json(new { success = false, message = $"Lỗi database: {innerEx}" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+            }
+        }
+
         // ========== QUẢN LÝ TÀI KHOẢN ==========
         public async Task<IActionResult> Accounts(bool partial = false)
         {

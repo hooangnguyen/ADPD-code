@@ -1,5 +1,6 @@
 ﻿using ADPD_code.Data;
 using ADPD_code.Models;
+using ADPD_code.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,10 +9,12 @@ namespace ADPD_code.Controllers
     public class LecturerController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILecturerAnalyticsService _lecturerAnalyticsService;
 
-        public LecturerController(ApplicationDbContext context)
+        public LecturerController(ApplicationDbContext context, ILecturerAnalyticsService lecturerAnalyticsService)
         {
             _context = context;
+            _lecturerAnalyticsService = lecturerAnalyticsService;
         }
 
         public async Task<IActionResult> Dashboard(bool partial = false)
@@ -37,34 +40,12 @@ namespace ADPD_code.Controllers
                 ViewBag.FullName = lecturer.FullName;
             }
 
-            // Tính toán thống kê
-            var totalCourses = await _context.Courses
-                .Where(c => c.LecturerID == lecturerId)
-                .CountAsync();
-
-            var totalStudents = await _context.Enrollments
-                .Include(e => e.Course)
-                .Where(e => e.Course.LecturerID == lecturerId)
-                .Select(e => e.StudentID)
-                .Distinct()
-                .CountAsync();
-
-            var pendingAssignments = await _context.AssignmentSubmissions
-                .Include(s => s.Assignment)
-                .Where(s => s.Assignment.LecturerID == lecturerId && (!s.Score.HasValue || s.Score == 0))
-                .CountAsync();
-
-            // Tính số lớp học hôm nay từ Timetable
-            var today = DateTime.Today;
-            var todayClasses = await _context.Timetable
-                .Include(t => t.Course)
-                .Where(t => t.Course.LecturerID == lecturerId && t.StudyDate == today)
-                .CountAsync();
-
-            ViewBag.TotalCourses = totalCourses;
-            ViewBag.TotalStudents = totalStudents;
-            ViewBag.PendingAssignments = pendingAssignments;
-            ViewBag.TodayClasses = todayClasses;
+            // Lấy thống kê từ service
+            var stats = await _lecturerAnalyticsService.GetDashboardStats(lecturerId.Value);
+            ViewBag.TotalCourses = stats.TotalCourses;
+            ViewBag.TotalStudents = stats.TotalStudents;
+            ViewBag.PendingAssignments = stats.PendingAssignments;
+            ViewBag.TodayClasses = stats.TodayClasses;
 
             // Lấy danh sách môn học gần đây
             var courses = await _context.Courses
@@ -113,6 +94,7 @@ namespace ADPD_code.Controllers
             ViewBag.RecentSubmissions = formattedSubmissions;
 
             // Lấy lịch dạy hôm nay
+            var today = DateTime.Today;
             var todaySchedule = await _context.Timetable
                 .Include(t => t.Course)
                 .Include(t => t.Class)

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ADPD_code.Data;
+using ADPD_code.Services;
 using ADPD_code.Services.Notification;
 using ADPD_code.Models;
 
@@ -8,8 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Register ApplicationDbContext with SQL Server
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+// Register ApplicationDbContext and its factory.
+// AddDbContextFactory also registers the DbContext as a scoped service,
+// so calling AddDbContext separately is not needed and can cause issues.
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add distributed memory cache required by session and configure session
@@ -29,6 +32,9 @@ builder.Services.AddScoped<EmailNotificationService>();
 builder.Services.AddScoped<SMSNotificationService>();
 builder.Services.AddScoped<InAppNotificationService>();
 builder.Services.AddScoped<PushNotificationService>();
+
+// ========== LECTURER SERVICES REGISTRATION ==========
+builder.Services.AddScoped<ILecturerAnalyticsService, LecturerAnalyticsService>();
 
 var app = builder.Build();
 
