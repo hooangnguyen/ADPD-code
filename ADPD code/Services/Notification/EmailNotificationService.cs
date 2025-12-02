@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ADPD_code.Data;
 using ADPD_code.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using NotificationModel = ADPD_code.Models.Notification;
 using NotificationLogModel = ADPD_code.Models.NotificationLog;
 
@@ -14,11 +15,16 @@ namespace ADPD_code.Services.Notification
     {
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<EmailNotificationService> _logger;
 
-        public EmailNotificationService(IConfiguration configuration, ApplicationDbContext context)
+        public EmailNotificationService(
+            IConfiguration configuration,
+            ApplicationDbContext context,
+            ILogger<EmailNotificationService> logger = null)
         {
             _configuration = configuration;
             _context = context;
+            _logger = logger;
         }
 
         public NotificationType GetNotificationType()
@@ -41,10 +47,19 @@ namespace ADPD_code.Services.Notification
                 var senderEmail = _configuration["Email:SenderEmail"];
                 var senderPassword = _configuration["Email:SenderPassword"];
 
+                // Kiểm tra cấu hình
+                if (string.IsNullOrEmpty(smtpServer) || string.IsNullOrEmpty(senderEmail))
+                {
+                    throw new InvalidOperationException("Email configuration is missing in appsettings.json");
+                }
+
+                _logger?.LogInformation($"Sending email to {notification.RecipientEmail}");
+
                 using (var client = new SmtpClient(smtpServer, smtpPort))
                 {
                     client.EnableSsl = true;
                     client.Credentials = new NetworkCredential(senderEmail, senderPassword);
+                    client.Timeout = int.Parse(_configuration["Email:Timeout"] ?? "30000");
 
                     var mailMessage = new MailMessage
                     {
@@ -66,12 +81,15 @@ namespace ADPD_code.Services.Notification
 
                     // Ghi log
                     await LogNotificationAsync(notification, "Email gửi thành công");
+                    _logger?.LogInformation($"Email sent successfully to {notification.RecipientEmail}");
 
                     return true;
                 }
             }
             catch (Exception ex)
             {
+                _logger?.LogError($"Error sending email: {ex.Message}");
+
                 notification.Status = NotificationStatus.Failed;
                 notification.ErrorMessage = ex.Message;
 

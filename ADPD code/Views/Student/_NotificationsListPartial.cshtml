@@ -1,0 +1,53 @@
+﻿@model IEnumerable<ADPD_code.Models.Notification>
+
+<div class="notifications-panel">
+    @if (Model != null && Model.Any())
+    {
+        <ul class="notifications-list">
+            @foreach (var n in Model)
+            {
+                var shortMsg = (n.Message ?? "").Length > 120 ? (n.Message ?? "").Substring(0, 120) + "…" : n.Message;
+                <li class="notification-item" data-id="@n.NotificationID">
+                    <div class="notification-left">
+                        <div class="notification-title">@n.Title</div>
+                        <div class="notification-message">@shortMsg</div>
+                    </div>
+                    <div class="notification-meta">
+                        <div class="notification-time">@((n.CreatedDate).ToString("dd/MM/yyyy HH:mm"))</div>
+                    </div>
+                </li>
+            }
+        </ul>
+        <div class="notifications-footer">
+            <a href="@Url.Action("Assignments", "Student")">Xem tất cả thông báo →</a>
+        </div>
+    }
+    else
+    {
+        <div class="notifications-empty">
+            <div>📭 Chưa có thông báo</div>
+        </div>
+    }
+</div>
+
+<style>
+/* Minimal styles to make dropdown usable — move to CSS if you prefer */
+.notifications-panel {
+    width: 320px;
+    max-height: 420px;
+    overflow: auto;
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-radius: 6px;
+    padding: 8px;
+}
+.notifications-list { list-style: none; margin:0; padding:0; }
+.notification-item { display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #f0f0f0; cursor:pointer; }
+.notification-item:hover { background:#f7f9fc; }
+.notification-title { font-weight:600; font-size:0.95rem; }
+.notification-message { font-size:0.85rem; color:#555; margin-top:4px; }
+.notification-time { font-size:0.75rem; color:#999; }
+.notifications-empty { padding:18px; text-align:center; color:#666; }
+.notifications-footer { padding:8px; text-align:center; font-size:0.9rem; }
+</style>

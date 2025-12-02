@@ -28,11 +28,11 @@ namespace ADPD_code.Services.Notification
         {
             try
             {
-                // Lưu trực tiếp vào database
+                // Không Add lại, chỉ Update vì đã được Add ở NotificationManager
                 notification.Status = NotificationStatus.Delivered;
                 notification.SentDate = DateTime.Now;
 
-                _context.Add(notification);
+                _context.Update(notification);
                 await _context.SaveChangesAsync();
 
                 await LogNotificationAsync(notification, "Thông báo in-app được tạo");
@@ -44,7 +44,7 @@ namespace ADPD_code.Services.Notification
                 notification.Status = NotificationStatus.Failed;
                 notification.ErrorMessage = ex.Message;
 
-                _context.Add(notification);
+                _context.Update(notification);
                 await _context.SaveChangesAsync();
 
                 await LogNotificationAsync(notification, $"Thất bại: {ex.Message}");

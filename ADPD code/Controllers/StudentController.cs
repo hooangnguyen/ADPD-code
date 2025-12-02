@@ -1,7 +1,9 @@
+
 using ADPD_code.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ADPD_code.ViewModels;
+using ADPD_code.Models;
 
 namespace ADPD_code.Controllers
 {
@@ -819,6 +821,32 @@ namespace ADPD_code.Controllers
 
             // The user's file is named exercisedetails.cshtml, so let's return that view.
             return View("exercisedetails", assignment);
+        }
+
+        // API: Lấy thông báo gần đây cho sinh viên hiện tại (trả về HTML partial)
+        [HttpGet]
+        public async Task<IActionResult> GetNotifications()
+        {
+            if (HttpContext.Session.GetString("Role") != "Student")
+            {
+                return Unauthorized();
+            }
+
+            var studentId = HttpContext.Session.GetInt32("StudentID");
+            if (!studentId.HasValue)
+            {
+                return Unauthorized();
+            }
+
+            // Lấy 10 thông báo gần nhất
+            var notifications = await _context.Notifications
+                .Where(n => n.RecipientID == studentId.Value)
+                .OrderByDescending(n => n.CreatedDate)
+                .Take(10)
+                .ToListAsync();
+
+            // Trả về partial view (tạo Views/Student/_NotificationsListPartial.cshtml nếu chưa có)
+            return PartialView("_NotificationsListPartial", notifications);
         }
     }
 }

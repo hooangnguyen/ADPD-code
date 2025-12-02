@@ -7,11 +7,16 @@
             <span>Dashboard</span>
         </div>
     </div>
-    <div class="topbar-right">
-        <button class="notification-btn">
+    <div class="topbar-right" style="position:relative;">
+        <button class="notification-btn" id="notificationBtn" aria-expanded="false" aria-controls="notificationDropdown">
             🔔
-            <span class="notification-badge">3</span>
+            <span class="notification-badge" id="notificationBadge" style="display:none;">0</span>
         </button>
+
+        <div id="notificationDropdown" style="display:none; position:absolute; right:0; top:38px; z-index:1200;">
+            <!-- Partial loaded via AJAX -->
+            <div class="notification-loading" style="padding:12px;">Loading...</div>
+        </div>
     </div>
 </div>
 
@@ -187,4 +192,6 @@
         </div>
     </div>
 </div>
+
+<script src="~/js/notifications.js" asp-append-version="true"></script>
 
