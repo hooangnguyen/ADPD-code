@@ -223,8 +223,8 @@
                         Username: document.getElementById('username').value,
                         Password: document.getElementById('password').value,
                         Role: role,
-                        StudentID: role === 'Student' && document.getElementById('studentId').value ? parseInt(document.getElementById('studentId').value) : null,
-                        LecturerID: role === 'Lecturer' && document.getElementById('lecturerId').value ? parseInt(document.getElementById('lecturerId').value) : null
+                        StudentID: role === 'Student' ? parseInt(document.getElementById('studentId').value) : null,
+                        LecturerID: role === 'Lecturer' ? parseInt(document.getElementById('lecturerId').value) : null
                     };
 
                     const jsonBody = JSON.stringify(data);

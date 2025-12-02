@@ -3,19 +3,38 @@ using ADPD_code.Models;
 using ADPD_code.Services;
 using ADPD_code.Services.Export;
 using ADPD_code.Services.Notification;
+using ADPD_code.Patterns; // ⭐ THÊM NAMESPACE MỚI
 using Microsoft.EntityFrameworkCore;
 
-// ==========================================================
-
 var builder = WebApplication.CreateBuilder(args);
-// Add services to the container.
+
+// Add services to the container
 builder.Services.AddControllersWithViews();
 
-// Register ApplicationDbContext and its factory.
-builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-  options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// ========== SINGLETON DATABASE CONNECTION MANAGER ⭐ ==========
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+optionsBuilder.UseSqlServer(connectionString);
 
-// Add distributed memory cache required by session and configure session
+// Đăng ký Singleton DatabaseConnectionManager
+builder.Services.AddSingleton(sp =>
+{
+    var logger = sp.GetService<ILogger<DatabaseConnectionManager>>();
+    return DatabaseConnectionManager.GetInstance(optionsBuilder.Options, logger);
+});
+
+// Đăng ký ApplicationDbContext sử dụng Singleton Manager
+builder.Services.AddScoped<ApplicationDbContext>(sp =>
+{
+    var manager = sp.GetRequiredService<DatabaseConnectionManager>();
+    return manager.CreateDbContext();
+});
+
+// Giữ nguyên DbContextFactory cho các service cần
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+// Add distributed memory cache và session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -23,27 +42,50 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-// ========== NOTIFICATION SERVICES REGISTRATION ==========
+
+// Notification Services
 builder.Services.AddScoped<INotificationFactory, NotificationFactory>();
 builder.Services.AddScoped<INotificationManager, NotificationManager>();
-
-// Register notification implementations (optional)
 builder.Services.AddScoped<EmailNotificationService>();
 builder.Services.AddScoped<SMSNotificationService>();
 builder.Services.AddScoped<InAppNotificationService>();
 builder.Services.AddScoped<PushNotificationService>();
 
-// ========== EXPORT SERVICES REGISTRATION ==========
-// Đăng ký dịch vụ Export của bạn
+// Export Services
 builder.Services.AddScoped<IExportService, ExcelExportAdapter>();
 
-
-// ========== LECTURER SERVICES REGISTRATION ==========
+// Lecturer Services
 builder.Services.AddScoped<ILecturerAnalyticsService, LecturerAnalyticsService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline. 
+// ========== TEST DATABASE CONNECTION AT STARTUP ⭐ ==========
+using (var scope = app.Services.CreateScope())
+{
+    var manager = scope.ServiceProvider.GetRequiredService<DatabaseConnectionManager>();
+
+    Console.WriteLine("=".PadRight(60, '='));
+    Console.WriteLine("🔍 Testing Database Connection...");
+    Console.WriteLine("=".PadRight(60, '='));
+
+    var testResult = await manager.TestConnectionAsync();
+
+    if (!testResult)
+    {
+        Console.WriteLine("❌ WARNING: Cannot connect to database!");
+        Console.WriteLine($"Connection String: {manager.GetConnectionString()}");
+    }
+    else
+    {
+        Console.WriteLine("✅ Database connection successful!");
+        var stats = manager.GetStats();
+        Console.WriteLine($"📊 Stats: {stats}");
+    }
+
+    Console.WriteLine("=".PadRight(60, '='));
+}
+
+// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -52,40 +94,39 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
-// Enable session after routing but before endpoints
 app.UseSession();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(
-  name: "default",
-  pattern: "{controller=Home}/{action=Index}/{id?}");
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// TEMP: minimal test endpoint... (giữ nguyên)
-app.MapGet("/test-notification", async (
-  int recipientId,
-  string title,
-  string message,
-  string type,
-  string? email,
-  INotificationManager notificationManager) =>
+// ========== ENDPOINT ĐỂ XEM THỐNG KÊ CONNECTION ⭐ ==========
+app.MapGet("/api/db-stats", (DatabaseConnectionManager manager) =>
 {
-    if (!Enum.TryParse<NotificationType>(type, true, out var ntype))
-        return Results.BadRequest($"Invalid notification type '{type}'. Valid: Email,SMS,InApp,Push");
+    var stats = manager.GetStats();
+    var activeConnections = manager.GetActiveConnections();
 
-    var success = await notificationManager.SendNotificationAsync(
-      recipientId,
-      title,
-      message,
-      ntype,
-      email: email,
-      phone: null,
-      priority: "Medium");
-
-    return success ? Results.Ok("Notification queued/sent") : Results.Problem("Failed to send notification");
+    return Results.Ok(new
+    {
+        stats = new
+        {
+            stats.TotalConnections,
+            stats.ActiveConnections,
+            stats.LastConnectionTime,
+            stats.ManagerCreatedTime,
+            UptimeMinutes = stats.Uptime.TotalMinutes,
+            stats.IsActive,
+            stats.ConnectionPoolSize
+        },
+        activeConnections = activeConnections.Select(c => new
+        {
+            c.Id,
+            c.CreatedAt,
+            AgeSeconds = c.Age.TotalSeconds
+        })
+    });
 });
 
 app.Run();

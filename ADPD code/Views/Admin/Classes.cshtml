@@ -289,7 +289,7 @@
 
             // Nếu classId không trống → sửa
             if (classId && classId !== '0' && classId !== '') {
-                url = `/Admin/EditClass/${parseInt(classId)}`;
+                url = `/Admin/EditClass/${classId}`;
                 data.ClassID = parseInt(classId);
                 console.log('🔧 MODE: EDIT - Class ID:', classId);
             } else {

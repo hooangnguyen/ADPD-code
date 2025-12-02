@@ -198,6 +198,7 @@ namespace ADPD_code.Controllers
             });
         }
         [HttpPost]
+        [Route("Admin/EditStudent/{id}")]
         public async Task<IActionResult> EditStudent(int id, [FromBody] EditStudentRequest? request)
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
@@ -474,6 +475,7 @@ namespace ADPD_code.Controllers
             });
         }
         [HttpPost]
+        [Route("Admin/EditLecturer/{id}")]
         public async Task<IActionResult> EditLecturer(int id, [FromBody] EditLecturerRequest? request)
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
@@ -630,33 +632,14 @@ namespace ADPD_code.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateClass()
+        public async Task<IActionResult> CreateClass([FromBody] CreateClassRequest request)
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
                 return Json(new { success = false, message = "Không có quyền truy cập" });
             }
-
             try
             {
-                HttpContext.Request.EnableBuffering();
-                HttpContext.Request.Body.Position = 0;
-
-                string body;
-                using (var reader = new StreamReader(HttpContext.Request.Body, Encoding.UTF8, leaveOpen: true))
-                {
-                    body = await reader.ReadToEndAsync();
-                }
-                HttpContext.Request.Body.Position = 0;
-
-                if (string.IsNullOrWhiteSpace(body))
-                {
-                    return Json(new { success = false, message = "Không có dữ liệu gửi lên" });
-                }
-
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var request = JsonSerializer.Deserialize<EditClassRequest>(body, options);
-
                 if (request == null)
                 {
                     return Json(new { success = false, message = "Lỗi parse JSON" });
@@ -729,7 +712,8 @@ namespace ADPD_code.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditClasses(int id)
+        [Route("Admin/EditClass/{id}")]
+        public async Task<IActionResult> EditClass(int id, [FromBody] EditClassRequest request)
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
@@ -742,24 +726,6 @@ namespace ADPD_code.Controllers
                 {
                     return Json(new { success = false, message = "ID lớp học không hợp lệ" });
                 }
-
-                HttpContext.Request.EnableBuffering();
-                HttpContext.Request.Body.Position = 0;
-
-                string body;
-                using (var reader = new StreamReader(HttpContext.Request.Body, Encoding.UTF8, leaveOpen: true))
-                {
-                    body = await reader.ReadToEndAsync();
-                }
-                HttpContext.Request.Body.Position = 0;
-
-                if (string.IsNullOrWhiteSpace(body))
-                {
-                    return Json(new { success = false, message = "Không có dữ liệu gửi lên" });
-                }
-
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var request = JsonSerializer.Deserialize<EditClassRequest>(body, options);
 
                 if (request == null)
                 {

@@ -1,12 +1,14 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using ADPD_code.Data;
-using ADPD_code.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace ADPD_code.Services
+namespace ADPD_code.Services  // ✅ Đảm bảo namespace đúng
 {
+    // ❌ XÓA dòng này nếu có: public interface ILecturerAnalyticsService
+    // Interface đã được định nghĩa trong file riêng
+
     public class LecturerAnalyticsService : ILecturerAnalyticsService
     {
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
@@ -35,7 +37,7 @@ namespace ADPD_code.Services
                     .Include(s => s.Assignment)
                     .Where(s => s.Assignment.LecturerID == lecturerId && (!s.Score.HasValue || s.Score == 0))
                     .CountAsync();
-                
+
                 var today = DateTime.Today;
                 var todayClasses = await context.Timetable
                     .Include(t => t.Course)

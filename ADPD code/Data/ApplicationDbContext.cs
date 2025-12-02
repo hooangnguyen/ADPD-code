@@ -5,9 +5,27 @@ namespace ADPD_code.Data
 {
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
+        private readonly Action<Guid> _onDispose;
+        public Guid ConnectionId { get; }
+
+        public ApplicationDbContext(
+            DbContextOptions<ApplicationDbContext> options,
+            Action<Guid> onDispose = null) : base(options)
         {
+            _onDispose = onDispose;
+            ConnectionId = Guid.NewGuid();
+        }
+
+        public override void Dispose()
+        {
+            _onDispose?.Invoke(ConnectionId);
+            base.Dispose();
+        }
+
+        public override async ValueTask DisposeAsync()
+        {
+            _onDispose?.Invoke(ConnectionId);
+            await base.DisposeAsync();
         }
         public DbSet<Timetable> Timetable { get; set; }
         public DbSet<Notification> Notifications { get; set; }

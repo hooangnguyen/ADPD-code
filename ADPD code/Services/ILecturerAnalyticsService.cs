@@ -1,7 +1,6 @@
-using System.Threading.Tasks;
-using ADPD_code.ViewModels;
+﻿using System.Threading.Tasks;
 
-namespace ADPD_code.Services
+namespace ADPD_code.Services  // ✅ Namespace phải giống nhau
 {
     public interface ILecturerAnalyticsService
     {
