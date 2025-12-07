@@ -4,12 +4,12 @@
     <div class="login-container">
         <div class="login-header">
             <div class="icon">📚</div>
-            <h1>Đăng nhập</h1>
-            <p>Hệ thống Quản lý Sinh viên</p>
+            <h1>Login</h1>
+            <p>Student Management System</p>
         </div>
 
         <div class="login-body">
-            <!-- Hiển thị thông báo thành công từ TempData -->
+            <!-- Display success message from TempData -->
             @if (TempData["SuccessMessage"] != null)
             {
                 <div class="alert alert-success" style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
@@ -17,7 +17,7 @@
                 </div>
             }
 
-            <!-- Hiển thị lỗi validation -->
+            <!-- Display validation errors -->
             @if (ViewData.ModelState.Any(x => x.Value.Errors.Any()))
             {
                 <div class="error-message alert alert-danger" style="display: block;">
@@ -29,24 +29,24 @@
                 @Html.AntiForgeryToken()
 
                 <div class="form-group">
-                    <label for="username">Tên đăng nhập hoặc Mã sinh viên</label>
+                    <label for="username">Username or Student ID</label>
                     <div class="input-wrapper">
                         <input type="text"
                                name="username"
                                id="username"
-                               placeholder="Nhập tên đăng nhập"
+                               placeholder="Enter username"
                                required>
                         <span class="input-icon">👤</span>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Mật khẩu</label>
+                    <label for="password">Password</label>
                     <div class="input-wrapper">
                         <input type="password"
                                name="password"
                                id="password"
-                               placeholder="Nhập mật khẩu"
+                               placeholder="Enter password"
                                required>
                         <span class="input-icon">🔒</span>
                     </div>
@@ -55,20 +55,20 @@
                 <div class="form-options">
                     <label class="remember-me">
                         <input type="checkbox" name="remember" id="remember">
-                        <span>Ghi nhớ đăng nhập</span>
+                        <span>Remember me</span>
                     </label>
-                    <a href="@Url.Action("Index", "Forgotpassword")" class="forgot-password">Quên mật khẩu?</a>
+                    <a href="@Url.Action("Index", "Forgotpassword")" class="forgot-password">Forgot password?</a>
                 </div>
 
-                <button type="submit" class="btn-login">Đăng nhập</button>
+                <button type="submit" class="btn-login">Login</button>
             </form>
 
             <div class="divider">
-                <span>hoặc</span>
+                <span>or</span>
             </div>
 
             <div class="register-link">
-                Chưa có tài khoản? <a href="@Url.Action("Index", "Register")">Đăng ký ngay</a>
+                Don't have an account? <a href="@Url.Action("Index", "Register")">Register now</a>
             </div>
         </div>
     </div>

@@ -11,15 +11,15 @@
             <div>
                 <h1>
                     <span>👩‍🏫</span>
-                    Quản lý Giảng viên
+                    Manage Lecturers
                 </h1>
-                <p>Thêm, sửa, xóa thông tin giảng viên</p>
+                <p>Add, edit, or delete lecturer information</p>
             </div>
-            <a href="@Url.Action("Dashboard", "Admin")" 
-               class="btn btn-secondary" 
+            <a href="@Url.Action("Dashboard", "Admin")"
+               class="btn btn-secondary"
                style="padding: 10px 20px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;"
                data-partial-url="@Url.Action("Dashboard", "Admin", new { partial = true })">
-                ← Về Dashboard
+                ← Back to Dashboard
             </a>
         </div>
     </div>
@@ -27,10 +27,10 @@
     <div class="management-toolbar">
         <div class="search-container">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên, email...">
+            <input type="text" id="searchInput" placeholder="Search by name, email...">
         </div>
         <button type="button" class="btn btn-primary" onclick="showCreateModal()">
-            ➕ Thêm giảng viên
+            ➕ Add Lecturer
         </button>
     </div>
 
@@ -38,13 +38,13 @@
         <table>
             <thead>
                 <tr>
-                    <th>STT</th>
-                    <th>Mã GV</th>
-                    <th>Họ và tên</th>
+                    <th>No.</th>
+                    <th>Lecturer ID</th>
+                    <th>Full Name</th>
                     <th>Email</th>
-                    <th>SĐT</th>
-                    <th>Khoa</th>
-                    <th>Thao tác</th>
+                    <th>Phone</th>
+                    <th>Department</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="lecturerTableBody">
@@ -61,8 +61,8 @@
                         <td>@lecturer.Phone</td>
                         <td>@(lecturer.Department?.DepartmentName ?? "N/A")</td>
                         <td>
-                            <button type="button" class="btn btn-success" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;" onclick="editLecturer(@lecturer.LecturerID)">✏️ Sửa</button>
-                            <button type="button" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteLecturer(@lecturer.LecturerID)">🗑️ Xóa</button>
+                            <button type="button" class="btn btn-success" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;" onclick="editLecturer(@lecturer.LecturerID)">✏️ Edit</button>
+                            <button type="button" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteLecturer(@lecturer.LecturerID)">🗑️ Delete</button>
                         </td>
                     </tr>
                     index++;
@@ -72,18 +72,18 @@
     </div>
 </div>
 
-<!-- Modal Thêm/Sửa Giảng viên -->
+<!-- Add/Edit Lecturer Modal -->
 <div id="lecturerModal" class="modal" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
-            <h2 id="modalTitle">Thêm Giảng viên</h2>
+            <h2 id="modalTitle">Add Lecturer</h2>
             <button type="button" class="close-btn" onclick="closeModal()">×</button>
         </div>
         <form id="lecturerForm">
             <div class="modal-body">
                 <input type="hidden" id="lecturerId" name="LecturerID" />
                 <div class="form-group">
-                    <label>Họ và tên *</label>
+                    <label>Full Name *</label>
                     <input type="text" id="fullName" name="FullName" required />
                 </div>
                 <div class="form-group">
@@ -91,13 +91,13 @@
                     <input type="email" id="email" name="Email" required />
                 </div>
                 <div class="form-group">
-                    <label>Số điện thoại</label>
+                    <label>Phone</label>
                     <input type="tel" id="phone" name="Phone" />
                 </div>
                 <div class="form-group">
-                    <label>Khoa</label>
+                    <label>Department</label>
                     <select id="departmentId" name="DepartmentID">
-                        <option value="">-- Chọn khoa --</option>
+                        <option value="">-- Select Department --</option>
                         @if (ViewBag.Departments != null)
                         {
                             @foreach (var dept in ViewBag.Departments)
@@ -109,8 +109,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn" onclick="closeModal()" style="background: #6c757d; color: white;">Hủy</button>
-                <button type="submit" class="btn btn-primary">Lưu</button>
+                <button type="button" class="btn" onclick="closeModal()" style="background: #6c757d; color: white;">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save</button>
             </div>
         </form>
     </div>
@@ -129,11 +129,11 @@
 
             if (!modal || !form || !title || !lecturerId) {
                 console.error('Modal elements not found');
-                alert('Có lỗi xảy ra khi mở form!');
+                alert('Error opening form!');
                 return;
             }
 
-            title.textContent = 'Thêm Giảng viên';
+            title.textContent = 'Add Lecturer';
             form.reset();
             lecturerId.value = '';
             modal.style.display = 'block';
@@ -144,22 +144,16 @@
             console.log('editLecturer called with id:', id);
             fetch(`/Admin/EditLecturer/${id}`)
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Edit response:', data);
-                    if (data.success && data.lecturer) {
-                        fillEditForm(data.lecturer);
-                    } else {
-                        alert('❌ ' + (data.message || 'Không tìm thấy giảng viên'));
-                    }
+                    if (data.success && data.lecturer) fillEditForm(data.lecturer);
+                    else alert('❌ ' + (data.message || 'Lecturer not found'));
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi tải thông tin giảng viên: ' + error.message);
+                    alert('Error loading lecturer info: ' + error.message);
                 });
         };
 
@@ -167,14 +161,9 @@
             const modal = document.getElementById('lecturerModal');
             const title = document.getElementById('modalTitle');
 
-            if (!modal || !title) {
-                console.error('Modal elements not found');
-                return;
-            }
+            if (!modal || !title) return;
 
-            title.textContent = 'Sửa Giảng viên';
-
-            // Đặt giá trị cho các field
+            title.textContent = 'Edit Lecturer';
             document.getElementById('lecturerId').value = lecturer.LecturerID || '';
             document.getElementById('fullName').value = lecturer.FullName || '';
             document.getElementById('email').value = lecturer.Email || '';
@@ -185,51 +174,34 @@
         }
 
         window.deleteLecturer = function(id) {
-            console.log('deleteLecturer called with id:', id);
-            if (!confirm('Bạn có chắc chắn muốn xóa giảng viên này?')) {
-                return;
-            }
+            if (!confirm('Are you sure you want to delete this lecturer?')) return;
 
             fetch(`/Admin/DeleteLecturer/${id}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                headers: {'Content-Type': 'application/json','Accept': 'application/json'}
+            })
+            .then(response => {
+                if (!response.ok) return response.text().then(text => {throw new Error(`HTTP ${response.status}: ${text}`);});
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('✅ ' + data.message);
+                    location.reload();
+                } else {
+                    alert('❌ ' + (data.message || 'Error occurred'));
                 }
             })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error(`HTTP ${response.status}: ${text}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Delete response:', data);
-                    if (data.success) {
-                        alert('✅ ' + data.message);
-                        location.reload();
-                    } else {
-                        alert('❌ ' + (data.message || 'Có lỗi xảy ra'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi xóa giảng viên: ' + error.message);
-                });
+            .catch(error => alert('❌ Error deleting lecturer: ' + error.message));
         };
 
         window.closeModal = function() {
             const modal = document.getElementById('lecturerModal');
-            if (modal) {
-                modal.style.display = 'none';
-            }
+            if (modal) modal.style.display = 'none';
         };
 
         function initFormHandlers() {
             const form = document.getElementById('lecturerForm');
-
             if (form && form.dataset.listenerAttached !== 'true') {
                 form.addEventListener('submit', handleFormSubmit);
                 form.dataset.listenerAttached = 'true';
@@ -239,10 +211,8 @@
             if (searchInput && searchInput.dataset.listenerAttached !== 'true') {
                 searchInput.addEventListener('input', function() {
                     const searchTerm = this.value.toLowerCase();
-                    const rows = document.querySelectorAll('#lecturerTableBody tr');
-                    rows.forEach(row => {
-                        const text = row.textContent.toLowerCase();
-                        row.style.display = text.includes(searchTerm) ? '' : 'none';
+                    document.querySelectorAll('#lecturerTableBody tr').forEach(row => {
+                        row.style.display = row.textContent.toLowerCase().includes(searchTerm) ? '' : 'none';
                     });
                 });
                 searchInput.dataset.listenerAttached = 'true';
@@ -250,9 +220,7 @@
 
             window.onclick = function(event) {
                 const modal = document.getElementById('lecturerModal');
-                if (event.target === modal) {
-                    closeModal();
-                }
+                if (event.target === modal) closeModal();
             };
         }
 
@@ -260,26 +228,15 @@
             e.preventDefault();
             e.stopPropagation();
 
-            console.log('Form submit triggered');
-
-            // Lấy giá trị từ các input
             const lecturerId = document.getElementById('lecturerId').value.trim();
             const fullName = document.getElementById('fullName').value.trim();
             const email = document.getElementById('email').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const departmentId = document.getElementById('departmentId').value.trim();
 
-            // Validate bắt buộc
-            if (!fullName) {
-                alert('❌ Vui lòng nhập Họ và tên');
-                return false;
-            }
-            if (!email) {
-                alert('❌ Vui lòng nhập Email');
-                return false;
-            }
+            if (!fullName) { alert('❌ Please enter full name'); return false; }
+            if (!email) { alert('❌ Please enter email'); return false; }
 
-            // Tạo object dữ liệu
             const data = {
                 FullName: fullName,
                 Email: email,
@@ -287,65 +244,37 @@
                 DepartmentID: departmentId ? parseInt(departmentId) : null
             };
 
-            // Xác định URL và thêm LecturerID nếu sửa
             let url = '/Admin/CreateLecturer';
             if (lecturerId && lecturerId !== '0') {
                 url = `/Admin/EditLecturer/${lecturerId}`;
                 data.LecturerID = parseInt(lecturerId);
-                console.log('MODE: EDIT - Lecturer ID:', lecturerId);
-            } else {
-                console.log('MODE: CREATE');
             }
-
-            const jsonBody = JSON.stringify(data);
-            console.log('📤 Sending to:', url);
-            console.log('📦 Data:', data);
-            console.log('📄 JSON:', jsonBody);
 
             fetch(url, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
+                headers: {'Content-Type': 'application/json','Accept': 'application/json'},
                 credentials: 'same-origin',
-                body: jsonBody
+                body: JSON.stringify(data)
             })
-                .then(response => {
-                    console.log('📨 Response status:', response.status);
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            console.error('❌ Error response:', text);
-                            throw new Error(`HTTP ${response.status}: ${text}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(responseData => {
-                    console.log('✅ Response data:', responseData);
-                    if (responseData.success) {
-                        alert('✅ ' + responseData.message);
-                        closeModal();
-                        setTimeout(() => {
-                            location.reload();
-                        }, 500);
-                    } else {
-                        alert('❌ ' + (responseData.message || 'Có lỗi xảy ra'));
-                    }
-                })
-                .catch(error => {
-                    console.error('❌ Fetch error:', error);
-                    alert('❌ Lỗi: ' + error.message);
-                });
+            .then(response => {
+                if (!response.ok) return response.text().then(text => {throw new Error(`HTTP ${response.status}: ${text}`);});
+                return response.json();
+            })
+            .then(responseData => {
+                if (responseData.success) {
+                    alert('✅ ' + responseData.message);
+                    closeModal();
+                    setTimeout(() => location.reload(), 500);
+                } else {
+                    alert('❌ ' + (responseData.message || 'Error occurred'));
+                }
+            })
+            .catch(error => alert('❌ Error: ' + error.message));
 
             return false;
         }
 
-        // Khởi tạo khi DOM sẵn sàng
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initFormHandlers);
-        } else {
-            initFormHandlers();
-        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initFormHandlers);
+        else initFormHandlers();
     })();
 </script>

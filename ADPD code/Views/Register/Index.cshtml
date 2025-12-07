@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Đăng ký";
+    ViewData["Title"] = "Register";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -8,17 +8,17 @@
 <div class="register-page">
     <div class="container">
         <div class="header">
-            <h1>Đăng ký Tài khoản Sinh viên</h1>
-            <p>Hệ thống Quản lý Sinh viên</p>
+            <h1>Student Account Registration</h1>
+            <p>Student Management System</p>
         </div>
 
-        <!-- Form đăng ký - POST đến RegisterController -->
+        <!-- Registration form - POST to RegisterController -->
         <form method="post" asp-controller="Register" asp-action="Register">
             @Html.AntiForgeryToken()
 
             @if (ViewData.ModelState.Any(x => x.Value.Errors.Any()))
             {
-                @* You may want to show field-level errors here if needed *@
+                @* Optionally show field-level errors here *@
             }
 
             @if (!ViewData.ModelState.IsValid)
@@ -29,25 +29,25 @@
             }
 
             <div class="form-group">
-                <label>Mã sinh viên <span class="required">*</span></label>
+                <label>Student ID <span class="required">*</span></label>
                 <input type="text"
                        name="studentId"
-                       placeholder="VD: SV001234"
+                       placeholder="Ex: SV001234"
                        required
                        pattern="^[A-Za-z0-9]+$"
-                       title="Chỉ chấp nhận chữ và số">
+                       title="Only letters and numbers are allowed">
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Họ và tên đệm <span class="required">*</span></label>
+                    <label>First & Middle Name <span class="required">*</span></label>
                     <input type="text"
                            name="firstName"
-                           placeholder="Nguyễn Văn"
+                           placeholder="Nguyen Van"
                            required>
                 </div>
                 <div class="form-group">
-                    <label>Tên <span class="required">*</span></label>
+                    <label>Last Name <span class="required">*</span></label>
                     <input type="text"
                            name="lastName"
                            placeholder="A"
@@ -65,56 +65,56 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Ngày sinh <span class="required">*</span></label>
+                    <label>Date of Birth <span class="required">*</span></label>
                     <input type="date"
                            name="birthDate"
                            required
                            max="@DateTime.Now.AddYears(-16).ToString("yyyy-MM-dd")">
                 </div>
                 <div class="form-group">
-                    <label>Giới tính <span class="required">*</span></label>
+                    <label>Gender <span class="required">*</span></label>
                     <select name="gender" required>
-                        <option value="">Chọn giới tính</option>
-                        <option value="male">Nam</option>
-                        <option value="female">Nữ</option>
+                        <option value="">Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
                     </select>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Số điện thoại <span class="required">*</span></label>
+                <label>Phone Number <span class="required">*</span></label>
                 <input type="tel"
                        name="phone"
                        placeholder="0123456789"
                        required
                        pattern="^[0-9]{10,11}$"
-                       title="Số điện thoại phải có 10-11 số">
+                       title="Phone number must be 10-11 digits">
             </div>
 
             <div class="form-group">
-                <label>Mật khẩu <span class="required">*</span></label>
+                <label>Password <span class="required">*</span></label>
                 <input type="password"
                        name="password"
                        id="password"
-                       placeholder="Tối thiểu 6 ký tự"
+                       placeholder="Minimum 6 characters"
                        required
                        minlength="6">
-                <small>Mật khẩu phải có ít nhất 6 ký tự</small>
+                <small>Password must be at least 6 characters</small>
             </div>
 
             <div class="form-group">
-                <label>Xác nhận mật khẩu <span class="required">*</span></label>
+                <label>Confirm Password <span class="required">*</span></label>
                 <input type="password"
                        name="confirmPassword"
                        id="confirmPassword"
-                       placeholder="Nhập lại mật khẩu"
+                       placeholder="Re-enter password"
                        required>
             </div>
 
-            <button type="submit" class="btn-submit">Đăng ký</button>
+            <button type="submit" class="btn-submit">Register</button>
 
             <div class="login-link">
-                Đã có tài khoản? <a href="@Url.Action("Index", "Login")">Đăng nhập ngay</a>
+                Already have an account? <a href="@Url.Action("Index", "Login")">Login here</a>
             </div>
         </form>
     </div>
@@ -122,14 +122,14 @@
 
 @section Scripts {
     <script>
-        // Kiểm tra mật khẩu khớp trước khi submit
+        // Check password match before submitting
         document.querySelector('form').addEventListener('submit', function(e) {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
             if (password !== confirmPassword) {
                 e.preventDefault();
-                alert('Mật khẩu xác nhận không khớp!');
+                alert('Password confirmation does not match!');
                 return false;
             }
         });

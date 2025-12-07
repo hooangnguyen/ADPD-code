@@ -1,5 +1,6 @@
 using ADPD_code.Data;
 using ADPD_code.Models;
+using ADPD_code.Patterns;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -12,10 +13,13 @@ namespace ADPD_code.Controllers
     public class AdminController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ClassManager _classManager;
 
         public AdminController(ApplicationDbContext context)
         {
             _context = context;
+            _classManager = ClassManager.Instance;
+
         }
 
         // Dashboard - Trang chủ Admin
@@ -76,7 +80,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             // Trả về JSON với danh sách lớp để frontend có thể sử dụng
@@ -89,7 +93,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             try
@@ -97,21 +101,21 @@ namespace ADPD_code.Controllers
                 // Validate dữ liệu
                 if (string.IsNullOrWhiteSpace(request.FullName))
                 {
-                    return Json(new { success = false, message = "Họ và tên không được để trống!" });
+                    return Json(new { success = false, message = "Full name cannot be empty!" });
                 }
                 if (string.IsNullOrWhiteSpace(request.Email))
                 {
-                    return Json(new { success = false, message = "Email không được để trống!" });
+                    return Json(new { success = false, message = "Email cannot be empty!" });
                 }
                 if (string.IsNullOrWhiteSpace(request.DOB))
                 {
-                    return Json(new { success = false, message = "Ngày sinh không được để trống!" });
+                    return Json(new { success = false, message = "Date of birth cannot be empty!" });
                 }
 
                 // Parse ngày sinh
                 if (!DateTime.TryParse(request.DOB, out DateTime dob))
                 {
-                    return Json(new { success = false, message = "Ngày sinh không hợp lệ!" });
+                    return Json(new { success = false, message = "Invalid date of birth!" });
                 }
 
                 // Kiểm tra email đã tồn tại chưa
@@ -119,18 +123,18 @@ namespace ADPD_code.Controllers
                     .FirstOrDefaultAsync(s => s.Email == request.Email);
                 if (existingEmail != null)
                 {
-                    return Json(new { success = false, message = "Email đã tồn tại trong hệ thống!" });
+                    return Json(new { success = false, message = "Email already exists in the system!" });
                 }
 
                 var student = new Student
                 {
                     FullName = request.FullName,
-                    Gender = request.Gender ?? "Nam",
+                    Gender = request.Gender ?? "Male",
                     DOB = dob,
                     Email = request.Email,
                     Phone = request.Phone ?? "",
                     Address = request.Address ?? "",
-                    Status = request.Status ?? "Đang học"
+                    Status = request.Status ?? "Studying"
                 };
 
                 _context.Students.Add(student);
@@ -155,11 +159,11 @@ namespace ADPD_code.Controllers
                     }
                 }
 
-                return Json(new { success = true, message = "Thêm sinh viên thành công!" });
+                return Json(new { success = true, message = "Student created successfully!" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
 
@@ -168,7 +172,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             var student = await _context.Students
@@ -177,7 +181,7 @@ namespace ADPD_code.Controllers
 
             if (student == null)
             {
-                return Json(new { success = false, message = "Không tìm thấy sinh viên" });
+                return Json(new { success = false, message = "Student not found" });
             }
 
             var classId = student.StudentClasses?.FirstOrDefault()?.ClassID;
@@ -203,7 +207,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             try
@@ -211,7 +215,7 @@ namespace ADPD_code.Controllers
                 // Kiểm tra ID hợp lệ
                 if (id <= 0)
                 {
-                    return Json(new { success = false, message = "ID sinh viên không hợp lệ" });
+                    return Json(new { success = false, message = "Invalid student ID" });
                 }
 
                 // Nếu request null, đọc body thủ công
@@ -226,7 +230,7 @@ namespace ADPD_code.Controllers
 
                         if (string.IsNullOrWhiteSpace(body))
                         {
-                            return Json(new { success = false, message = "Request body rỗng. Vui lòng kiểm tra lại dữ liệu gửi lên." });
+                            return Json(new { success = false, message = "Request body is empty. Please check the sent data." });
                         }
 
                         try
@@ -238,35 +242,35 @@ namespace ADPD_code.Controllers
                         }
                         catch (Exception jsonEx)
                         {
-                            return Json(new { success = false, message = $"Lỗi deserialize JSON: {jsonEx.Message}" });
+                            return Json(new { success = false, message = $"JSON deserialize error: {jsonEx.Message}" });
                         }
                     }
                 }
 
                 if (request == null)
                 {
-                    return Json(new { success = false, message = "Không thể đọc dữ liệu. Vui lòng thử lại." });
+                    return Json(new { success = false, message = "Could not read data. Please try again." });
                 }
 
                 // Tìm sinh viên
                 var student = await _context.Students.FindAsync(id);
                 if (student == null)
                 {
-                    return Json(new { success = false, message = "Không tìm thấy sinh viên" });
+                    return Json(new { success = false, message = "Student not found" });
                 }
 
                 // Validate dữ liệu
                 if (string.IsNullOrWhiteSpace(request.FullName))
                 {
-                    return Json(new { success = false, message = "Họ và tên không được để trống!" });
+                    return Json(new { success = false, message = "Full name cannot be empty!" });
                 }
                 if (string.IsNullOrWhiteSpace(request.Email))
                 {
-                    return Json(new { success = false, message = "Email không được để trống!" });
+                    return Json(new { success = false, message = "Email cannot be empty!" });
                 }
                 if (string.IsNullOrWhiteSpace(request.DOB))
                 {
-                    return Json(new { success = false, message = "Ngày sinh không được để trống!" });
+                    return Json(new { success = false, message = "Date of birth cannot be empty!" });
                 }
 
                 // Kiểm tra email đã tồn tại (trừ chính sinh viên này)
@@ -274,13 +278,13 @@ namespace ADPD_code.Controllers
                     .FirstOrDefaultAsync(s => s.Email == request.Email && s.StudentId != id);
                 if (existingEmail != null)
                 {
-                    return Json(new { success = false, message = "Email đã tồn tại trong hệ thống!" });
+                    return Json(new { success = false, message = "Email already exists in the system!" });
                 }
 
                 // Parse ngày sinh
                 if (!DateTime.TryParse(request.DOB, out DateTime dob))
                 {
-                    return Json(new { success = false, message = "Ngày sinh không hợp lệ!" });
+                    return Json(new { success = false, message = "Invalid date of birth!" });
                 }
 
                 // Cập nhật thông tin sinh viên
@@ -318,11 +322,11 @@ namespace ADPD_code.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                return Json(new { success = true, message = "Cập nhật sinh viên thành công!" });
+                return Json(new { success = true, message = "Student updated successfully!" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
 
@@ -331,7 +335,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             var student = await _context.Students
@@ -343,7 +347,7 @@ namespace ADPD_code.Controllers
 
             if (student == null)
             {
-                return Json(new { success = false, message = "Không tìm thấy sinh viên" });
+                return Json(new { success = false, message = "Student not found" });
             }
 
             try
@@ -366,17 +370,17 @@ namespace ADPD_code.Controllers
                 _context.Students.Remove(student);
                 await _context.SaveChangesAsync();
                 
-                return Json(new { success = true, message = "Xóa sinh viên thành công!" });
+                return Json(new { success = true, message = "Student deleted successfully!" });
             }
             catch (DbUpdateException dbEx)
             {
                 // Lấy inner exception để có thông tin chi tiết hơn
                 var innerEx = dbEx.InnerException?.Message ?? dbEx.Message;
-                return Json(new { success = false, message = $"Lỗi database: {innerEx}" });
+                return Json(new { success = false, message = $"Database error: {innerEx}" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
 
@@ -404,7 +408,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             try
@@ -412,11 +416,11 @@ namespace ADPD_code.Controllers
                 // Validate dữ liệu
                 if (string.IsNullOrWhiteSpace(request.FullName))
                 {
-                    return Json(new { success = false, message = "Họ và tên không được để trống!" });
+                    return Json(new { success = false, message = "Full name cannot be empty!" });
                 }
                 if (string.IsNullOrWhiteSpace(request.Email))
                 {
-                    return Json(new { success = false, message = "Email không được để trống!" });
+                    return Json(new { success = false, message = "Email cannot be empty!" });
                 }
 
                 // Kiểm tra email đã tồn tại chưa
@@ -424,7 +428,7 @@ namespace ADPD_code.Controllers
                     .FirstOrDefaultAsync(l => l.Email == request.Email);
                 if (existingEmail != null)
                 {
-                    return Json(new { success = false, message = "Email đã tồn tại trong hệ thống!" });
+                    return Json(new { success = false, message = "Email already exists in the system!" });
                 }
 
                 var lecturer = new Lecturer
@@ -438,11 +442,11 @@ namespace ADPD_code.Controllers
                 _context.Lecturers.Add(lecturer);
                 await _context.SaveChangesAsync();
 
-                return Json(new { success = true, message = "Thêm giảng viên thành công!" });
+                return Json(new { success = true, message = "Lecturer created successfully!" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
 
@@ -451,7 +455,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             var lecturer = await _context.Lecturers
@@ -460,7 +464,7 @@ namespace ADPD_code.Controllers
 
             if (lecturer == null)
             {
-                return Json(new { success = false, message = "Không tìm thấy giảng viên" });
+                return Json(new { success = false, message = "Lecturer not found" });
             }
 
             return Json(new { 
@@ -480,7 +484,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             try
@@ -488,7 +492,7 @@ namespace ADPD_code.Controllers
                 // Kiểm tra ID hợp lệ
                 if (id <= 0)
                 {
-                    return Json(new { success = false, message = "ID giảng viên không hợp lệ" });
+                    return Json(new { success = false, message = "Invalid lecturer ID" });
                 }
 
                 // Nếu request null, đọc body thủ công
@@ -503,7 +507,7 @@ namespace ADPD_code.Controllers
 
                         if (string.IsNullOrWhiteSpace(body))
                         {
-                            return Json(new { success = false, message = "Request body rỗng. Vui lòng kiểm tra lại dữ liệu gửi lên." });
+                            return Json(new { success = false, message = "Request body is empty. Please check the sent data." });
                         }
 
                         try
@@ -515,31 +519,31 @@ namespace ADPD_code.Controllers
                         }
                         catch (Exception jsonEx)
                         {
-                            return Json(new { success = false, message = $"Lỗi deserialize JSON: {jsonEx.Message}" });
+                            return Json(new { success = false, message = $"JSON deserialize error: {jsonEx.Message}" });
                         }
                     }
                 }
 
                 if (request == null)
                 {
-                    return Json(new { success = false, message = "Không thể đọc dữ liệu. Vui lòng thử lại." });
+                    return Json(new { success = false, message = "Could not read data. Please try again." });
                 }
 
                 // Tìm giảng viên
                 var lecturer = await _context.Lecturers.FindAsync(id);
                 if (lecturer == null)
                 {
-                    return Json(new { success = false, message = "Không tìm thấy giảng viên" });
+                    return Json(new { success = false, message = "Lecturer not found" });
                 }
 
                 // Validate dữ liệu
                 if (string.IsNullOrWhiteSpace(request.FullName))
                 {
-                    return Json(new { success = false, message = "Họ và tên không được để trống!" });
+                    return Json(new { success = false, message = "Full name cannot be empty!" });
                 }
                 if (string.IsNullOrWhiteSpace(request.Email))
                 {
-                    return Json(new { success = false, message = "Email không được để trống!" });
+                    return Json(new { success = false, message = "Email cannot be empty!" });
                 }
 
                 // Kiểm tra email đã tồn tại (trừ chính giảng viên này)
@@ -547,7 +551,7 @@ namespace ADPD_code.Controllers
                     .FirstOrDefaultAsync(l => l.Email == request.Email && l.LecturerID != id);
                 if (existingEmail != null)
                 {
-                    return Json(new { success = false, message = "Email đã tồn tại trong hệ thống!" });
+                    return Json(new { success = false, message = "Email already exists in the system!" });
                 }
 
                 // Cập nhật thông tin giảng viên
@@ -559,11 +563,11 @@ namespace ADPD_code.Controllers
                 _context.Update(lecturer);
                 await _context.SaveChangesAsync();
 
-                return Json(new { success = true, message = "Cập nhật giảng viên thành công!" });
+                return Json(new { success = true, message = "Lecturer updated successfully!" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
         [HttpPost]
@@ -571,7 +575,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             var lecturer = await _context.Lecturers
@@ -581,7 +585,7 @@ namespace ADPD_code.Controllers
 
             if (lecturer == null)
             {
-                return Json(new { success = false, message = "Không tìm thấy giảng viên" });
+                return Json(new { success = false, message = "Lecturer not found" });
             }
 
             try
@@ -603,11 +607,11 @@ namespace ADPD_code.Controllers
             catch (DbUpdateException dbEx)
             {
                 var innerEx = dbEx.InnerException?.Message ?? dbEx.Message;
-                return Json(new { success = false, message = $"Lỗi database: {innerEx}" });
+                return Json(new { success = false, message = $"Database error: {innerEx}" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
 
@@ -619,6 +623,9 @@ namespace ADPD_code.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
+            // ✅ Log READ operation qua Singleton
+            _classManager.LogRead();
+
             var classes = await _context.Classes
                 .Include(c => c.Major)
                 .Include(c => c.StudentClasses)
@@ -626,6 +633,11 @@ namespace ADPD_code.Controllers
                 .ToListAsync();
 
             ViewBag.Majors = await _context.Majors.ToListAsync();
+
+            // ✅ Truyền stats của Singleton vào ViewBag
+            ViewBag.ClassManagerStats = _classManager.GetStats();
+            ViewBag.SingletonHashCode = _classManager.InstanceHashCode;
+
             ViewData["IsPartial"] = partial;
 
             return partial ? PartialView(classes) : View(classes);
@@ -636,7 +648,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
             try
             {
@@ -673,11 +685,14 @@ namespace ADPD_code.Controllers
                 _context.Classes.Add(classModel);
                 await _context.SaveChangesAsync();
 
+                // ✅ Log CREATE operation qua Singleton
+                _classManager.LogCreate(classModel.ClassName);
+
                 return Json(new { success = true, message = "Thêm lớp học thành công!" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
 
@@ -686,8 +701,11 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
+
+            // ✅ Log READ operation qua Singleton (với ID cụ thể)
+            _classManager.LogRead(id);
 
             var classModel = await _context.Classes
                 .Include(c => c.Major)
@@ -717,7 +735,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             try
@@ -763,11 +781,14 @@ namespace ADPD_code.Controllers
                 _context.Update(classModel);
                 await _context.SaveChangesAsync();
 
+                // ✅ Log UPDATE operation qua Singleton
+                _classManager.LogUpdate(classModel.ClassID, classModel.ClassName);
+
                 return Json(new { success = true, message = "Cập nhật lớp học thành công!" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
 
@@ -776,7 +797,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             var classModel = await _context.Classes
@@ -791,23 +812,28 @@ namespace ADPD_code.Controllers
 
             try
             {
+                // ✅ Lưu tên lớp trước khi xóa (để log)
+                string className = classModel.ClassName;
+
                 // Xóa lớp học (các bản ghi liên quan sẽ tự động xóa do cascade)
                 _context.Classes.Remove(classModel);
                 await _context.SaveChangesAsync();
-                
+
+                // ✅ Log DELETE operation qua Singleton
+                _classManager.LogDelete(id, className);
+
                 return Json(new { success = true, message = "Xóa lớp học thành công!" });
             }
             catch (DbUpdateException dbEx)
             {
                 var innerEx = dbEx.InnerException?.Message ?? dbEx.Message;
-                return Json(new { success = false, message = $"Lỗi database: {innerEx}" });
+                return Json(new { success = false, message = $"Database error: {innerEx}" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
-
         // ========== QUẢN LÝ MÔN HỌC ==========
         public async Task<IActionResult> Courses(bool partial = false)
         {
@@ -832,7 +858,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             try
@@ -861,7 +887,7 @@ namespace ADPD_code.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
 
@@ -870,7 +896,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             var course = await _context.Courses.FindAsync(id);
@@ -899,7 +925,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             if (id != request.CourseID)
@@ -927,7 +953,7 @@ namespace ADPD_code.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
 
@@ -936,7 +962,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             var course = await _context.Courses.FindAsync(id);
@@ -954,11 +980,11 @@ namespace ADPD_code.Controllers
             catch (DbUpdateException dbEx)
             {
                 var innerEx = dbEx.InnerException?.Message ?? dbEx.Message;
-                return Json(new { success = false, message = $"Lỗi database: {innerEx}" });
+                return Json(new { success = false, message = $"Database error: {innerEx}" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
 
@@ -988,7 +1014,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             try
@@ -1045,7 +1071,7 @@ namespace ADPD_code.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
 
@@ -1054,7 +1080,7 @@ namespace ADPD_code.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
-                return Json(new { success = false, message = "Không có quyền truy cập" });
+                return Json(new { success = false, message = "Unauthorized access" });
             }
 
             var account = await _context.Accounts.FindAsync(id);
@@ -1071,7 +1097,7 @@ namespace ADPD_code.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
 

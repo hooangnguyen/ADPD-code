@@ -2,24 +2,54 @@
 @{
     var isPartial = ViewData["IsPartial"] as bool? ?? false;
     Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
+    var stats = ViewBag.ClassManagerStats as ADPD_code.Patterns.ClassManagerStats;
 }
 <link href="~/css/AdminDashboard.css?v=1.0" rel="stylesheet" asp-append-version="true" />
 
 <div class="management-wrapper">
+    <!-- ⭐ SINGLETON PATTERN BANNER -->
+    <div class="singleton-banner">
+        <div class="singleton-header">
+            <span class="singleton-icon">🔷</span>
+            <div>
+                <h3>Singleton Pattern Demo</h3>
+                <p>ClassManager - Centralized management of all class operations</p>
+            </div>
+        </div>
+        <div class="singleton-stats">
+            <div class="stat-item">
+                <div class="stat-label">Total Operations</div>
+                <div class="stat-value">@(stats?.TotalOperations ?? 0)</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Instance Hash</div>
+                <div class="stat-value">@ViewBag.SingletonHashCode</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Uptime</div>
+                <div class="stat-value">@(stats != null ? $"{stats.Uptime.TotalMinutes:F1}m" : "N/A")</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Status</div>
+                <div class="stat-value status-active">@(stats?.IsActive == true ? "Active" : "Inactive")</div>
+            </div>
+        </div>
+    </div>
+
     <div class="management-header">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
             <div>
                 <h1>
                     <span>🏫</span>
-                    Quản lý Lớp học
+                    Class Management
                 </h1>
-                <p>Thêm, sửa, xóa thông tin lớp học</p>
+                <p>Add, edit, delete class information</p>
             </div>
-            <a href="@Url.Action("Dashboard", "Admin")" 
-               class="btn btn-secondary" 
+            <a href="@Url.Action("Dashboard", "Admin")"
+               class="btn btn-secondary"
                style="padding: 10px 20px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;"
                data-partial-url="@Url.Action("Dashboard", "Admin", new { partial = true })">
-                ← Về Dashboard
+                ← Back to Dashboard
             </a>
         </div>
     </div>
@@ -27,10 +57,10 @@
     <div class="management-toolbar">
         <div class="search-container">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên lớp...">
+            <input type="text" id="searchInput" placeholder="Search by class name...">
         </div>
         <button type="button" class="btn btn-primary" onclick="showCreateModal()">
-            ➕ Thêm lớp học
+            ➕ Add Class
         </button>
     </div>
 
@@ -38,13 +68,13 @@
         <table>
             <thead>
                 <tr>
-                    <th>STT</th>
-                    <th>Mã lớp</th>
-                    <th>Tên lớp</th>
-                    <th>Ngành</th>
-                    <th>Thời gian học</th>
-                    <th>Số sinh viên</th>
-                    <th>Thao tác</th>
+                    <th>No.</th>
+                    <th>Class ID</th>
+                    <th>Class Name</th>
+                    <th>Major</th>
+                    <th>Study Date</th>
+                    <th>Students</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="classTableBody">
@@ -61,8 +91,8 @@
                         <td>@classModel.StudyTime.ToString("dd/MM/yyyy")</td>
                         <td>@(classModel.StudentClasses?.Count ?? 0)</td>
                         <td>
-                            <button type="button" class="btn btn-success" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;" onclick="editClass(@classModel.ClassID)">✏️ Sửa</button>
-                            <button type="button" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteClass(@classModel.ClassID)">🗑️ Xóa</button>
+                            <button type="button" class="btn btn-success" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;" onclick="editClass(@classModel.ClassID)">✏️ Edit</button>
+                            <button type="button" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteClass(@classModel.ClassID)">🗑️ Delete</button>
                         </td>
                     </tr>
                     index++;
@@ -70,26 +100,49 @@
             </tbody>
         </table>
     </div>
+
+    <!-- ⭐ SINGLETON PATTERN EXPLANATION PANEL -->
+    <div class="pattern-explanation">
+        <h3>📚 About Singleton Pattern</h3>
+        <div class="explanation-content">
+            <div class="explanation-item">
+                <strong>✅ Single Instance Guarantee:</strong>
+                <p>ClassManager has only one instance across the application (Hash: @ViewBag.SingletonHashCode)</p>
+            </div>
+            <div class="explanation-item">
+                <strong>✅ Centralized Management:</strong>
+                <p>All Create, Read, Update, Delete operations are handled through ClassManager</p>
+            </div>
+            <div class="explanation-item">
+                <strong>✅ Automatic Logging:</strong>
+                <p>Each operation is logged and counted (Total: @(stats?.TotalOperations ?? 0) operations)</p>
+            </div>
+            <div class="explanation-item">
+                <strong>✅ Thread-safe:</strong>
+                <p>Uses double-check locking to ensure safety in multi-threaded environments</p>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Modal Thêm/Sửa Lớp học -->
+<!-- Modal Add/Edit Class -->
 <div id="classModal" class="modal" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
-            <h2 id="modalTitle">Thêm Lớp học</h2>
+            <h2 id="modalTitle">Add Class</h2>
             <button type="button" class="close-btn" onclick="closeModal()">×</button>
         </div>
         <form id="classForm">
             <div class="modal-body">
                 <input type="hidden" id="classId" name="ClassID" />
                 <div class="form-group">
-                    <label>Tên lớp *</label>
+                    <label>Class Name *</label>
                     <input type="text" id="className" name="ClassName" required />
                 </div>
                 <div class="form-group">
-                    <label>Ngành *</label>
+                    <label>Major *</label>
                     <select id="majorId" name="MajorID" required>
-                        <option value="">-- Chọn ngành --</option>
+                        <option value="">-- Select Major --</option>
                         @if (ViewBag.Majors != null)
                         {
                             @foreach (var major in ViewBag.Majors)
@@ -100,24 +153,151 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Thời gian học *</label>
+                    <label>Study Date *</label>
                     <input type="date" id="studyTime" name="StudyTime" required />
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn" onclick="closeModal()" style="background: #6c757d; color: white;">Hủy</button>
-                <button type="submit" class="btn btn-primary">Lưu</button>
+                <button type="button" class="btn" onclick="closeModal()" style="background: #6c757d; color: white;">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save</button>
             </div>
         </form>
     </div>
 </div>
 
+<style>
+    /* ⭐ SINGLETON BANNER STYLES */
+    .singleton-banner {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px 30px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .singleton-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .singleton-icon {
+        font-size: 48px;
+        line-height: 1;
+    }
+
+    .singleton-header h3 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+    }
+
+    .singleton-header p {
+        margin: 5px 0 0 0;
+        opacity: 0.9;
+        font-size: 14px;
+    }
+
+    .singleton-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        opacity: 0.8;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        font-family: 'Courier New', monospace;
+    }
+
+        .stat-value.status-active {
+            color: #4ade80;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+        }
+
+    /* ⭐ PATTERN EXPLANATION STYLES */
+    .pattern-explanation {
+        background: #f8f9fa;
+        border: 2px solid #667eea;
+        border-radius: 12px;
+        padding: 25px;
+        margin-top: 30px;
+    }
+
+        .pattern-explanation h3 {
+            color: #667eea;
+            margin: 0 0 20px 0;
+            font-size: 20px;
+        }
+
+    .explanation-content {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .explanation-item {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+
+        .explanation-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .explanation-item p {
+            margin: 0;
+            color: #666;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .singleton-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .explanation-content {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
 <script>
     (function() {
         'use strict';
 
+        console.log('%c🔷 Singleton Pattern Active', 'color: #667eea; font-size: 16px; font-weight: bold;');
+        console.log('ClassManager Instance Hash:', '@ViewBag.SingletonHashCode');
+        console.log('Total Operations:', @(stats?.TotalOperations ?? 0));
+        console.log('Uptime:', '@(stats != null ? $"{stats.Uptime.TotalMinutes:F1}" : "0")' + ' minutes');
+
         window.showCreateModal = function() {
-            console.log('showCreateModal called');
+            console.log('🔷 Singleton: showCreateModal called');
             const modal = document.getElementById('classModal');
             const form = document.getElementById('classForm');
             const title = document.getElementById('modalTitle');
@@ -125,11 +305,11 @@
 
             if (!modal || !form || !title || !classId) {
                 console.error('Modal elements not found');
-                alert('Có lỗi xảy ra khi mở form!');
+                alert('Error opening form!');
                 return;
             }
 
-            title.textContent = 'Thêm Lớp học';
+            title.textContent = 'Add Class';
             form.reset();
             classId.value = '';
             modal.style.display = 'block';
@@ -137,40 +317,27 @@
         };
 
         window.editClass = function(id) {
-            console.log('editClass called with id:', id);
+            console.log('🔷 Singleton: editClass called with id:', id);
             fetch(`/Admin/EditClass/${id}`)
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Edit response:', data);
-                    if (data.success && data.classModel) {
-                        fillEditForm(data.classModel);
-                    } else {
-                        alert('❌ ' + (data.message || 'Không tìm thấy lớp học'));
-                    }
+                    console.log('🔷 Singleton: Edit response:', data);
+                    if (data.success && data.classModel) fillEditForm(data.classModel);
+                    else alert('❌ ' + (data.message || 'Class not found'));
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi tải thông tin lớp học: ' + error.message);
-                });
+                .catch(error => { console.error('Error:', error); alert('Error loading class info: ' + error.message); });
         };
 
         function fillEditForm(classModel) {
             const modal = document.getElementById('classModal');
             const title = document.getElementById('modalTitle');
 
-            if (!modal || !title) {
-                console.error('Modal elements not found');
-                return;
-            }
+            if (!modal || !title) return;
 
-            title.textContent = 'Sửa Lớp học';
-
-            // Đặt giá trị cho các field
+            title.textContent = 'Edit Class';
             document.getElementById('classId').value = classModel.ClassID || '';
             document.getElementById('className').value = classModel.ClassName || '';
             document.getElementById('majorId').value = classModel.MajorID || '';
@@ -180,46 +347,18 @@
         }
 
         window.deleteClass = function(id) {
-            console.log('deleteClass called with id:', id);
-            if (!confirm('Bạn có chắc chắn muốn xóa lớp học này?')) {
-                return;
-            }
+            console.log('🔷 Singleton: deleteClass called with id:', id);
+            if (!confirm('Are you sure you want to delete this class?')) return;
 
-            fetch(`/Admin/DeleteClass/${id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error(`HTTP ${response.status}: ${text}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Delete response:', data);
-                    if (data.success) {
-                        alert('✅ ' + data.message);
-                        location.reload();
-                    } else {
-                        alert('❌ ' + (data.message || 'Có lỗi xảy ra'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi xóa lớp học: ' + error.message);
-                });
+            fetch(`/Admin/DeleteClass/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' } })
+                .then(response => { if (!response.ok) return response.text().then(text => { throw new Error(`HTTP ${response.status}: ${text}`); }); return response.json(); })
+                .then(data => { if (data.success) { alert('✅ ' + data.message); location.reload(); } else alert('❌ ' + (data.message || 'Error occurred')); })
+                .catch(error => { console.error('Error:', error); alert('Error deleting class: ' + error.message); });
         };
 
         window.closeModal = function() {
             const modal = document.getElementById('classModal');
-            if (modal) {
-                modal.style.display = 'none';
-            }
+            if (modal) modal.style.display = 'none';
         };
 
         function initFormHandlers() {
@@ -234,10 +373,8 @@
             if (searchInput && searchInput.dataset.listenerAttached !== 'true') {
                 searchInput.addEventListener('input', function() {
                     const searchTerm = this.value.toLowerCase();
-                    const rows = document.querySelectorAll('#classTableBody tr');
-                    rows.forEach(row => {
-                        const text = row.textContent.toLowerCase();
-                        row.style.display = text.includes(searchTerm) ? '' : 'none';
+                    document.querySelectorAll('#classTableBody tr').forEach(row => {
+                        row.style.display = row.textContent.toLowerCase().includes(searchTerm) ? '' : 'none';
                     });
                 });
                 searchInput.dataset.listenerAttached = 'true';
@@ -245,9 +382,7 @@
 
             window.onclick = function(event) {
                 const modal = document.getElementById('classModal');
-                if (event.target === modal) {
-                    closeModal();
-                }
+                if (event.target === modal) closeModal();
             };
         }
 
@@ -255,96 +390,35 @@
             e.preventDefault();
             e.stopPropagation();
 
-            console.log('Form submit triggered');
+            console.log('🔷 Singleton: Form submit triggered');
 
-            // Lấy giá trị từ các input
             const classId = document.getElementById('classId').value.trim();
             const className = document.getElementById('className').value.trim();
             const majorId = document.getElementById('majorId').value.trim();
             const studyTime = document.getElementById('studyTime').value.trim();
 
-            // Validate bắt buộc
-            if (!className) {
-                alert('❌ Vui lòng nhập Tên lớp');
-                return false;
-            }
-            if (!majorId) {
-                alert('❌ Vui lòng chọn Ngành');
-                return false;
-            }
-            if (!studyTime) {
-                alert('❌ Vui lòng chọn Thời gian học');
-                return false;
-            }
+            if (!className) { alert('❌ Please enter Class Name'); return false; }
+            if (!majorId) { alert('❌ Please select Major'); return false; }
+            if (!studyTime) { alert('❌ Please select Study Date'); return false; }
 
-            // Tạo object dữ liệu
-            const data = {
-                ClassName: className,
-                MajorID: parseInt(majorId),
-                StudyTime: studyTime
-            };
-
-            // Xác định URL - QUAN TRỌNG!
+            const data = { ClassName: className, MajorID: parseInt(majorId), StudyTime: studyTime };
             let url = '/Admin/CreateClass';
 
-            // Nếu classId không trống → sửa
             if (classId && classId !== '0' && classId !== '') {
                 url = `/Admin/EditClass/${classId}`;
                 data.ClassID = parseInt(classId);
-                console.log('🔧 MODE: EDIT - Class ID:', classId);
-            } else {
-                console.log('➕ MODE: CREATE');
-            }
+                console.log('🔷 Singleton MODE: EDIT - Class ID:', classId);
+            } else console.log('🔷 Singleton MODE: CREATE');
 
-            const jsonBody = JSON.stringify(data);
-            console.log('📤 Sending to:', url);
-            console.log('📦 Data:', data);
-            console.log('📄 JSON:', jsonBody);
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                credentials: 'same-origin',
-                body: jsonBody
-            })
-                .then(response => {
-                    console.log('📨 Response status:', response.status);
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            console.error('❌ Error response:', text);
-                            throw new Error(`HTTP ${response.status}: ${text}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(responseData => {
-                    console.log('✅ Response data:', responseData);
-                    if (responseData.success) {
-                        alert('✅ ' + responseData.message);
-                        closeModal();
-                        setTimeout(() => {
-                            location.reload();
-                        }, 500);
-                    } else {
-                        alert('❌ ' + (responseData.message || 'Có lỗi xảy ra'));
-                    }
-                })
-                .catch(error => {
-                    console.error('❌ Fetch error:', error);
-                    alert('❌ Lỗi: ' + error.message);
-                });
+            fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, credentials: 'same-origin', body: JSON.stringify(data) })
+                .then(response => { if (!response.ok) return response.text().then(text => { throw new Error(`HTTP ${response.status}: ${text}`); }); return response.json(); })
+                .then(responseData => { if (responseData.success) { alert('✅ ' + responseData.message); closeModal(); setTimeout(() => location.reload(), 500); } else alert('❌ ' + (responseData.message || 'Error occurred')); })
+                .catch(error => { console.error('❌ Fetch error:', error); alert('❌ Error: ' + error.message); });
 
             return false;
         }
 
-        // Khởi tạo khi DOM sẵn sàng
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initFormHandlers);
-        } else {
-            initFormHandlers();
-        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initFormHandlers);
+        else initFormHandlers();
     })();
 </script>

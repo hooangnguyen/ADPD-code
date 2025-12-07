@@ -181,7 +181,7 @@ namespace ADPD_code.Patterns
         }
 
         #endregion
-
+                
         #region Logging
 
         private void LogInfo(string message)

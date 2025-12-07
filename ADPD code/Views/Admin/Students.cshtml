@@ -11,15 +11,15 @@
             <div>
                 <h1>
                     <span>🎓</span>
-                    Quản lý Sinh viên
+                    Student Management
                 </h1>
-                <p>Thêm, sửa, xóa thông tin sinh viên</p>
+                <p>Add, edit, or delete student information</p>
             </div>
-            <a href="@Url.Action("Dashboard", "Admin")" 
-               class="btn btn-secondary" 
+            <a href="@Url.Action("Dashboard", "Admin")"
+               class="btn btn-secondary"
                style="padding: 10px 20px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;"
                data-partial-url="@Url.Action("Dashboard", "Admin", new { partial = true })">
-                ← Về Dashboard
+                ← Back to Dashboard
             </a>
         </div>
     </div>
@@ -27,10 +27,10 @@
     <div class="management-toolbar">
         <div class="search-container">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên, MSSV, email...">
+            <input type="text" id="searchInput" placeholder="Search by name, student ID, email...">
         </div>
         <button type="button" class="btn btn-primary" onclick="showCreateModal()">
-            ➕ Thêm sinh viên
+            ➕ Add Student
         </button>
     </div>
 
@@ -38,14 +38,14 @@
         <table>
             <thead>
                 <tr>
-                    <th>STT</th>
-                    <th>MSSV</th>
-                    <th>Họ và tên</th>
+                    <th>No.</th>
+                    <th>Student ID</th>
+                    <th>Full Name</th>
                     <th>Email</th>
-                    <th>SĐT</th>
-                    <th>Lớp</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
+                    <th>Phone</th>
+                    <th>Class</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="studentTableBody">
@@ -64,12 +64,12 @@
                         <td>@className</td>
                         <td>
                             <span class="status-badge @(student.Status == "Đang học" ? "status-active" : "status-inactive")">
-                                @student.Status
+                                @(student.Status == "Đang học" ? "Active" : "Inactive")
                             </span>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-success" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;" onclick="editStudent(@student.StudentId)">✏️ Sửa</button>
-                            <button type="button" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteStudent(@student.StudentId)">🗑️ Xóa</button>
+                            <button type="button" class="btn btn-success" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;" onclick="editStudent(@student.StudentId)">✏️ Edit</button>
+                            <button type="button" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteStudent(@student.StudentId)">🗑️ Delete</button>
                         </td>
                     </tr>
                     index++;
@@ -79,11 +79,11 @@
     </div>
 </div>
 
-<!-- Modal Thêm/Sửa Sinh viên Compact -->
+<!-- Modal Add/Edit Student Compact -->
 <div id="studentModal" class="modal" style="display: none;">
     <div class="modal-content compact-modal">
         <div class="modal-header">
-            <h2 id="modalTitle">Sửa Sinh viên</h2>
+            <h2 id="modalTitle">Edit Student</h2>
             <button type="button" class="close-btn" onclick="closeModal()">×</button>
         </div>
         <form id="studentForm">
@@ -91,19 +91,19 @@
                 <input type="hidden" id="studentId" name="StudentId" />
 
                 <div class="form-group">
-                    <label>Họ và tên *</label>
+                    <label>Full Name *</label>
                     <input type="text" id="fullName" name="FullName" required />
                 </div>
                 <div class="form-group">
-                    <label>Giới tính *</label>
+                    <label>Gender *</label>
                     <select id="gender" name="Gender" required>
-                        <option value="">-- Chọn --</option>
-                        <option value="Nam">Nam</option>
-                        <option value="Nữ">Nữ</option>
+                        <option value="">-- Select --</option>
+                        <option value="Nam">Male</option>
+                        <option value="Nữ">Female</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Ngày sinh *</label>
+                    <label>Date of Birth *</label>
                     <input type="date" id="dob" name="DOB" required />
                 </div>
                 <div class="form-group">
@@ -111,24 +111,24 @@
                     <input type="email" id="email" name="Email" required />
                 </div>
                 <div class="form-group">
-                    <label>Số điện thoại *</label>
+                    <label>Phone Number *</label>
                     <input type="tel" id="phone" name="Phone" required />
                 </div>
                 <div class="form-group">
-                    <label>Địa chỉ *</label>
+                    <label>Address *</label>
                     <input type="text" id="address" name="Address" required />
                 </div>
                 <div class="form-group">
-                    <label>Trạng thái *</label>
+                    <label>Status *</label>
                     <select id="status" name="Status" required>
-                        <option value="Đang học">Đang học</option>
-                        <option value="Nghỉ học">Nghỉ học</option>
+                        <option value="Đang học">Active</option>
+                        <option value="Nghỉ học">Inactive</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Lớp</label>
+                    <label>Class</label>
                     <select id="classId" name="ClassID">
-                        <option value="">-- Chọn lớp --</option>
+                        <option value="">-- Select Class --</option>
                         @if (ViewBag.Classes != null)
                         {
                             @foreach (var cls in ViewBag.Classes)
@@ -140,25 +140,25 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary compact-btn" onclick="closeModal()">Hủy</button>
-                <button type="submit" class="btn btn-primary compact-btn">Lưu</button>
+                <button type="button" class="btn btn-secondary compact-btn" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary compact-btn">Save</button>
             </div>
         </form>
     </div>
 </div>
 
 <style>
-    /* Modal thu nhỏ */
+    /* Compact modal */
     .compact-modal {
-        width: 500px; /* giảm rộng */
+        width: 500px;
         max-width: 95%;
         padding: 12px;
         font-size: 13px;
-        overflow-y: auto; /* scroll khi dài */
-        max-height: 90vh; /* cao tối đa 90% viewport */
+        overflow-y: auto;
+        max-height: 90vh;
     }
 
-    /* Chia 2 cột */
+    /* Two-column form */
     .grid-form {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -183,7 +183,6 @@
                 box-sizing: border-box;
             }
 
-    /* Footer */
     .modal-footer {
         display: flex;
         justify-content: flex-end;
@@ -195,267 +194,7 @@
         padding: 4px 8px;
         font-size: 12px;
     }
-</style>
 
-<script>
-    (function() {
-        'use strict';
-
-        window.showCreateModal = function() {
-            console.log('showCreateModal called');
-            const modal = document.getElementById('studentModal');
-            const form = document.getElementById('studentForm');
-            const title = document.getElementById('modalTitle');
-            const studentId = document.getElementById('studentId');
-
-            if (!modal || !form || !title || !studentId) {
-                console.error('Modal elements not found');
-                alert('Có lỗi xảy ra khi mở form!');
-                return;
-            }
-
-            title.textContent = 'Thêm Sinh viên';
-            form.reset();
-            studentId.value = '';
-            modal.style.display = 'block';
-            setTimeout(initFormHandlers, 100);
-        };
-
-        window.editStudent = function(id) {
-            console.log('editStudent called with id:', id);
-            fetch(`/Admin/EditStudent/${id}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Edit response:', data);
-                    if (data.success && data.student) {
-                        fillEditForm(data.student);
-                    } else {
-                        alert('❌ ' + (data.message || 'Không tìm thấy sinh viên'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi tải thông tin sinh viên: ' + error.message);
-                });
-        };
-
-        function fillEditForm(student) {
-            const modal = document.getElementById('studentModal');
-            const title = document.getElementById('modalTitle');
-
-            if (!modal || !title) {
-                console.error('Modal elements not found');
-                return;
-            }
-
-            title.textContent = 'Sửa Sinh viên';
-
-            // Đặt giá trị cho các field
-            document.getElementById('studentId').value = student.StudentId || '';
-            document.getElementById('fullName').value = student.FullName || '';
-            document.getElementById('gender').value = student.Gender || 'Nam';
-            document.getElementById('dob').value = student.DOB || '';
-            document.getElementById('email').value = student.Email || '';
-            document.getElementById('phone').value = student.Phone || '';
-            document.getElementById('address').value = student.Address || '';
-            document.getElementById('status').value = student.Status || 'Đang học';
-            document.getElementById('classId').value = student.ClassID || '';
-
-            modal.style.display = 'block';
-        }
-
-        window.deleteStudent = function(id) {
-            console.log('deleteStudent called with id:', id);
-            if (!confirm('Bạn có chắc chắn muốn xóa sinh viên này?')) {
-                return;
-            }
-
-            fetch(`/Admin/DeleteStudent/${id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error(`HTTP ${response.status}: ${text}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Delete response:', data);
-                    if (data.success) {
-                        alert('✅ ' + data.message);
-                        location.reload();
-                    } else {
-                        alert('❌ ' + (data.message || 'Có lỗi xảy ra'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi xóa sinh viên: ' + error.message);
-                });
-        };
-
-        window.closeModal = function() {
-            const modal = document.getElementById('studentModal');
-            if (modal) {
-                modal.style.display = 'none';
-            }
-        };
-
-        function initFormHandlers() {
-            const form = document.getElementById('studentForm');
-
-            if (form && form.dataset.listenerAttached !== 'true') {
-                form.addEventListener('submit', handleFormSubmit);
-                form.dataset.listenerAttached = 'true';
-            }
-
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput && searchInput.dataset.listenerAttached !== 'true') {
-                searchInput.addEventListener('input', function() {
-                    const searchTerm = this.value.toLowerCase();
-                    const rows = document.querySelectorAll('#studentTableBody tr');
-                    rows.forEach(row => {
-                        const text = row.textContent.toLowerCase();
-                        row.style.display = text.includes(searchTerm) ? '' : 'none';
-                    });
-                });
-                searchInput.dataset.listenerAttached = 'true';
-            }
-
-            window.onclick = function(event) {
-                const modal = document.getElementById('studentModal');
-                if (event.target === modal) {
-                    closeModal();
-                }
-            };
-        }
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            console.log('Form submit triggered');
-
-            // Lấy giá trị từ các input
-            const studentId = document.getElementById('studentId').value.trim();
-            const fullName = document.getElementById('fullName').value.trim();
-            const gender = document.getElementById('gender').value.trim();
-            const dob = document.getElementById('dob').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const address = document.getElementById('address').value.trim();
-            const status = document.getElementById('status').value.trim();
-            const classId = document.getElementById('classId').value.trim();
-
-            // Validate bắt buộc
-            if (!fullName) {
-                alert('❌ Vui lòng nhập Họ và tên');
-                return false;
-            }
-            if (!email) {
-                alert('❌ Vui lòng nhập Email');
-                return false;
-            }
-            if (!dob) {
-                alert('❌ Vui lòng chọn Ngày sinh');
-                return false;
-            }
-            if (!phone) {
-                alert('❌ Vui lòng nhập Số điện thoại');
-                return false;
-            }
-            if (!address) {
-                alert('❌ Vui lòng nhập Địa chỉ');
-                return false;
-            }
-
-            // Tạo object dữ liệu
-            const data = {
-                FullName: fullName,
-                Gender: gender || 'Nam',
-                DOB: dob,
-                Email: email,
-                Phone: phone,
-                Address: address,
-                Status: status || 'Đang học',
-                ClassID: classId ? parseInt(classId) : null
-            };
-
-            // Xác định URL và thêm StudentId nếu sửa
-            let url = '/Admin/CreateStudent';
-            if (studentId && studentId !== '0') {
-                url = `/Admin/EditStudent/${studentId}`;
-                data.StudentId = parseInt(studentId);
-                console.log('MODE: EDIT - Student ID:', studentId);
-            } else {
-                console.log('MODE: CREATE');
-            }
-
-            const jsonBody = JSON.stringify(data);
-            console.log('📤 Sending to:', url);
-            console.log('📦 Data:', data);
-            console.log('📄 JSON:', jsonBody);
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                credentials: 'same-origin',
-                body: jsonBody
-            })
-                .then(response => {
-                    console.log('📨 Response status:', response.status);
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            console.error('❌ Error response:', text);
-                            throw new Error(`HTTP ${response.status}: ${text}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(responseData => {
-                    console.log('✅ Response data:', responseData);
-                    if (responseData.success) {
-                        alert('✅ ' + responseData.message);
-                        closeModal();
-                        setTimeout(() => {
-                            location.reload();
-                        }, 500);
-                    } else {
-                        alert('❌ ' + (responseData.message || 'Có lỗi xảy ra'));
-                    }
-                })
-                .catch(error => {
-                    console.error('❌ Fetch error:', error);
-                    alert('❌ Lỗi: ' + error.message);
-                });
-
-            return false;
-        }
-
-        // Khởi tạo khi DOM sẵn sàng
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initFormHandlers);
-        } else {
-            initFormHandlers();
-        }
-    })();
-</script>
-
-<style>
     .status-badge {
         display: inline-block;
         padding: 5px 12px;

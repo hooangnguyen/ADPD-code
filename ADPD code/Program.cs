@@ -3,7 +3,7 @@ using ADPD_code.Models;
 using ADPD_code.Services;
 using ADPD_code.Services.Export;
 using ADPD_code.Services.Notification;
-using ADPD_code.Patterns; // ⭐ THÊM NAMESPACE MỚI
+using ADPD_code.Patterns;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,10 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 builder.Services.AddControllersWithViews();
 
-// ========== SINGLETON DATABASE CONNECTION MANAGER ⭐ ==========
+// ========== DATABASE CONFIGURATION ==========
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 optionsBuilder.UseSqlServer(connectionString);
+
+// ========== SINGLETON PATTERNS ==========
 
 // Đăng ký Singleton DatabaseConnectionManager
 builder.Services.AddSingleton(sp =>
@@ -23,6 +25,15 @@ builder.Services.AddSingleton(sp =>
     return DatabaseConnectionManager.GetInstance(optionsBuilder.Options, logger);
 });
 
+// ⭐ Đăng ký Singleton ClassManager
+builder.Services.AddSingleton(sp =>
+{
+    var logger = sp.GetService<ILogger<ClassManager>>();
+    return ClassManager.GetInstance(logger);
+});
+
+// ========== DATABASE CONTEXT ==========
+
 // Đăng ký ApplicationDbContext sử dụng Singleton Manager
 builder.Services.AddScoped<ApplicationDbContext>(sp =>
 {
@@ -30,11 +41,11 @@ builder.Services.AddScoped<ApplicationDbContext>(sp =>
     return manager.CreateDbContext();
 });
 
-// Giữ nguyên DbContextFactory cho các service cần
+// Đăng ký DbContextFactory cho các service cần
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// Add distributed memory cache và session
+// ========== SESSION CONFIGURATION ==========
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -43,7 +54,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Notification Services
+// ========== NOTIFICATION SERVICES (Factory Pattern) ==========
 builder.Services.AddScoped<INotificationFactory, NotificationFactory>();
 builder.Services.AddScoped<INotificationManager, NotificationManager>();
 builder.Services.AddScoped<EmailNotificationService>();
@@ -51,41 +62,72 @@ builder.Services.AddScoped<SMSNotificationService>();
 builder.Services.AddScoped<InAppNotificationService>();
 builder.Services.AddScoped<PushNotificationService>();
 
-// Export Services
+// ========== EXPORT SERVICES (Adapter Pattern) ==========
 builder.Services.AddScoped<IExportService, ExcelExportAdapter>();
 
-// Lecturer Services
+// ========== LECTURER SERVICES ==========
 builder.Services.AddScoped<ILecturerAnalyticsService, LecturerAnalyticsService>();
 
 var app = builder.Build();
 
-// ========== TEST DATABASE CONNECTION AT STARTUP ⭐ ==========
+// ========== STARTUP TESTS ==========
 using (var scope = app.Services.CreateScope())
 {
-    var manager = scope.ServiceProvider.GetRequiredService<DatabaseConnectionManager>();
+    var dbManager = scope.ServiceProvider.GetRequiredService<DatabaseConnectionManager>();
+    var classManager = scope.ServiceProvider.GetRequiredService<ClassManager>();
 
-    Console.WriteLine("=".PadRight(60, '='));
-    Console.WriteLine("🔍 Testing Database Connection...");
-    Console.WriteLine("=".PadRight(60, '='));
+    Console.WriteLine("\n" + "=".PadRight(70, '='));
+    Console.WriteLine("🔍 Testing Singleton Patterns...");
+    Console.WriteLine("=".PadRight(70, '='));
 
-    var testResult = await manager.TestConnectionAsync();
+    // Test Database Connection
+    Console.WriteLine("\n📊 Database Connection Test:");
+    var testResult = await dbManager.TestConnectionAsync();
 
     if (!testResult)
     {
+        Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("❌ WARNING: Cannot connect to database!");
-        Console.WriteLine($"Connection String: {manager.GetConnectionString()}");
+        Console.ResetColor();
+        Console.WriteLine($"Connection String: {dbManager.GetConnectionString()}");
+        Console.WriteLine("\n💡 Check:");
+        Console.WriteLine("   - SQL Server is running");
+        Console.WriteLine("   - Server name is correct: GNCYNO\\SQLEXPRESS");
+        Console.WriteLine("   - Database QLSV exists");
     }
     else
     {
+        Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("✅ Database connection successful!");
-        var stats = manager.GetStats();
-        Console.WriteLine($"📊 Stats: {stats}");
+        Console.ResetColor();
+        var dbStats = dbManager.GetStats();
+        Console.WriteLine($"   {dbStats}");
     }
 
-    Console.WriteLine("=".PadRight(60, '='));
+    // Test ClassManager
+    Console.WriteLine("\n🏫 ClassManager Test:");
+    try
+    {
+        var classStats = classManager.GetStats();
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"✅ ClassManager initialized successfully!");
+        Console.ResetColor();
+        Console.WriteLine($"   Instance Hash: {classStats.InstanceHashCode}");
+        Console.WriteLine($"   Total Operations: {classStats.TotalOperations}");
+        Console.WriteLine($"   Uptime: {classStats.Uptime.TotalSeconds:F1}s");
+        Console.WriteLine($"   Status: {(classStats.IsActive ? "Active ✓" : "Inactive ✗")}");
+    }
+    catch (Exception ex)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"❌ ClassManager error: {ex.Message}");
+        Console.ResetColor();
+    }
+
+    Console.WriteLine("\n" + "=".PadRight(70, '=') + "\n");
 }
 
-// Configure the HTTP request pipeline
+// ========== HTTP REQUEST PIPELINE ==========
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -98,11 +140,14 @@ app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
 
+// ========== ROUTING ==========
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// ========== ENDPOINT ĐỂ XEM THỐNG KÊ CONNECTION ⭐ ==========
+// ========== API ENDPOINTS FOR MONITORING ==========
+
+// Database Statistics Endpoint
 app.MapGet("/api/db-stats", (DatabaseConnectionManager manager) =>
 {
     var stats = manager.GetStats();
@@ -110,6 +155,8 @@ app.MapGet("/api/db-stats", (DatabaseConnectionManager manager) =>
 
     return Results.Ok(new
     {
+        pattern = "Singleton Pattern",
+        component = "DatabaseConnectionManager",
         stats = new
         {
             stats.TotalConnections,
@@ -128,5 +175,129 @@ app.MapGet("/api/db-stats", (DatabaseConnectionManager manager) =>
         })
     });
 });
+
+// ClassManager Statistics Endpoint
+app.MapGet("/api/class-manager-stats", (ClassManager manager) =>
+{
+    var stats = manager.GetStats();
+
+    return Results.Ok(new
+    {
+        pattern = "Singleton Pattern",
+        component = "ClassManager",
+        instance = new
+        {
+            hashCode = stats.InstanceHashCode,
+            createdTime = stats.CreatedTime,
+            uptime = new
+            {
+                minutes = stats.Uptime.TotalMinutes,
+                seconds = stats.Uptime.TotalSeconds,
+                formatted = $"{stats.Uptime.TotalMinutes:F1}m"
+            }
+        },
+        operations = new
+        {
+            total = stats.TotalOperations,
+            breakdown = "CREATE, READ, UPDATE, DELETE"
+        },
+        status = stats.IsActive ? "Active ✓" : "Inactive ✗"
+    });
+});
+
+// Combined Singleton Stats Endpoint
+app.MapGet("/api/singleton-stats", (DatabaseConnectionManager dbManager, ClassManager classManager) =>
+{
+    var dbStats = dbManager.GetStats();
+    var classStats = classManager.GetStats();
+
+    return Results.Ok(new
+    {
+        pattern = "Singleton Pattern Demo",
+        timestamp = DateTime.Now,
+        singletons = new
+        {
+            databaseConnectionManager = new
+            {
+                status = "Active",
+                hashCode = dbManager.GetHashCode(),
+                totalConnections = dbStats.TotalConnections,
+                activeConnections = dbStats.ActiveConnections,
+                uptime = $"{dbStats.Uptime.TotalMinutes:F1} minutes"
+            },
+            classManager = new
+            {
+                status = classStats.IsActive ? "Active" : "Inactive",
+                hashCode = classStats.InstanceHashCode,
+                totalOperations = classStats.TotalOperations,
+                uptime = $"{classStats.Uptime.TotalMinutes:F1} minutes"
+            }
+        }
+    });
+});
+
+// Health Check Endpoint
+app.MapGet("/api/health", async (DatabaseConnectionManager dbManager, ClassManager classManager) =>
+{
+    var dbHealthy = await dbManager.TestConnectionAsync();
+    var dbStats = dbManager.GetStats();
+    var classStats = classManager.GetStats();
+
+    var overallHealthy = dbHealthy && classStats.IsActive;
+
+    return Results.Ok(new
+    {
+        status = overallHealthy ? "Healthy ✓" : "Unhealthy ✗",
+        timestamp = DateTime.Now,
+        components = new
+        {
+            database = new
+            {
+                healthy = dbHealthy,
+                connections = dbStats.ActiveConnections,
+                uptime = $"{dbStats.Uptime.TotalMinutes:F1}m"
+            },
+            classManager = new
+            {
+                healthy = classStats.IsActive,
+                operations = classStats.TotalOperations,
+                uptime = $"{classStats.Uptime.TotalMinutes:F1}m",
+                hashCode = classStats.InstanceHashCode
+            }
+        }
+    });
+});
+
+// Verify Singleton Endpoint
+app.MapGet("/api/verify-singleton", (ClassManager manager) =>
+{
+    var instance1 = manager;
+    var instance2 = ClassManager.Instance;
+    var areSame = ReferenceEquals(instance1, instance2);
+
+    return Results.Ok(new
+    {
+        test = "Singleton Verification",
+        result = areSame ? "PASSED ✓" : "FAILED ✗",
+        details = new
+        {
+            injectedInstance = instance1.GetHashCode(),
+            staticInstance = instance2.GetHashCode(),
+            areSameReference = areSame,
+            message = areSame
+                ? "Both references point to the same instance - Singleton working correctly!"
+                : "Different instances detected - Singleton NOT working!"
+        }
+    });
+});
+
+Console.WriteLine("\n🚀 Application started successfully!");
+Console.WriteLine("📊 Monitoring endpoints:");
+Console.WriteLine("   - GET /api/db-stats              (Database stats)");
+Console.WriteLine("   - GET /api/class-manager-stats   (ClassManager stats)");
+Console.WriteLine("   - GET /api/singleton-stats       (Combined stats)");
+Console.WriteLine("   - GET /api/health                (Health check)");
+Console.WriteLine("   - GET /api/verify-singleton      (Verify singleton)");
+Console.WriteLine();
 
 app.Run();
