@@ -1,6 +1,6 @@
-﻿@model IEnumerable<ADPD_code.Models.Course>
+@model IEnumerable<ADPD_code.Models.Course>
 @{
-    ViewData["Title"] = "Đăng ký học";
+    ViewData["Title"] = "Course Registration";
     var isPartial = ViewData["IsPartial"] as bool? ?? false;
     Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
     var registeredCourseIds = ViewBag.RegisteredCourseIds as List<int> ?? new List<int>();
@@ -28,9 +28,9 @@
 
     <!-- Page Header -->
     <div class="page-header">
-        <div class="page-title">📚 Đăng ký học phần</div>
+        <div class="page-title">📚 Course Registration</div>
         <div class="semester-info">
-            Học kỳ: @currentSemester | Năm học: @currentYear
+            Semester: @currentSemester | Academic Year: @currentYear
         </div>
     </div>
 
@@ -38,17 +38,17 @@
     <div class="summary-cards">
         <div class="summary-card">
             <div class="summary-number" id="totalCourses">@Model.Count()</div>
-            <div class="summary-label">Môn học khả dụng</div>
+            <div class="summary-label">Available Courses</div>
         </div>
         <div class="summary-card">
             <div class="summary-number" id="registeredCount">@registeredCourseIds.Count</div>
-            <div class="summary-label">Đã đăng ký</div>
+            <div class="summary-label">Registered</div>
         </div>
         <div class="summary-card">
             <div class="summary-number" id="totalCredits">
                 @Model.Where(c => registeredCourseIds.Contains(c.CourseID)).Sum(c => c.Credits)
             </div>
-            <div class="summary-label">Tổng tín chỉ</div>
+            <div class="summary-label">Total Credits</div>
         </div>
     </div>
 
@@ -58,28 +58,28 @@
             <input type="hidden" name="partial" value="@(isPartial ? "true" : "false")" />
             <div class="filter-grid">
                 <div class="filter-item">
-                    <label class="filter-label">Tìm kiếm môn học</label>
+                    <label class="filter-label">Search courses</label>
                     <input type="text" name="search" class="filter-input"
-                           placeholder="Nhập tên môn học..."
+                           placeholder="Enter course name..."
                            value="@Context.Request.Query["search"]">
                 </div>
                 <div class="filter-item">
-                    <label class="filter-label">Số tín chỉ</label>
+                    <label class="filter-label">Credits</label>
                     <select name="credits" class="filter-select">
-                        <option value="">Tất cả</option>
-                        <option value="2" selected="@(Context.Request.Query["credits"] == "2")">2 tín chỉ</option>
-                        <option value="3" selected="@(Context.Request.Query["credits"] == "3")">3 tín chỉ</option>
-                        <option value="4" selected="@(Context.Request.Query["credits"] == "4")">4 tín chỉ</option>
+                        <option value="">All</option>
+                        <option value="2" selected="@(Context.Request.Query["credits"] == "2")">2 credits</option>
+                        <option value="3" selected="@(Context.Request.Query["credits"] == "3")">3 credits</option>
+                        <option value="4" selected="@(Context.Request.Query["credits"] == "4")">4 credits</option>
                     </select>
                 </div>
                 <div class="filter-item">
-                    <label class="filter-label">Giảng viên</label>
+                    <label class="filter-label">Lecturer</label>
                     <input type="text" name="lecturer" class="filter-input"
-                           placeholder="Tên giảng viên..."
+                           placeholder="Lecturer name..."
                            value="@Context.Request.Query["lecturer"]">
                 </div>
                 <div class="filter-item">
-                    <button type="submit" class="btn-filter">🔍 Tìm kiếm</button>
+                    <button type="submit" class="btn-filter">🔍 Search</button>
                 </div>
             </div>
         </form>
@@ -92,11 +92,11 @@
             <table class="course-table">
                 <thead>
                     <tr>
-                        <th style="width: 30%;">Môn học</th>
-                        <th style="width: 20%;">Giảng viên</th>
-                        <th style="width: 10%; text-align: center;">Tín chỉ</th>
-                        <th style="width: 15%; text-align: center;">Chỗ trống</th>
-                        <th style="width: 25%; text-align: right;">Thao tác</th>
+                        <th style="width: 30%;">Course</th>
+                        <th style="width: 20%;">Lecturer</th>
+                        <th style="width: 10%; text-align: center;">Credits</th>
+                        <th style="width: 15%; text-align: center;">Available Seats</th>
+                        <th style="width: 25%; text-align: right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -104,35 +104,35 @@
                     {
                         var isRegistered = registeredCourseIds.Contains(course.CourseID);
                         var enrolledCount = course.Enrollments?.Count ?? 0;
-                        var maxStudents = 50; // Giới hạn sinh viên mỗi lớp
+                        var maxStudents = 50; // Maximum students per class
                         var availableSeats = maxStudents - enrolledCount;
                         var isFull = availableSeats <= 0;
 
                         <tr>
                             <td>
                                 <div class="course-name">@course.CourseName</div>
-                                <div class="course-code">Mã môn: MH @course.CourseID.ToString().PadLeft(4, '0')</div>
+                                <div class="course-code">Code: MH @course.CourseID.ToString().PadLeft(4, '0')</div>
                             </td>
                             <td>
                                 <div class="lecturer-name">
-                                    @(course.Lecturer?.FullName ?? "Chưa phân công")
+                                    @(course.Lecturer?.FullName ?? "Not assigned")
                                 </div>
                             </td>
                             <td style="text-align: center;">
-                                <span class="credits-badge">@course.Credits TC</span>
+                                <span class="credits-badge">@course.Credits Credits</span>
                             </td>
                             <td style="text-align: center;">
                                 <div class="seats-info">
                                     @if (isFull)
                                     {
                                         <span class="seats-full" style="color: #e74c3c; font-weight: 600;">
-                                            Hết slot
+                                            Full
                                         </span>
                                     }
                                     else
                                     {
                                         <span class="seats-available" style="color: #27ae60; font-weight: 600;">
-                                            Còn @availableSeats chỗ
+                                            @availableSeats seats left
                                         </span>
                                     }
                                 </div>
@@ -142,25 +142,25 @@
                                 {
                                     <span class="status-registered">
                                         <span>✓</span>
-                                        <span>Đã đăng ký</span>
+                                        <span>Registered</span>
                                     </span>
                                 }
                                 else if (isFull)
                                 {
                                     <button class="btn-register" disabled style="background: #95a5a6; cursor: not-allowed; opacity: 0.6;">
-                                        ❌ Hết slot
+                                        ❌ Full
                                     </button>
                                 }
                                 else
                                 {
-                                    <form method="post" action="@Url.Action("RegisterCourse", "Student")" style="display: inline;" onsubmit="return confirm('Bạn có chắc muốn đăng ký môn học này?');">
+                                    <form method="post" action="@Url.Action("RegisterCourse", "Student")" style="display: inline;" onsubmit="return confirm('Are you sure you want to register for this course?');">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="courseId" value="@course.CourseID" />
                                         <input type="hidden" name="semester" value="@currentSemester" />
                                         <input type="hidden" name="academicYear" value="@currentYear" />
                                         <input type="hidden" name="partial" value="@(isPartial ? "true" : "false")" />
                                         <button type="submit" class="btn-register">
-                                            ➕ Đăng ký
+                                            ➕ Register
                                         </button>
                                     </form>
                                 }
@@ -174,8 +174,8 @@
         {
             <div class="empty-state">
                 <div class="empty-icon">📚</div>
-                <p style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Không có môn học nào</p>
-                <p>Vui lòng thử lại với bộ lọc khác</p>
+                <p style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">No courses available</p>
+                <p>Please try again with different filters</p>
             </div>
         }
     </div>

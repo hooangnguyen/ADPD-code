@@ -1,6 +1,6 @@
-﻿@model ADPD_code.Models.Student
+@model ADPD_code.Models.Student
 @{
-    ViewData["Title"] = "Hồ sơ cá nhân";
+    ViewData["Title"] = "Profile";
     var isPartial = ViewData["IsPartial"] as bool? ?? false;
     Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
 }
@@ -191,26 +191,26 @@
         <div class="profile-header">
             <div class="profile-avatar">👤</div>
             <div class="profile-name">@Model.FullName</div>
-            <div class="profile-id">Mã sinh viên: @Model.StudentId</div>
+            <div class="profile-id">Student ID: @Model.StudentId</div>
         </div>
 
         <!-- Profile Body -->
         <div class="profile-body">
             <!-- Personal Information -->
             <div class="section-title">
-                <span>📋</span> Thông tin cá nhân
+                <span>📋</span> Personal Information
             </div>
             <div class="info-grid">
                 <div class="info-item">
-                    <div class="info-label">Họ và tên</div>
+                    <div class="info-label">Full Name</div>
                     <div class="info-value">@Model.FullName</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Giới tính</div>
+                    <div class="info-label">Gender</div>
                     <div class="info-value">@Model.Gender</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Ngày sinh</div>
+                    <div class="info-label">Date of Birth</div>
                     <div class="info-value">@Model.DOB.ToString("dd/MM/yyyy")</div>
                 </div>
                 <div class="info-item">
@@ -218,11 +218,11 @@
                     <div class="info-value">@Model.Email</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Số điện thoại</div>
+                    <div class="info-label">Phone Number</div>
                     <div class="info-value">@Model.Phone</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Trạng thái</div>
+                    <div class="info-label">Status</div>
                     <div class="info-value">
                         <span class="status-badge @(Model.Status == "Đang học" ? "status-active" : "status-inactive")">
                             @Model.Status
@@ -233,33 +233,33 @@
 
             <!-- Address -->
             <div class="section-title">
-                <span>🏠</span> Địa chỉ
+                <span>🏠</span> Address
             </div>
             <div class="info-grid" style="margin-bottom: 40px;">
                 <div class="info-item" style="grid-column: 1 / -1;">
-                    <div class="info-label">Địa chỉ thường trú</div>
-                    <div class="info-value">@(string.IsNullOrEmpty(Model.Address) ? "Chưa cập nhật" : Model.Address)</div>
+                    <div class="info-label">Permanent Address</div>
+                    <div class="info-value">@(string.IsNullOrEmpty(Model.Address) ? "Not updated" : Model.Address)</div>
                 </div>
             </div>
 
             <!-- Academic Information -->
             <div class="section-title">
-                <span>🎓</span> Thông tin học tập
+                <span>🎓</span> Academic Information
             </div>
             <div class="info-grid">
                 <div class="info-item">
-                    <div class="info-label">Mã sinh viên</div>
+                    <div class="info-label">Student ID</div>
                     <div class="info-value">@Model.StudentId</div>
                 </div>
                 @if (Model.StudentClasses != null && Model.StudentClasses.Any())
                 {
                     var firstClass = Model.StudentClasses.First().Class;
                     <div class="info-item">
-                        <div class="info-label">Ngành học</div>
+                        <div class="info-label">Major</div>
                         <div class="info-value">@(firstClass?.Major?.MajorName ?? "N/A")</div>
                     </div>
                     <div class="info-item" style="grid-column: 1 / -1;">
-                        <div class="info-label">Lớp học</div>
+                        <div class="info-label">Classes</div>
                         <div class="class-list">
                             @foreach (var studentClass in Model.StudentClasses)
                             {
@@ -271,15 +271,15 @@
                 else
                 {
                     <div class="info-item">
-                        <div class="info-label">Ngành học</div>
-                        <div class="info-value" style="color: #999;">Chưa được phân lớp</div>
+                        <div class="info-label">Major</div>
+                        <div class="info-value" style="color: #999;">Not assigned to class</div>
                     </div>
                 }
             </div>
 
             <!-- Action Buttons -->
             <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px solid #f0f0f0;">
-                <a href="#" class="edit-btn">✏️ Chỉnh sửa thông tin</a>
+                <a href="#" class="edit-btn">✏️ Edit Information</a>
             </div>
         </div>
     </div>

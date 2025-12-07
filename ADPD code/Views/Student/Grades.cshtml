@@ -1,14 +1,14 @@
-﻿@model IEnumerable<ADPD_code.Models.Enrollment>
+@model IEnumerable<ADPD_code.Models.Enrollment>
 @{
-    ViewData["Title"] = "Bảng điểm";
+    ViewData["Title"] = "Grades";
     var isPartial = ViewData["IsPartial"] as bool? ?? false;
     Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
 }
 
 <link rel="stylesheet" href="~/css/Dashboard.css" />
     <div class="grades-header">
-        <h1>📊 Bảng Điểm</h1>
-        <p>Kết quả học tập của sinh viên</p>
+        <h1>📊 Grades</h1>
+        <p>Student academic results</p>
     </div>
 
     @if (Model != null && Model.Any())
@@ -23,7 +23,7 @@
         {
             var grades = semesterGroup.ToList();
 
-            // Tính GPA học kỳ
+            // Calculate semester GPA
             var semesterScores = grades
             .Where(e => !string.IsNullOrEmpty(e.Score?.ToString()) && double.TryParse(e.Score?.ToString(), out _))
             .Select(e => double.Parse(e.Score?.ToString() ?? "0"))
@@ -36,17 +36,17 @@
 
             <div class="semester-group">
                 <div class="semester-title">
-                    @semesterGroup.Key.Semester - Năm học @semesterGroup.Key.AcademicYear
+                    @semesterGroup.Key.Semester - Academic Year @semesterGroup.Key.AcademicYear
                 </div>
 
                 <table class="grades-table">
                     <thead>
                         <tr>
-                            <th>Mã môn</th>
-                            <th>Tên môn học</th>
-                            <th>Tín chỉ</th>
-                            <th>Giảng viên</th>
-                            <th>Điểm</th>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>Credits</th>
+                            <th>Lecturer</th>
+                            <th>Score</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,7 +71,7 @@
                                     }
                                     else
                                     {
-                                        <span style="color: #999;">Chưa có điểm</span>
+                                        <span style="color: #999;">No score yet</span>
                                     }
                                 </td>
                             </tr>
@@ -81,22 +81,22 @@
 
                 <div class="gpa-summary">
                     <div class="gpa-item">
-                        <h3>GPA Học kỳ</h3>
+                        <h3>Semester GPA</h3>
                         <div class="value">@semesterGPA</div>
                     </div>
                     <div class="gpa-item">
-                        <h3>Tín chỉ đã học</h3>
+                        <h3>Credits Completed</h3>
                         <div class="value">@semesterCredits</div>
                     </div>
                     <div class="gpa-item">
-                        <h3>Số môn</h3>
+                        <h3>Number of Courses</h3>
                         <div class="value">@grades.Count</div>
                     </div>
                 </div>
             </div>
         }
 
-        // Tổng kết
+        // Summary
         var totalScores = Model
         .Where(e => !string.IsNullOrEmpty(e.Score?.ToString()) && double.TryParse(e.Score?.ToString(), out _))
         .Select(e => double.Parse(e.Score?.ToString() ?? "0"))
@@ -104,24 +104,24 @@
 
         double overallGPA = totalScores.Any() ? Math.Round(totalScores.Average(), 2) : 0;
         int totalCredits = Model.Where(e => e.Course != null)
-        // Giả sử Credits là kiểu INT/DOUBLE, chỉ cần SUM trực tiếp
+        // Assuming Credits is INT/DOUBLE type, just SUM directly
         .Sum(e => e.Course!.Credits);
 
         <div class="semester-group" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
             <div style="font-size: 20px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 10px;">
-                📈 Tổng Kết
+                📈 Summary
             </div>
             <div class="gpa-summary" style="background: rgba(255,255,255,0.1);">
                 <div class="gpa-item" style="color: white;">
-                    <h3 style="color: rgba(255,255,255,0.8);">GPA Tích lũy</h3>
+                    <h3 style="color: rgba(255,255,255,0.8);">Cumulative GPA</h3>
                     <div class="value" style="color: white; font-size: 32px;">@overallGPA</div>
                 </div>
                 <div class="gpa-item" style="color: white;">
-                    <h3 style="color: rgba(255,255,255,0.8);">Tổng tín chỉ</h3>
+                    <h3 style="color: rgba(255,255,255,0.8);">Total Credits</h3>
                     <div class="value" style="color: white; font-size: 32px;">@totalCredits</div>
                 </div>
                 <div class="gpa-item" style="color: white;">
-                    <h3 style="color: rgba(255,255,255,0.8);">Tổng môn học</h3>
+                    <h3 style="color: rgba(255,255,255,0.8);">Total Courses</h3>
                     <div class="value" style="color: white; font-size: 32px;">@Model.Count()</div>
                 </div>
             </div>
@@ -131,8 +131,8 @@
     {
         <div class="semester-group">
             <div class="no-data">
-                <h3>📚 Chưa có dữ liệu điểm</h3>
-                <p>Bạn chưa đăng ký môn học nào hoặc chưa có điểm.</p>
+                <h3>📚 No grade data available</h3>
+                <p>You haven't registered for any courses or don't have grades yet.</p>
             </div>
         </div>
     }

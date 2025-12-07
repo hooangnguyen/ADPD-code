@@ -1,6 +1,6 @@
 ﻿@model ADPD_code.Models.Lecturer
 @{
-    ViewData["Title"] = "Hồ sơ giảng viên";
+    ViewData["Title"] = "Lecturer Profile";
     var isPartial = ViewData["IsPartial"] as bool? ?? false;
     Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
 }
@@ -330,44 +330,44 @@
 </style>
 
 <div class="profile-container">
-    <a href="@Url.Action("Dashboard", "Lecturer")" class="back-btn">← Quay lại Dashboard</a>
+    <a href="@Url.Action("Dashboard", "Lecturer")" class="back-btn">← Back to Dashboard</a>
 
     <div class="profile-card">
         <!-- Profile Header -->
         <div class="profile-header">
             <div class="profile-avatar">👨‍🏫</div>
             <div class="profile-name">@Model.FullName</div>
-            <div class="profile-id">Mã giảng viên: GV@Model.LecturerId</div>
+            <div class="profile-id">Lecturer ID: GV@Model.LecturerId</div>
         </div>
 
         <!-- Profile Body -->
         <div class="profile-body">
             <!-- Statistics -->
             <div class="section-title">
-                <span>📊</span> Thống kê giảng dạy
+                <span>📊</span> Teaching Statistics
             </div>
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-number">@(Model.Courses?.Count ?? 0)</div>
-                    <div class="stat-label">Môn giảng dạy</div>
+                    <div class="stat-label">Courses Taught</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number">@(Model.Courses?.Sum(c => c.Enrollments?.Count) ?? 0)</div>
-                    <div class="stat-label">Tổng sinh viên</div>
+                    <div class="stat-label">Total Students</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number">@(Model.Assignments?.Count ?? 0)</div>
-                    <div class="stat-label">Bài tập đã giao</div>
+                    <div class="stat-label">Assignments Given</div>
                 </div>
             </div>
 
             <!-- Personal Information -->
             <div class="section-title">
-                <span>📋</span> Thông tin cá nhân
+                <span>📋</span> Personal Information
             </div>
             <div class="info-grid">
                 <div class="info-item">
-                    <div class="info-label">Họ và tên</div>
+                    <div class="info-label">Full Name</div>
                     <div class="info-value">@Model.FullName</div>
                 </div>
                 <div class="info-item">
@@ -375,18 +375,18 @@
                     <div class="info-value">@Model.Email</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Số điện thoại</div>
-                    <div class="info-value">@(string.IsNullOrEmpty(Model.Phone) ? "Chưa cập nhật" : Model.Phone)</div>
+                    <div class="info-label">Phone Number</div>
+                    <div class="info-value">@(string.IsNullOrEmpty(Model.Phone) ? "Not updated" : Model.Phone)</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Khoa</div>
+                    <div class="info-label">Department</div>
                     <div class="info-value">@(Model.Department?.DepartmentName ?? "N/A")</div>
                 </div>
             </div>
 
             <!-- Courses Teaching -->
             <div class="section-title">
-                <span>📚</span> Môn học giảng dạy
+                <span>📚</span> Teaching Courses
             </div>
             @if (Model.Courses != null && Model.Courses.Any())
             {
@@ -396,12 +396,12 @@
                         <div class="course-card">
                             <div class="course-name">@course.CourseName</div>
                             <div style="color: #64748b; font-size: 14px; margin-bottom: 8px;">
-                                @(string.IsNullOrEmpty(course.Description) ? "Môn học chuyên ngành" : course.Description)
+                                @(string.IsNullOrEmpty(course.Description) ? "Specialized course" : course.Description)
                             </div>
                             <div class="course-info">
-                                <span class="course-credits">@course.Credits tín chỉ</span>
+                                <span class="course-credits">@course.Credits credits</span>
                                 <span class="course-students">
-                                    👥 @(course.Enrollments?.Count ?? 0) sinh viên
+                                    👥 @(course.Enrollments?.Count ?? 0) students
                                 </span>
                             </div>
                         </div>
@@ -411,23 +411,23 @@
             else
             {
                 <div class="empty-state">
-                    <p>Chưa có môn học nào được phân công</p>
+                    <p>No courses assigned yet</p>
                 </div>
             }
 
             <!-- Recent Assignments -->
             <div class="section-title">
-                <span>📝</span> Bài tập gần đây
+                <span>📝</span> Recent Assignments
             </div>
             @if (Model.Assignments != null && Model.Assignments.Any())
             {
                 <table class="assignment-table">
                     <thead>
                         <tr>
-                            <th>Tiêu đề</th>
-                            <th>Môn học</th>
-                            <th>Hạn nộp</th>
-                            <th>Đã nộp</th>
+                            <th>Title</th>
+                            <th>Course</th>
+                            <th>Deadline</th>
+                            <th>Submissions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -449,7 +449,7 @@
                                 </td>
                                 <td>
                                     <span class="submission-count">
-                                        @(assignment.AssignmentSubmissions?.Count ?? 0) bài
+                                        @(assignment.AssignmentSubmissions?.Count ?? 0) submissions
                                     </span>
                                 </td>
                             </tr>
@@ -460,20 +460,20 @@
             else
             {
                 <div class="empty-state">
-                    <p>Chưa có bài tập nào được giao</p>
+                    <p>No assignments given yet</p>
                 </div>
             }
 
             <!-- Action Buttons -->
             <div class="action-buttons">
                 <a href="@Url.Action("Edit", "Lecturer", new { id = Model.LecturerID })" class="btn btn-primary">
-                    ✏️ Chỉnh sửa thông tin
+                    ✏️ Edit Information
                 </a>
                 <a href="@Url.Action("Courses", "Lecturer")" class="btn btn-secondary">
-                    📚 Quản lý môn học
+                    📚 Manage Courses
                 </a>
                 <a href="@Url.Action("Assignments", "Lecturer")" class="btn btn-secondary">
-                    📝 Quản lý bài tập
+                    📝 Manage Assignments
                 </a>
             </div>
         </div>

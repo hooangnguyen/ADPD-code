@@ -9,16 +9,16 @@
         <div class="header">
             <h1>
                 <span style="font-size: 36px;">📋</span>
-                Lịch sử Điểm danh
+                Attendance History
             </h1>
-            <p>Xem lịch sử điểm danh của bạn theo từng môn học</p>
+            <p>View your attendance history by course</p>
         </div>
 
         <div class="toolbar">
             <div class="filter-group">
-                <label for="courseSelect">Chọn môn học:</label>
+                <label for="courseSelect">Select course:</label>
                 <select id="courseSelect" class="filter-select">
-                    <option value="">-- Chọn môn học --</option>
+                    <option value="">-- Select course --</option>
                     @if (ViewBag.Courses != null)
                     {
                         @foreach (var course in ViewBag.Courses)
@@ -30,19 +30,19 @@
             </div>
 
             <div class="filter-group">
-                <label for="startDate">Từ ngày:</label>
+                <label for="startDate">From date:</label>
                 <input type="date" id="startDate" class="filter-select" />
             </div>
 
             <div class="filter-group">
-                <label for="endDate">Đến ngày:</label>
+                <label for="endDate">To date:</label>
                 <input type="date" id="endDate" class="filter-select" />
             </div>
 
             <div class="action-buttons">
                 <button class="btn btn-primary" id="loadAttendanceBtn" onclick="loadAttendance()">
                     <span>🔍</span>
-                    <span>Tìm kiếm</span>
+                    <span>Search</span>
                 </button>
             </div>
         </div>
@@ -58,27 +58,27 @@
             <div class="stat-card stat-total">
                 <div class="stat-icon">📊</div>
                 <h3 id="totalDays">0</h3>
-                <p>Tổng số buổi</p>
+                <p>Total Sessions</p>
             </div>
             <div class="stat-card stat-present">
                 <div class="stat-icon">✅</div>
                 <h3 id="presentDays">0</h3>
-                <p>Có mặt</p>
+                <p>Present</p>
             </div>
             <div class="stat-card stat-absent">
                 <div class="stat-icon">❌</div>
                 <h3 id="absentDays">0</h3>
-                <p>Vắng</p>
+                <p>Absent</p>
             </div>
             <div class="stat-card stat-excused">
                 <div class="stat-icon">⚠️</div>
                 <h3 id="excusedDays">0</h3>
-                <p>Có phép</p>
+                <p>Excused</p>
             </div>
             <div class="stat-card stat-rate">
                 <div class="stat-icon">📈</div>
                 <h3 id="attendanceRate">0%</h3>
-                <p>Tỷ lệ tham dự</p>
+                <p>Attendance Rate</p>
             </div>
         </div>
 
@@ -86,9 +86,9 @@
             <table id="attendanceTable">
                 <thead>
                     <tr>
-                        <th>STT</th>
-                        <th>Ngày điểm danh</th>
-                        <th>Trạng thái</th>
+                        <th>No.</th>
+                        <th>Date</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="attendanceTableBody">
@@ -97,7 +97,7 @@
         </div>
 
         <div id="noDataMessage" class="no-data-message" style="display: none;">
-            <p>Vui lòng chọn môn học và nhấn "Tìm kiếm" để xem lịch sử điểm danh.</p>
+            <p>Please select a course and click "Search" to view attendance history.</p>
         </div>
     </div>
 </div>
@@ -109,20 +109,20 @@
         const endDate = document.getElementById('endDate').value;
 
         if (!courseId) {
-            alert('Vui lòng chọn môn học!');
+            alert('Please select a course!');
             return;
         }
 
         const loadBtn = document.getElementById('loadAttendanceBtn');
         const originalText = loadBtn.innerHTML;
-        loadBtn.innerHTML = '<span class="loading"></span> Đang tải...';
+        loadBtn.innerHTML = '<span class="loading"></span> Loading...';
         loadBtn.disabled = true;
 
         let url = `/Student/GetMyAttendance?courseId=${courseId}`;
         if (startDate) url += `&startDate=${startDate}`;
         if (endDate) url += `&endDate=${endDate}`;
 
-        document.getElementById('attendanceTableBody').innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 40px;"><div class="loading" style="margin: 0 auto;"></div><p style="margin-top: 15px; color: #6c757d;">Đang tải dữ liệu...</p></td></tr>';
+        document.getElementById('attendanceTableBody').innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 40px;"><div class="loading" style="margin: 0 auto;"></div><p style="margin-top: 15px; color: #6c757d;">Loading data...</p></td></tr>';
 
         fetch(url)
             .then(response => response.json())
@@ -138,33 +138,33 @@
                     document.getElementById('statsGrid').style.display = 'grid';
                     document.getElementById('noDataMessage').style.display = 'none';
                 } else {
-                    alert('Lỗi: ' + data.message);
+                    alert('Error: ' + data.message);
                 }
             })
             .catch(error => {
                 loadBtn.innerHTML = originalText;
                 loadBtn.disabled = false;
                 console.error('Error:', error);
-                alert('Có lỗi xảy ra khi tải dữ liệu!');
+                alert('An error occurred while loading data!');
             });
     }
 
     function displayAttendance(data) {
         const stats = data.statistics;
         
-        // Cập nhật thống kê
+        // Update statistics
         document.getElementById('totalDays').textContent = stats.totalDays;
         document.getElementById('presentDays').textContent = stats.presentDays;
         document.getElementById('absentDays').textContent = stats.absentDays;
         document.getElementById('excusedDays').textContent = stats.excusedDays;
         document.getElementById('attendanceRate').textContent = stats.attendanceRate + '%';
 
-        // Hiển thị bảng
+        // Display table
         const tbody = document.getElementById('attendanceTableBody');
         tbody.innerHTML = '';
 
         if (data.history.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 40px; color: #6c757d;">Chưa có dữ liệu điểm danh</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 40px; color: #6c757d;">No attendance data available</td></tr>';
             return;
         }
 

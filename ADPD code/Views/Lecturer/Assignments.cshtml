@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<ADPD_code.Models.Assignment>
 @{
-    ViewData["Title"] = "Quản lý bài tập";
+    ViewData["Title"] = "Assignment Management";
     var isPartial = ViewData["IsPartial"] as bool? ?? false;
     var submissionCounts = ViewBag.SubmissionCounts as Dictionary<int, int>;
     Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
@@ -10,12 +10,12 @@
 <div class="lecturer-assignments-container">
     @if (!isPartial)
     {
-        <a href="@Url.Action("Dashboard", "Lecturer")" class="back-btn">← Quay lại Dashboard</a>
+        <a href="@Url.Action("Dashboard", "Lecturer")" class="back-btn">← Back to Dashboard</a>
     }
 
     <div class="page-header">
-        <h1>📝 Quản lý Bài tập</h1>
-        <p>Giao bài tập và chấm điểm cho sinh viên</p>
+        <h1>📝 Assignment Management</h1>
+        <p>Assign and grade assignments for students</p>
     </div>
 
     @if (Model != null && Model.Any())
@@ -25,22 +25,22 @@
             <div class="stat-card">
                 <div class="stat-icon">📚</div>
                 <div class="stat-value">@Model.Count()</div>
-                <div class="stat-label">Tổng bài tập</div>
+                <div class="stat-label">Total Assignments</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon">✅</div>
                 <div class="stat-value">@Model.Count(a => a.EndDate >= DateTime.Now)</div>
-                <div class="stat-label">Đang mở</div>
+                <div class="stat-label">Open</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon">⏰</div>
                 <div class="stat-value">@Model.Count(a => a.EndDate < DateTime.Now)</div>
-                <div class="stat-label">Đã đóng</div>
+                <div class="stat-label">Closed</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon">📤</div>
                 <div class="stat-value">@(submissionCounts?.Values.Sum() ?? 0)</div>
-                <div class="stat-label">Bài nộp</div>
+                <div class="stat-label">Submissions</div>
             </div>
         </div>
 
@@ -48,7 +48,7 @@
         <div class="action-bar">
             <div></div>
             <a href="@Url.Action("CreateAssignment", "Lecturer")" class="btn-create">
-                ➕ Tạo bài tập mới
+                ➕ Create New Assignment
             </a>
         </div>
 
@@ -73,28 +73,28 @@
                     <div class="status-indicator">
                         @if (isActive)
                         {
-                            <span class="status-badge status-active">✅ Đang mở</span>
+                            <span class="status-badge status-active">✅ Open</span>
                         }
                         else if (isUpcoming)
                         {
-                            <span class="status-badge status-upcoming">🕐 Sắp mở</span>
+                            <span class="status-badge status-upcoming">🕐 Upcoming</span>
                         }
                         else
                         {
-                            <span class="status-badge status-ended">🔒 Đã đóng</span>
+                            <span class="status-badge status-ended">🔒 Closed</span>
                         }
                     </div>
                 </div>
 
                 <div style="color: #666; margin-bottom: 15px; line-height: 1.6;">
-                    @(assignment.Description ?? "Không có mô tả")
+                    @(assignment.Description ?? "No description")
                 </div>
 
                 <div class="assignment-meta">
                     <div class="meta-item">
                         <span class="meta-icon">📅</span>
                         <div class="meta-content">
-                            <div class="meta-label">Ngày giao</div>
+                            <div class="meta-label">Assigned Date</div>
                             <div class="meta-value">@assignment.StartDate.ToString("dd/MM/yyyy")</div>
                         </div>
                     </div>
@@ -110,7 +110,7 @@
                     <div class="meta-item">
                         <span class="meta-icon">👥</span>
                         <div class="meta-content">
-                            <div class="meta-label">Số bài nộp</div>
+                            <div class="meta-label">Submissions</div>
                             <div class="meta-value">@submissionCount</div>
                         </div>
                     </div>
@@ -128,15 +128,15 @@
                     <div class="submission-stats">
                         <div class="stat-item">
                             <div class="stat-number">@submissionCount</div>
-                            <div class="stat-text">Tổng bài nộp</div>
+                            <div class="stat-text">Total Submissions</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-number" style="color: #27ae60;">@gradedCount</div>
-                            <div class="stat-text">Đã chấm</div>
+                            <div class="stat-text">Graded</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-number" style="color: #e74c3c;">@needGradingCount</div>
-                            <div class="stat-text">Chưa chấm</div>
+                            <div class="stat-text">Pending</div>
                         </div>
                     </div>
                 }
@@ -144,16 +144,16 @@
                 <div class="assignment-actions">
                     <a href="@Url.Action("GradeAssignment", "Lecturer", new { id = assignment.AssignmentID })"
                        class="btn-primary">
-                        ✏️ Chấm điểm (@submissionCount)
+                        ✏️ Grade (@submissionCount)
                     </a>
                     <a href="@Url.Action("EditAssignment", "Lecturer", new { id = assignment.AssignmentID })"
                        class="btn-secondary">
-                        📝 Sửa
+                        📝 Edit
                     </a>
                     <a href="@Url.Action("DeleteAssignment", "Lecturer", new { id = assignment.AssignmentID })"
                        class="btn-danger"
-                       onclick="return confirm('Bạn có chắc muốn xóa bài tập này?')">
-                        🗑️ Xóa
+                       onclick="return confirm('Are you sure you want to delete this assignment?')">
+                        🗑️ Delete
                     </a>
                 </div>
             </div>
@@ -164,13 +164,13 @@
         <div class="action-bar">
             <div></div>
             <a href="@Url.Action("CreateAssignment", "Lecturer")" class="btn-create">
-                ➕ Tạo bài tập mới
+                ➕ Create New Assignment
             </a>
         </div>
 
         <div class="no-data">
-            <h3>📝 Chưa có bài tập nào</h3>
-            <p>Bạn chưa tạo bài tập nào. Nhấn nút "Tạo bài tập mới" để bắt đầu.</p>
+            <h3>📝 No assignments yet</h3>
+            <p>You haven't created any assignments. Click "Create New Assignment" to get started.</p>
         </div>
     }
 </div>

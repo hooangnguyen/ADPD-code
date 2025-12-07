@@ -26,15 +26,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Môn học - StudentMS</title>
+    <title>Subjects - StudentMS</title>
     <link href="~/css/subject.css" rel="stylesheet" />
 </head>
 <body>
 
     <div class="page-header">
-        <div class="page-title">📚 Môn học của tôi</div>
+        <div class="page-title">📚 My Subjects</div>
         <div class="semester-info">
-            Học kỳ: @latestSemester | Năm học: @latestAcademicYear
+            Semester: @latestSemester | Academic Year: @latestAcademicYear
         </div>
     </div>
 
@@ -42,15 +42,15 @@
     <div class="summary-cards">
         <div class="summary-card">
             <div class="summary-number" id="totalCourses">@totalCourses</div>
-            <div class="summary-label">Tổng môn học</div>
+            <div class="summary-label">Total Courses</div>
         </div>
         <div class="summary-card">
             <div class="summary-number" id="totalCredits">@totalCredits</div>
-            <div class="summary-label">Tổng tín chỉ</div>
+            <div class="summary-label">Total Credits</div>
         </div>
         <div class="summary-card">
             <div class="summary-number" id="avgScore">@avgScore</div>
-            <div class="summary-label">Điểm TB học kỳ</div>
+            <div class="summary-label">Semester Average</div>
         </div>
     </div>
 
@@ -59,14 +59,14 @@
         <form id="filterForm">
             <div class="filter-grid">
                 <div class="filter-item">
-                    <label class="filter-label">Tìm kiếm môn học</label>
+                    <label class="filter-label">Search courses</label>
                     <input type="text" id="searchInput" class="filter-input"
-                           placeholder="Nhập tên môn học hoặc mã môn...">
+                           placeholder="Enter course name or code...">
                 </div>
                 <div class="filter-item">
-                    <label class="filter-label">Học kỳ</label>
+                    <label class="filter-label">Semester</label>
                     <select id="semesterFilter" class="filter-select">
-                        <option value="">Tất cả</option>
+                        <option value="">All</option>
                         @foreach (var semester in semesters)
                         {
                             <option value="@semester">@semester</option>
@@ -74,9 +74,9 @@
                     </select>
                 </div>
                 <div class="filter-item">
-                    <label class="filter-label">Năm học</label>
+                    <label class="filter-label">Academic Year</label>
                     <select id="yearFilter" class="filter-select">
-                        <option value="">Tất cả</option>
+                        <option value="">All</option>
                         @foreach (var year in academicYears)
                         {
                             <option value="@year">@year</option>
@@ -84,7 +84,7 @@
                     </select>
                 </div>
                 <div class="filter-item">
-                    <button type="button" class="btn-filter" onclick="filterCourses()">🔍 Tìm kiếm</button>
+                    <button type="button" class="btn-filter" onclick="filterCourses()">🔍 Search</button>
                 </div>
             </div>
         </form>
@@ -95,19 +95,19 @@
         <table class="course-table">
             <thead>
                 <tr>
-                    <th style="width: 30%;">Môn học</th>
-                    <th style="width: 20%;">Giảng viên</th>
-                    <th style="width: 10%; text-align: center;">Tín chỉ</th>
-                    <th style="width: 15%; text-align: center;">Điểm số</th>
-                    <th style="width: 25%; text-align: right;">Thao tác</th>
+                    <th style="width: 30%;">Course</th>
+                    <th style="width: 20%;">Lecturer</th>
+                    <th style="width: 10%; text-align: center;">Credits</th>
+                    <th style="width: 15%; text-align: center;">Score</th>
+                    <th style="width: 25%; text-align: right;">Actions</th>
                 </tr>
             </thead>
             <tbody id="courseTableBody">
                 @foreach (var subject in Model)
                 {
-                    // Logic để xác định class cho điểm số
+                    // Logic to determine class for score
                     string scoreClass = "score-none";
-                    string scoreDisplay = "Chưa có";
+                    string scoreDisplay = "Not available";
                     if (subject.Score.HasValue)
                     {
                         scoreDisplay = subject.Score.Value.ToString("0.0");
@@ -120,19 +120,19 @@
                     <tr data-semester="@subject.Semester" data-year="@subject.AcademicYear" data-name="@subject.CourseName.ToLower()" data-code="@subject.CourseCode.ToLower()">
                         <td>
                             <div class="course-name">@subject.CourseName</div>
-                            <div class="course-code">Mã môn: @subject.CourseCode</div>
+                            <div class="course-code">Code: @subject.CourseCode</div>
                         </td>
                         <td>
                             <div class="lecturer-name">@subject.LecturerName</div>
                         </td>
                         <td style="text-align: center;">
-                            <span class="credits-badge">@subject.Credits TC</span>
+                            <span class="credits-badge">@subject.Credits Credits</span>
                         </td>
                         <td style="text-align: center;">
                             <span class="score-display @scoreClass">@scoreDisplay</span>
                         </td>
                         <td style="text-align: right;">
-                             <button class="btn-action btn-assignment" onclick="loadContent('Student/Assignments')">📝 Bài tập</button>
+                             <button class="btn-action btn-assignment" onclick="loadContent('Student/Assignments')">📝 Assignments</button>
                         </td>
                     </tr>
                 }

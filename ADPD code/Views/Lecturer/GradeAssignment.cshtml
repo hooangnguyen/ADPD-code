@@ -1,7 +1,7 @@
 ﻿@model ADPD_code.Models.Assignment
 @{
     Layout = null;
-    ViewData["Title"] = "Chấm điểm bài tập";
+    ViewData["Title"] = "Grade Assignment";
     var submissions = ViewBag.Submissions as List<ADPD_code.Models.AssignmentSubmission>;
 }
 
@@ -384,7 +384,7 @@
 
 </style>
 <div class="grade-container">
-    <a href="@Url.Action("Assignments", "Lecturer")" class="back-btn">← Quay lại Danh sách bài tập</a>
+    <a href="@Url.Action("Assignments", "Lecturer")" class="back-btn">← Back to Assignments</a>
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -395,7 +395,7 @@
     }
 
     <div class="grade-header">
-        <h1>✏️ Chấm điểm Bài tập</h1>
+        <h1>✏️ Grade Assignment</h1>
         <p>@Model.Title</p>
     </div>
 
@@ -405,7 +405,7 @@
             <div class="info-item">
                 <span class="info-icon">📚</span>
                 <div class="info-content">
-                    <h4>Môn học</h4>
+                    <h4>Course</h4>
                     <p>@(Model.Course?.CourseName ?? "N/A")</p>
                 </div>
             </div>
@@ -419,15 +419,15 @@
             <div class="info-item">
                 <span class="info-icon">📤</span>
                 <div class="info-content">
-                    <h4>Tổng bài nộp</h4>
-                    <p>@(submissions?.Count ?? 0) bài</p>
+                    <h4>Total Submissions</h4>
+                    <p>@(submissions?.Count ?? 0) submissions</p>
                 </div>
             </div>
             <div class="info-item">
                 <span class="info-icon">✅</span>
                 <div class="info-content">
-                    <h4>Đã chấm</h4>
-                    <p>@(submissions?.Count(s => s.Score.HasValue && s.Score > 0) ?? 0) bài</p>
+                    <h4>Graded</h4>
+                    <p>@(submissions?.Count(s => s.Score.HasValue && s.Score > 0) ?? 0) submissions</p>
                 </div>
             </div>
         </div>
@@ -437,15 +437,15 @@
     {
         <!-- Filter Bar -->
         <div class="filter-bar">
-            <strong>Lọc:</strong>
+            <strong>Filter:</strong>
             <button class="filter-btn active" onclick="filterSubmissions('all')">
-                Tất cả (@submissions.Count)
+                All (@submissions.Count)
             </button>
             <button class="filter-btn" onclick="filterSubmissions('pending')">
-                Chưa chấm (@submissions.Count(s => !s.Score.HasValue || s.Score == 0))
+                Pending (@submissions.Count(s => !s.Score.HasValue || s.Score == 0))
             </button>
             <button class="filter-btn" onclick="filterSubmissions('graded')">
-                Đã chấm (@submissions.Count(s => s.Score.HasValue && s.Score > 0))
+                Graded (@submissions.Count(s => s.Score.HasValue && s.Score > 0))
             </button>
         </div>
 
@@ -468,14 +468,14 @@
                     <div class="submission-status">
                         @if (isGraded)
                         {
-                            <span class="status-badge status-graded">✅ Đã chấm: @submission.Score điểm</span>
+                            <span class="status-badge status-graded">✅ Graded: @submission.Score points</span>
                         }
                         else
                         {
-                            <span class="status-badge status-pending">⏳ Chưa chấm</span>
+                            <span class="status-badge status-pending">⏳ Pending</span>
                         }
                         <div class="submit-time">
-                            📅 Nộp lúc: @submission.SubmitDate.ToString("dd/MM/yyyy HH:mm")
+                            📅 Submitted: @submission.SubmitDate.ToString("dd/MM/yyyy HH:mm")
                         </div>
                     </div>
                 </div>
@@ -484,7 +484,7 @@
                 <div class="submission-content">
                     @if (!string.IsNullOrEmpty(submission.SubmissionText))
                     {
-                        <span class="content-label">💬 Nội dung bài làm:</span>
+                        <span class="content-label">💬 Submission Content:</span>
                         <div class="content-text">@submission.SubmissionText</div>
                     }
 
@@ -492,7 +492,7 @@
                     {
                         <a href="@Url.Action("DownloadSubmissionFile", "Lecturer", new { id = submission.SubmissionID })"
                            class="file-download">
-                            📥 Tải xuống file bài nộp
+                            📥 Download Submission File
                         </a>
                     }
                 </div>
@@ -502,18 +502,18 @@
                 {
                     <div class="graded-display" id="graded-@submission.SubmissionID">
                         <div>
-                            <strong style="color: #155724;">Điểm số:</strong>
+                            <strong style="color: #155724;">Score:</strong>
                             <div class="graded-score">@submission.Score / 10</div>
                         </div>
                         @if (!string.IsNullOrEmpty(submission.Feedback))
                         {
                             <div>
-                                <strong style="color: #155724;">Nhận xét:</strong>
+                                <strong style="color: #155724;">Feedback:</strong>
                                 <div class="graded-feedback">@submission.Feedback</div>
                             </div>
                         }
                         <button class="edit-grade-btn" onclick="toggleGradeForm(@submission.SubmissionID)">
-                            ✏️ Chỉnh sửa điểm
+                            ✏️ Edit Grade
                         </button>
                     </div>
                 }
@@ -529,7 +529,7 @@
                     <input type="hidden" name="assignmentId" value="@Model.AssignmentID" />
 
                     <div class="form-row">
-                        <label class="form-label">Điểm số:</label>
+                        <label class="form-label">Score:</label>
                         <div>
                             <div class="score-input-group">
                                 <input type="number"
@@ -540,7 +540,7 @@
                                        step="0.5"
                                        value="@(submission.Score ?? 0)"
                                        required />
-                                <span class="score-unit">/ 10 điểm</span>
+                                <span class="score-unit">/ 10 points</span>
                             </div>
                             <div class="quick-scores" style="margin-top: 10px;">
                                 <button type="button" class="quick-score-btn" onclick="setScore(@submission.SubmissionID, 10)">10</button>
@@ -554,14 +554,14 @@
                     </div>
 
                     <div class="form-row">
-                        <label class="form-label">Nhận xét:</label>
+                        <label class="form-label">Feedback:</label>
                         <textarea name="feedback"
                           class="feedback-textarea"
-                          placeholder="Nhập nhận xét cho sinh viên...">@submission.Feedback</textarea>
+                          placeholder="Enter feedback for the student...">@submission.Feedback</textarea>
                     </div>
 
                     <button type="submit" class="submit-grade-btn">
-                        💾 Lưu điểm
+                        💾 Save Grade
                     </button>
                 </form>
             </div>
@@ -570,8 +570,8 @@
     else
     {
         <div class="no-submissions">
-            <h3>📭 Chưa có bài nộp</h3>
-            <p>Chưa có sinh viên nào nộp bài tập này.</p>
+            <h3>📭 No submissions yet</h3>
+            <p>No students have submitted this assignment yet.</p>
         </div>
     }
 </div>
