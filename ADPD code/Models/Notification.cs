@@ -17,9 +17,8 @@ namespace ADPD_code.Models
     public enum NotificationStatus
     {
         Pending,    // Chờ gửi
-        Sent,       // Đã gửi
-        Failed,     // Thất bại
-        Delivered   // Đã gửi thành công
+        Delivered,  // Đã gửi thành công
+        Failed      // Thất bại
     }
 
     [Table("Notification")]
@@ -32,10 +31,10 @@ namespace ADPD_code.Models
         public int RecipientID { get; set; }
 
         [Required, StringLength(100)]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [Required]
-        public string Message { get; set; }
+        public string Message { get; set; } = string.Empty;
 
         [Required]
         public NotificationType Type { get; set; }
@@ -43,19 +42,22 @@ namespace ADPD_code.Models
         [Required]
         public NotificationStatus Status { get; set; }
 
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         public DateTime? SentDate { get; set; }
 
         [StringLength(255)]
-        public string RecipientEmail { get; set; }
+        public string? RecipientEmail { get; set; }
 
         [StringLength(20)]
-        public string RecipientPhone { get; set; }
+        public string? RecipientPhone { get; set; }
 
-        public string ErrorMessage { get; set; }
+        public string? ErrorMessage { get; set; }
 
         [StringLength(50)]
-        public string Priority { get; set; } // High, Medium, Low
+        public string? Priority { get; set; } // High, Medium, Low
+
+        // NEW: Track read/unread for in-app notifications
+        public bool IsRead { get; set; } = false;
     }
 }

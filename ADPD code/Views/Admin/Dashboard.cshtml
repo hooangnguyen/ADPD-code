@@ -78,6 +78,13 @@ else
                     </a>
                 </li>
                 <li class="menu-item">
+                    <a href="@Url.Action("Create", "AdminNotification")"
+                       data-partial-url="@Url.Action("Create", "AdminNotification", new { partial = true })">
+                        <span class="menu-icon">🏭</span>
+                        <span>Notification System</span>
+                    </a>
+                </li>
+                <li class="menu-item">
                     <a href="@Url.Action("Logout", "Login")">
                         <span class="menu-icon">🚪</span>
                         <span>Logout</span>

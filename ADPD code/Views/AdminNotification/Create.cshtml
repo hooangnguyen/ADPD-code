@@ -1,0 +1,339 @@
+﻿@{
+    var partialVal = ViewContext?.HttpContext?.Request?.Query["partial"].ToString();
+    var isPartial = string.Equals(partialVal, "true", System.StringComparison.OrdinalIgnoreCase);
+    Layout = isPartial ? null : "_Layout";
+    ViewData["Title"] = "Send Notification - Factory Pattern";
+}
+
+<link href="~/css/AdminDashboard.css" rel="stylesheet" />
+
+<div class="management-wrapper">
+    <!-- 🎯 FACTORY PATTERN BANNER -->
+
+    <div class="management-header">
+        <h1>📨 Send Notification</h1>
+    </div>
+
+    <!-- Notification form -->
+    <div class="notification-form-card">
+        <form id="notificationForm">
+            <div class="form-section">
+                <h3>👤 Recipient</h3>
+                <div class="form-group">
+                    <label>Select student</label>
+                    <select id="recipientId" required>
+                        <option value="">-- Select student --</option>
+                        <!-- Load students from DB -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>📋 Notification Content</h3>
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="title" placeholder="E.g.: Exam schedule notice" required />
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea id="message" rows="4" placeholder="Enter notification message..." required></textarea>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>🏭 Select Notification Type</h3>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                    The factory creates the correct service based on your selection.
+                </p>
+
+                <div class="notification-types">
+                    <div class="type-card">
+                        <input type="radio" name="type" value="0" id="typeEmail" checked />
+                        <label for="typeEmail">
+                            <span class="type-icon">📧</span>
+                            <strong>Email</strong>
+                            <span class="type-desc">Send via Email</span>
+                        </label>
+                    </div>
+
+                    <div class="type-card">
+                        <input type="radio" name="type" value="1" id="typeSMS" />
+                        <label for="typeSMS">
+                            <span class="type-icon">📱</span>
+                            <strong>SMS</strong>
+                            <span class="type-desc">Send SMS</span>
+                        </label>
+                    </div>
+
+                    <div class="type-card">
+                        <input type="radio" name="type" value="2" id="typeInApp" />
+                        <label for="typeInApp">
+                            <span class="type-icon">🔔</span>
+                            <strong>In-App</strong>
+                            <span class="type-desc">Display inside the app</span>
+                        </label>
+                    </div>
+
+                    <div class="type-card">
+                        <input type="radio" name="type" value="3" id="typePush" />
+                        <label for="typePush">
+                            <span class="type-icon">📲</span>
+                            <strong>Push</strong>
+                            <span class="type-desc">Push notification</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>⚙️ Options</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email (if Email selected)</label>
+                        <input type="email" id="email" placeholder="student@example.com" />
+                    </div>
+                    <div class="form-group">
+                        <label>Phone (if SMS selected)</label>
+                        <input type="tel" id="phone" placeholder="0123456789" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select id="priority">
+                        <option value="Low">Low</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">📤 Send Notification</button>
+                <button type="button" class="btn btn-secondary" onclick="sendToAll()">
+                    📢 Send to All Students
+                </button>
+            </div>
+        </form>
+    </div>
+
+
+<style>
+    .factory-banner {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 25px 30px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+    }
+
+    .factory-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .factory-icon {
+        font-size: 48px;
+    }
+
+    .factory-flow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        background: rgba(255,255,255,0.1);
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .flow-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.2);
+        padding: 15px 20px;
+        border-radius: 8px;
+        min-width: 150px;
+    }
+
+    .flow-arrow {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .notification-types {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+    }
+
+    .type-card {
+        position: relative;
+    }
+
+    .type-card input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+
+    .type-card label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: white;
+    }
+
+    .type-card input:checked + label {
+        border-color: #f5576c;
+        background: linear-gradient(135deg, #fff5f7 0%, #ffe9ec 100%);
+        box-shadow: 0 4px 15px rgba(245, 87, 108, 0.2);
+    }
+
+    .type-icon {
+        font-size: 36px;
+    }
+
+    .type-desc {
+        font-size: 12px;
+        color: #999;
+    }
+
+    .notification-form-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+        padding-bottom: 25px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .form-section:last-child {
+        border-bottom: none;
+    }
+
+    .form-section h3 {
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    .explanation-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+</style>
+
+<script>
+    // Load students list
+    async function loadStudents() {
+        try {
+            const response = await fetch('/Admin/GetStudents', {
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin'
+            });
+
+            if (!response.ok) {
+                console.error('Failed to load students:', response.status, response.statusText);
+                return;
+            }
+
+            const data = await response.json();
+
+            const select = document.getElementById('recipientId');
+            // Clear existing options (keep placeholder)
+            select.querySelectorAll('option:not([value=""])').forEach(o => o.remove());
+
+            data.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.studentId;
+                option.textContent = `${student.fullName} (${student.email})`;
+                option.dataset.email = student.email || '';
+                option.dataset.phone = student.phone || '';
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading students:', error);
+        }
+    }
+
+    // Auto-fill email/phone when selecting student
+    document.getElementById('recipientId')?.addEventListener('change', function() {
+        const selected = this.options[this.selectedIndex];
+        document.getElementById('email').value = selected?.dataset?.email || '';
+        document.getElementById('phone').value = selected?.dataset?.phone || '';
+    });
+
+    // Send notification
+    document.getElementById('notificationForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const data = {
+            recipientId: parseInt(document.getElementById('recipientId').value),
+            title: document.getElementById('title').value,
+            message: document.getElementById('message').value,
+            type: parseInt(document.querySelector('input[name="type"]:checked').value),
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value,
+            priority: document.getElementById('priority').value
+        };
+
+        try {
+            const response = await fetch('/AdminNotification/Send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            alert(result.message);
+
+            if (result.success) {
+                this.reset();
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    });
+
+    // Send to all students
+    async function sendToAll() {
+        if (!confirm('Are you sure you want to send to ALL students?')) return;
+
+        const data = {
+            title: document.getElementById('title').value,
+            message: document.getElementById('message').value,
+            type: parseInt(document.querySelector('input[name="type"]:checked').value),
+            priority: document.getElementById('priority').value
+        };
+
+        try {
+            const response = await fetch('/AdminNotification/SendToAll', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            alert(result.message);
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+
+    // Load students on page load
+    loadStudents();
+</script>

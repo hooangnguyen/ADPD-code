@@ -7,7 +7,8 @@
             @foreach (var n in Model)
             {
                 var shortMsg = (n.Message ?? "").Length > 120 ? (n.Message ?? "").Substring(0, 120) + "…" : n.Message;
-                <li class="notification-item" data-id="@n.NotificationID">
+                var isRead = n.IsRead ? "true" : "false";
+                <li class="notification-item @(n.IsRead ? "" : "notification-unread")" data-id="@n.NotificationID" data-isread="@isRead">
                     <div class="notification-left">
                         <div class="notification-title">@n.Title</div>
                         <div class="notification-message">@shortMsg</div>
@@ -50,4 +51,5 @@
 .notification-time { font-size:0.75rem; color:#999; }
 .notifications-empty { padding:18px; text-align:center; color:#666; }
 .notifications-footer { padding:8px; text-align:center; font-size:0.9rem; }
+.notification-unread { background: #f7fbff; border-left: 4px solid #3498db; }
 </style>

@@ -1159,6 +1159,28 @@ namespace ADPD_code.Controllers
                 return Convert.ToBase64String(hashedBytes);
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetStudents()
+        {
+            if (HttpContext.Session.GetString("Role") != "Admin")
+            {
+                return Json(new { success = false, message = "Unauthorized" });
+            }
+
+            var students = await _context.Students
+                .OrderBy(s => s.FullName)
+                .Select(s => new
+                {
+                    studentId = s.StudentId,
+                    fullName = s.FullName,
+                    email = s.Email,
+                    phone = s.Phone
+                })
+                .ToListAsync();
+
+            return Json(students);
+        }
     }
 
     // Request models

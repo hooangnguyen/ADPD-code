@@ -1,4 +1,3 @@
-
 using ADPD_code.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -847,6 +846,51 @@ namespace ADPD_code.Controllers
 
             // Trả về partial view (tạo Views/Student/_NotificationsListPartial.cshtml nếu chưa có)
             return PartialView("_NotificationsListPartial", notifications);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MarkAllNotificationsRead()
+        {
+            if (HttpContext.Session.GetString("Role") != "Student")
+                return Unauthorized();
+
+            var studentId = HttpContext.Session.GetInt32("StudentID");
+            if (!studentId.HasValue)
+                return Unauthorized();
+
+            var list = await _context.Notifications
+                .Where(n => n.RecipientID == studentId.Value && !n.IsRead && n.Type == NotificationType.InApp)
+                .ToListAsync();
+
+            if (list.Any())
+            {
+                foreach (var n in list) n.IsRead = true;
+                await _context.SaveChangesAsync();
+            }
+
+            return Json(new { success = true, updated = list.Count });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MarkNotificationRead(int id)
+        {
+            if (HttpContext.Session.GetString("Role") != "Student")
+                return Unauthorized();
+
+            var studentId = HttpContext.Session.GetInt32("StudentID");
+            if (!studentId.HasValue)
+                return Unauthorized();
+
+            var notif = await _context.Notifications.FirstOrDefaultAsync(n => n.NotificationID == id && n.RecipientID == studentId.Value);
+            if (notif == null) return Json(new { success = false, message = "Not found" });
+
+            if (!notif.IsRead)
+            {
+                notif.IsRead = true;
+                await _context.SaveChangesAsync();
+            }
+
+            return Json(new { success = true });
         }
     }
 }

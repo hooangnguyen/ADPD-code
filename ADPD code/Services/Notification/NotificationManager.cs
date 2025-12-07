@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using ADPD_code.Data;
 using ADPD_code.Models;
+using NotificationModel = ADPD_code.Models.Notification;
 
 namespace ADPD_code.Services.Notification
 {
@@ -30,9 +31,8 @@ namespace ADPD_code.Services.Notification
         {
             try
             {
-                // Tạo notification object
-                var notification = new ADPD_code.Models.Notification
-                {
+                // Tạo notification object (fully-qualified alias avoids namespace/type conflict)
+                var notification = new NotificationModel {
                     RecipientID = recipientId,
                     Title = title,
                     Message = message,
@@ -41,14 +41,15 @@ namespace ADPD_code.Services.Notification
                     CreatedDate = DateTime.Now,
                     RecipientEmail = email,
                     RecipientPhone = phone,
-                    Priority = priority
+                    Priority = priority,
+                    IsRead = false
                 };
 
                 // Lưu vào database
-                _context.Add(notification);
+                _context.Notifications.Add(notification);
                 await _context.SaveChangesAsync();
 
-                // Tạo service từ factory
+                // Tạo service từ factory (call correct method)
                 var service = _factory.CreateNotificationService(type);
 
                 // Gửi thông báo

@@ -29,6 +29,52 @@
 
             </div>
         </nav>
+        @* Include with: @Html.Partial("_NotificationBell") inside your header/navbar *@
+        <button id="notificationBtn" class="notification-btn" type="button" aria-expanded="false" title="Thông báo">
+            <span class="bell-icon">🔔</span>
+            <span id="notificationBadge" class="notification-badge" style="display:none">0</span>
+        </button>
+        <div id="notificationDropdown" class="notification-dropdown" style="display:none"></div>
+
+        <link rel="stylesheet" href="~/css/AdminDashboard.css" asp-append-version="true" />
+        <style>
+            .notification-btn {
+                position: relative;
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                font-size: 20px;
+                padding: 6px 10px;
+                color: inherit;
+            }
+
+            .notification-badge {
+                display: inline-block;
+                min-width: 18px;
+                height: 18px;
+                padding: 0 5px;
+                line-height: 18px;
+                border-radius: 9px;
+                background: #e74c3c;
+                color: white;
+                font-size: 12px;
+                font-weight: 600;
+                position: absolute;
+                top: 2px;
+                right: 2px;
+            }
+
+            .notification-dropdown {
+                position: absolute;
+                right: 12px;
+                top: 46px;
+                z-index: 1200;
+                display: none;
+                min-width: 300px;
+            }
+        </style>
+
+        <script src="~/js/notifications.js" asp-append-version="true"></script>
     </header>
 
     <div class="container-fluid">
