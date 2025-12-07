@@ -1,6 +1,6 @@
-﻿@model IEnumerable<ADPD_code.Models.Course>
+@model IEnumerable<ADPD_code.Models.Course>
 @{
-    ViewData["Title"] = "Lịch học";
+    ViewData["Title"] = "Schedule";
     var isPartial = ViewData["IsPartial"] as bool? ?? false;
     Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
 }
@@ -210,50 +210,50 @@
 
 </style>
     <div class="schedule-header">
-        <h1>📅 Lịch Học</h1>
-        <p>Thời khóa biểu học kỳ hiện tại</p>
+        <h1>📅 Schedule</h1>
+        <p>Current semester timetable</p>
     </div>
 
     @if (Model != null && Model.Any())
     {
-        <!-- Danh sách môn học -->
+        <!-- Course List -->
         <div class="courses-list">
-            <h2 style="margin-bottom: 20px; color: #333;">📚 Danh sách môn học</h2>
+            <h2 style="margin-bottom: 20px; color: #333;">📚 Course List</h2>
             @foreach (var course in Model)
             {
                 <div class="course-card">
                     <div class="course-info">
                         <h3>@course.CourseName</h3>
-                        <div class="course-code">Mã môn: CS@(course.CourseID)</div>
+                        <div class="course-code">Code: CS@(course.CourseID)</div>
                     </div>
                     <div class="course-detail">
-                        <div class="course-detail-label">Tín chỉ</div>
+                        <div class="course-detail-label">Credits</div>
                         <div class="course-detail-value">@(course.Credits == 0 ? "N/A" : course.Credits.ToString())</div>
                     </div>
                     <div class="course-detail">
-                        <div class="course-detail-label">Giảng viên</div>
+                        <div class="course-detail-label">Lecturer</div>
                         <div class="course-detail-value">@(course.Lecturer?.FullName ?? "N/A")</div>
                     </div>
                     <div class="course-detail">
-                        <div class="course-detail-label">Phòng học</div>
+                        <div class="course-detail-label">Room</div>
                         <div class="course-detail-value">A@(100 + course.CourseID)</div>
                     </div>
                 </div>
             }
         </div>
 
-        <!-- Lịch theo tuần (giả lập) -->
+        <!-- Weekly Schedule (simulated) -->
         <div class="week-view">
-            <h2 style="margin-bottom: 20px; color: #333;">📆 Thời khóa biểu tuần</h2>
+            <h2 style="margin-bottom: 20px; color: #333;">📆 Weekly Timetable</h2>
             <div class="calendar-grid">
                 <!-- Header -->
-                <div class="day-header" style="background: #f9f9f9; color: #666;">Giờ</div>
-                <div class="day-header">Thứ 2</div>
-                <div class="day-header">Thứ 3</div>
-                <div class="day-header">Thứ 4</div>
-                <div class="day-header">Thứ 5</div>
-                <div class="day-header">Thứ 6</div>
-                <div class="day-header">Thứ 7</div>
+                <div class="day-header" style="background: #f9f9f9; color: #666;">Time</div>
+                <div class="day-header">Monday</div>
+                <div class="day-header">Tuesday</div>
+                <div class="day-header">Wednesday</div>
+                <div class="day-header">Thursday</div>
+                <div class="day-header">Friday</div>
+                <div class="day-header">Saturday</div>
 
                 @{
                     var timeSlots = new[] { "7:30", "9:45", "13:00", "15:15" };

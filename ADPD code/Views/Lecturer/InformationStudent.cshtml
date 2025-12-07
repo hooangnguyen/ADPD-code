@@ -9,38 +9,38 @@
         <div class="header">
             <h1>
                 <span style="font-size: 36px;">📚</span>
-                Quản lý Sinh viên
+                Student Management
             </h1>
-            <p>Danh sách toàn bộ sinh viên đang được quản lý</p>
+            <p>List of all students being managed</p>
         </div>
 
         <div class="stats-grid">
             <div class="stat-card">
                 <h3 id="totalStudents">0</h3>
-                <p>Tổng số sinh viên</p>
+                <p>Total Students</p>
             </div>
             <div class="stat-card">
                 <h3 id="activeStudents">0</h3>
-                <p>Đang học</p>
+                <p>Active</p>
             </div>
             <div class="stat-card">
                 <h3 id="avgAttendance">0%</h3>
-                <p>Tỷ lệ tham dự TB</p>
+                <p>Average Attendance</p>
             </div>
             <div class="stat-card">
                 <h3 id="classCount">0</h3>
-                <p>Số lớp</p>
+                <p>Number of Classes</p>
             </div>
         </div>
 
         <div class="toolbar">
             <div class="search-container">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên, MSSV, email...">
+                <input type="text" id="searchInput" placeholder="Search by name, student ID, email...">
             </div>
 
             <select class="filter-select" id="classFilter">
-                <option value="">Tất cả lớp</option>
+                <option value="">All Classes</option>
                 @if (ViewBag.Classes != null)
                 {
                     @foreach (var className in ViewBag.Classes)
@@ -51,13 +51,13 @@
             </select>
 
             <select class="filter-select" id="statusFilter">
-                <option value="">Tất cả trạng thái</option>
-                <option value="Đang học">Đang học</option>
-                <option value="Nghỉ học">Nghỉ học</option>
+                <option value="">All Status</option>
+                <option value="Đang học">Active</option>
+                <option value="Nghỉ học">Inactive</option>
             </select>
 
             <a href="/Lecturer/ExportStudentsExcel" class="btn btn-excel">
-                📊 Xuất Excel
+                📊 Export Excel
             </a>
         </div>
 
@@ -65,16 +65,16 @@
             <table id="studentTable">
                 <thead>
                     <tr>
-                        <th onclick="sortTable(0)">STT</th>
+                        <th onclick="sortTable(0)">No.</th>
                         <th onclick="sortTable(1)">Avatar</th>
-                        <th onclick="sortTable(2)">MSSV ↕</th>
-                        <th onclick="sortTable(3)">Họ và tên ↕</th>
-                        <th onclick="sortTable(4)">Lớp ↕</th>
+                        <th onclick="sortTable(2)">Student ID ↕</th>
+                        <th onclick="sortTable(3)">Full Name ↕</th>
+                        <th onclick="sortTable(4)">Class ↕</th>
                         <th onclick="sortTable(5)">Email</th>
-                        <th onclick="sortTable(6)">SĐT</th>
-                        <th onclick="sortTable(7)">Điểm TB ↕</th>
-                        <th onclick="sortTable(8)">Tỷ lệ tham dự ↕</th>
-                        <th>Trạng thái</th>
+                        <th onclick="sortTable(6)">Phone</th>
+                        <th onclick="sortTable(7)">GPA ↕</th>
+                        <th onclick="sortTable(8)">Attendance Rate ↕</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="studentTableBody">
@@ -83,11 +83,11 @@
         </div>
     </div>
 
-    <!-- Modal hiển thị chi tiết sinh viên -->
+    <!-- Student Detail Modal -->
     <div id="studentModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Thông tin chi tiết sinh viên</h2>
+                <h2>Student Details</h2>
                 <button class="close-btn" onclick="closeModal()">×</button>
             </div>
             <div class="modal-body">
@@ -95,15 +95,15 @@
                     <div class="student-photo" id="modalAvatar">SV</div>
                     <div class="student-info">
                         <div class="info-group">
-                            <label>Mã số sinh viên</label>
+                            <label>Student ID</label>
                             <p id="modalMSSV">-</p>
                         </div>
                         <div class="info-group">
-                            <label>Họ và tên</label>
+                            <label>Full Name</label>
                             <p id="modalName">-</p>
                         </div>
                         <div class="info-group">
-                            <label>Lớp</label>
+                            <label>Class</label>
                             <p id="modalClass">-</p>
                         </div>
                     </div>
@@ -111,11 +111,11 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
                     <div class="info-group">
-                        <label>Ngày sinh</label>
+                        <label>Date of Birth</label>
                         <p id="modalDOB">-</p>
                     </div>
                     <div class="info-group">
-                        <label>Giới tính</label>
+                        <label>Gender</label>
                         <p id="modalGender">-</p>
                     </div>
                     <div class="info-group">
@@ -123,32 +123,32 @@
                         <p id="modalEmail">-</p>
                     </div>
                     <div class="info-group">
-                        <label>Số điện thoại</label>
+                        <label>Phone Number</label>
                         <p id="modalPhone">-</p>
                     </div>
                     <div class="info-group">
-                        <label>Địa chỉ</label>
+                        <label>Address</label>
                         <p id="modalAddress">-</p>
                     </div>
                     <div class="info-group">
-                        <label>Trạng thái</label>
+                        <label>Status</label>
                         <p id="modalStatus">-</p>
                     </div>
                 </div>
 
-                <h3 style="margin-top: 30px; margin-bottom: 15px; color: #667eea;">📊 Thống kê học tập</h3>
+                <h3 style="margin-top: 30px; margin-bottom: 15px; color: #667eea;">📊 Academic Statistics</h3>
                 <div class="attendance-stats">
                     <div class="mini-stat">
                         <h4 id="modalGPA">0</h4>
-                        <p>Điểm trung bình</p>
+                        <p>Average Score</p>
                     </div>
                     <div class="mini-stat">
                         <h4 id="modalAttendance">0%</h4>
-                        <p>Tỷ lệ tham dự</p>
+                        <p>Attendance Rate</p>
                     </div>
                     <div class="mini-stat">
                         <h4 id="modalAbsent">0</h4>
-                        <p>Số buổi vắng</p>
+                        <p>Absent Sessions</p>
                     </div>
                 </div>
             </div>
@@ -180,7 +180,7 @@
             tbody.innerHTML = '';
 
             if (filteredStudents.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px; color: #6c757d;">Không tìm thấy sinh viên nào</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px; color: #6c757d;">No students found</td></tr>';
                 updateStats();
                 return;
             }

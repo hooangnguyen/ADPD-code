@@ -1,6 +1,6 @@
-﻿@model ADPD_code.Models.Assignment
+@model ADPD_code.Models.Assignment
 @{
-    ViewData["Title"] = "Nộp bài tập";
+    ViewData["Title"] = "Submit Assignment";
     var isPartial = ViewData["IsPartial"] as bool? ?? false;
     Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
     var submission = ViewBag.Submission as ADPD_code.Models.AssignmentSubmission;

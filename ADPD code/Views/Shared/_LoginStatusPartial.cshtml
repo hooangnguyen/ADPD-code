@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http
 
 @{
     // Use Context.Session and guard against null HttpContext/Session
@@ -29,7 +29,7 @@
     }
     else
     {
-        <a href="@Url.Action("Index", "Login")" class="btn btn-primary btn-nav-login">Đăng nhập</a>
-        <a href="@Url.Action("Index", "Register")" class="btn btn-primary btn-nav-register">Đăng ký</a>
+        <a href="@Url.Action("Index", "Login")" class="btn btn-primary btn-nav-login">Sign in</a>
+        <a href="@Url.Action("Index", "Register")" class="btn btn-primary btn-nav-register">Sign up</a>
     }
 </div>

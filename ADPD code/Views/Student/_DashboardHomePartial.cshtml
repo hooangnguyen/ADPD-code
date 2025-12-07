@@ -2,7 +2,7 @@
     <div class="topbar-left">
         <h1>Dashboard</h1>
         <div class="breadcrumb">
-            <span>Trang chủ</span>
+            <span>Home</span>
             <span>/</span>
             <span>Dashboard</span>
         </div>
@@ -25,28 +25,28 @@
         <div class="stat-card">
             <div class="stat-icon blue">📊</div>
             <div class="stat-info">
-                <h3>GPA Tích lũy</h3>
+                <h3>Cumulative GPA</h3>
                 <div class="value">@ViewBag.GPA</div>  
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon green">📚</div>
             <div class="stat-info">
-                <h3>Tín chỉ đã học</h3>
+                <h3>Credits Completed</h3>
                 <div class="value">@ViewBag.TotalCredits/@ViewBag.MaxCredits</div>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon orange">✅</div>
             <div class="stat-info">
-                <h3>Môn học kỳ này</h3>
+                <h3>Current Semester Courses</h3>
                 <div class="value">@ViewBag.CurrentSemesterCourses</div>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon purple">📅</div>
             <div class="stat-info">
-                <h3>Lớp hôm nay</h3>
+                <h3>Today's Classes</h3>
                 <div class="value">@ViewBag.TodayClasses</div>
             </div>
         </div>
@@ -60,7 +60,7 @@
                     <p style="font-size: 13px; color: #666; margin-top: 4px;">
                         @{
                             var displayDate = ViewBag.TodayDate != null ? (DateTime)ViewBag.TodayDate : DateTime.Now;
-                            var dayNames = new[] { "Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy" };
+                            var dayNames = new[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
                             var dayName = dayNames[(int)displayDate.DayOfWeek];
                         }
                         @dayName, @displayDate.ToString("dd/MM/yyyy")
@@ -68,15 +68,15 @@
                 </div>
                 <a href="@Url.Action("Schedule", "Student")"
                    class="view-all"
-                   data-partial-url="@Url.Action("Schedule", "Student", new { partial = true })">Xem tất cả →</a>
+                   data-partial-url="@Url.Action("Schedule", "Student", new { partial = true })">View all →</a>
             </div>
             <table class="schedule-table">
                 <thead>
                     <tr>
-                        <th>Môn học</th>
-                        <th>Thời gian</th>
-                        <th>Phòng</th>
-                        <th>Giảng viên</th>
+                        <th>Subject</th>
+                        <th>Time</th>
+                        <th>Room</th>
+                        <th>Lecturer</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -99,7 +99,7 @@
                     {
                         <tr>
                             <td colspan="4" style="text-align: center; color: #999;">
-                                Không có lịch học hôm nay
+                                No classes scheduled for today
                             </td>
                         </tr>
                     }                             
@@ -110,10 +110,10 @@
         <div>
             <div class="card" style="margin-bottom: 20px;">
                 <div class="card-header">
-                    <h2 class="card-title">Thông báo</h2>
+                    <h2 class="card-title">Notifications</h2>
                     <a href="@Url.Action("Assignments", "Student")" 
                        class="view-all"
-                       data-partial-url="@Url.Action("Assignments", "Student", new { partial = true })">Xem tất cả →</a>
+                       data-partial-url="@Url.Action("Assignments", "Student", new { partial = true })">View all →</a>
                 </div>
 
                 @if (ViewBag.RecentAssignments != null && ((IEnumerable<dynamic>)ViewBag.RecentAssignments).Any())
@@ -129,7 +129,7 @@
                             <div class="notification-content">
                                 <h4>@assignment.Title</h4>
                                 <p>@assignment.CourseName - Deadline: @assignment.Deadline.ToString("dd/MM/yyyy")</p>
-                                <span class="notification-time">@(daysLeft >= 0 ? $"Còn {daysLeft} ngày" : $"Quá hạn {-daysLeft} ngày")</span>
+                                <span class="notification-time">@(daysLeft >= 0 ? $"{daysLeft} days left" : $"Overdue by {-daysLeft} days")</span>
                             </div>
                         </div>
                     }
@@ -139,53 +139,53 @@
                     <div class="notification-item">
                         <div class="notification-icon info">📢</div>
                         <div class="notification-content">
-                            <h4>Chưa có thông báo</h4>
-                            <p>Hiện tại chưa có thông báo mới</p>
-                            <span class="notification-time">Hôm nay</span>
+                            <h4>No notifications</h4>
+                            <p>Currently no new notifications</p>
+                            <span class="notification-time">Today</span>
                         </div>
                     </div>
                 }
 
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">Thao tác nhanh</h2>
+                    <h2 class="card-title">Quick Actions</h2>
                 </div>
                 <div class="quick-actions">
                 <a href="@Url.Action("RegisterStudy", "Student")"
                    class="action-btn"
                    data-partial-url="@Url.Action("RegisterStudy", "Student", new { partial = true })">
                     <div class="icon">✏️</div>
-                    <span>Đăng ký môn học</span>
+                    <span>Register Course</span>
                     </a>
                     <a href="@Url.Action("Grades", "Student")"
                        class="action-btn"
                        data-partial-url="@Url.Action("Grades", "Student", new { partial = true })">
                         <div class="icon">📊</div>
-                        <span>Xem điểm</span>
+                        <span>View Grades</span>
                     </a>
                     <a href="@Url.Action("Subject","Student")"
                        class="action-btn"
                        data-partial-url="@Url.Action("Subject","Student",new{ partial = true })">
                        <div class="icon">📚</div>
-                      <span>môn học </span>
+                      <span>Subjects</span>
                        </a>    
                     <a href="@Url.Action("Assignments", "Student")"
                        class="action-btn"
                        data-partial-url="@Url.Action("Assignments", "Student", new { partial = true })">
                         <div class="icon">📝</div>
-                        <span>Bài tập</span>
+                        <span>Assignments</span>
                     </a>
                     <a href="@Url.Action("Schedule", "Student")"
                        class="action-btn"
                        data-partial-url="@Url.Action("Schedule", "Student", new { partial = true })">
                         <div class="icon">📅</div>
-                        <span>Lịch thi</span>
+                        <span>Exam Schedule</span>
                     </a>
                     <a href="@Url.Action("Attendance", "Student")"
                        class="action-btn"
                        data-partial-url="@Url.Action("Attendance", "Student", new { partial = true })">
                         <div class="icon">📋</div>
-                        <span>Điểm danh</span>
+                        <span>Attendance</span>
                     </a>
                 </div>
             </div>

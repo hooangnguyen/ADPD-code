@@ -1,6 +1,6 @@
-﻿@model IEnumerable<ADPD_code.Models.Assignment>
+@model IEnumerable<ADPD_code.Models.Assignment>
 @{
-    ViewData["Title"] = "Bài tập";
+    ViewData["Title"] = "Assignments";
     var isPartial = ViewData["IsPartial"] as bool? ?? false;
     Layout = isPartial ? null : "~/Views/Shared/_Layout.cshtml";
     var submissions = ViewBag.Submissions as List<ADPD_code.Models.AssignmentSubmission>;
@@ -262,11 +262,11 @@
 </style>
 
 <div class="assignments-container">
-    <a href="@Url.Action("Dashboard", "Student")" class="back-btn">← Quay lại Dashboard</a>
+    <a href="@Url.Action("Dashboard", "Student")" class="back-btn">← Back to Dashboard</a>
 
     <div class="assignments-header">
-        <h1>📝 Bài Tập</h1>
-        <p>Quản lý bài tập và deadline</p>
+        <h1>📝 Assignments</h1>
+        <p>Manage assignments and deadlines</p>
     </div>
 
     @if (Model != null && Model.Any())
@@ -278,10 +278,10 @@
         <!-- Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="showTab('upcoming')">
-                Đang mở (@upcomingAssignments.Count)
+                Open (@upcomingAssignments.Count)
             </button>
             <button class="tab-btn" onclick="showTab('overdue')">
-                Quá hạn (@overdueAssignments.Count)
+                Overdue (@overdueAssignments.Count)
             </button>
         </div>
 
@@ -304,38 +304,38 @@
                             </div>
                             @if (isGraded && submission != null)
                             {
-                                <span class="status-badge status-graded">✅ Đã chấm: @submission.Score điểm</span>
+                                <span class="status-badge status-graded">✅ Graded: @submission.Score points</span>
                             }
                             else if (hasSubmitted)
                             {
-                                <span class="status-badge status-submitted">📤 Đã nộp</span>
+                                <span class="status-badge status-submitted">📤 Submitted</span>
                             }
                             else if (daysLeft < 2)
                             {
-                                <span class="status-badge status-overdue">⚠️ Sắp hết hạn</span>
+                                <span class="status-badge status-overdue">⚠️ Due soon</span>
                             }
                             else
                             {
-                                <span class="status-badge status-pending">⏳ Chưa nộp</span>
+                                <span class="status-badge status-pending">⏳ Not submitted</span>
                             }
                         </div>
 
                         <div class="assignment-description">
-                            @(assignment.Description ?? "Không có mô tả")
+                            @(assignment.Description ?? "No description")
                         </div>
 
                         <div class="assignment-meta">
                             <div class="meta-item">
                                 <span class="meta-icon">👨‍🏫</span>
                                 <div class="meta-content">
-                                    <div class="meta-label">Giảng viên</div>
+                                    <div class="meta-label">Lecturer</div>
                                     <div class="meta-value">@assignment.Lecturer?.FullName ?? "N/A"</div>
                                 </div>
                             </div>
                             <div class="meta-item">
                                 <span class="meta-icon">📅</span>
                                 <div class="meta-content">
-                                    <div class="meta-label">Ngày giao</div>
+                                    <div class="meta-label">Assigned Date</div>
                                     <div class="meta-value">@assignment.StartDate.ToString("dd/MM/yyyy")</div>
                                 </div>
                             </div>
@@ -351,9 +351,9 @@
                             <div class="meta-item">
                                 <span class="meta-icon">⏳</span>
                                 <div class="meta-content">
-                                    <div class="meta-label">Thời gian còn lại</div>
+                                    <div class="meta-label">Time remaining</div>
                                     <div class="meta-value" style="color: @(daysLeft < 2 ? "#e74c3c" : "#27ae60");">
-                                        @(daysLeft >= 1 ? $"{(int)daysLeft} ngày" : $"{(int)(daysLeft * 24)} giờ")
+                                        @(daysLeft >= 1 ? $"{(int)daysLeft} days" : $"{(int)(daysLeft * 24)} hours")
                                     </div>
                                 </div>
                             </div>
@@ -362,12 +362,12 @@
                         @if (hasSubmitted && submission != null)
                         {
                             <div class="submission-info">
-                                <strong>✅ Bạn đã nộp bài này</strong><br />
-                                Ngày nộp: @submission.SubmitDate.ToString("dd/MM/yyyy HH:mm")<br />
+                                <strong>✅ You have submitted this assignment</strong><br />
+                                Submission date: @submission.SubmitDate.ToString("dd/MM/yyyy HH:mm")<br />
                                 @if (isGraded && !string.IsNullOrEmpty(submission.Feedback))
                                 {
                                     <div style="margin-top: 8px;">
-                                        <strong>Nhận xét:</strong> @submission.Feedback
+                                        <strong>Feedback:</strong> @submission.Feedback
                                     </div>
                                 }
                             </div>
@@ -377,12 +377,12 @@
                             @if (!hasSubmitted)
                             {
                                 <a href="@Url.Action("SubmitAssignment", "Student", new { id = assignment.AssignmentID })"
-                                   class="btn-primary">📤 Nộp bài</a>
+                                   class="btn-primary">📤 Submit</a>
                             }
                             else if (!isGraded)
                             {
                                 <a href="@Url.Action("SubmitAssignment", "Student", new { id = assignment.AssignmentID })"
-                                   class="btn-primary">✏️ Chỉnh sửa bài nộp</a>
+                                   class="btn-primary">✏️ Edit submission</a>
                             }
                         </div>
                     </div>
@@ -391,8 +391,8 @@
             else
             {
                 <div class="no-data">
-                    <h3>🎉 Không có bài tập đang mở</h3>
-                    <p>Bạn đã hoàn thành tất cả bài tập hiện tại!</p>
+                    <h3>🎉 No open assignments</h3>
+                    <p>You have completed all current assignments!</p>
                 </div>
             }
         </div>
@@ -415,27 +415,27 @@
                             </div>
                             @if (isGraded)
                             {
-                                <span class="status-badge status-graded">✅ Đã chấm: @(submission != null ? submission.Score : 0) điểm</span>
+                                <span class="status-badge status-graded">✅ Graded: @(submission != null ? submission.Score : 0) points</span>
                             }
                             else if (hasSubmitted)
                             {
-                                <span class="status-badge status-submitted">📤 Nộp muộn</span>
+                                <span class="status-badge status-submitted">📤 Late submission</span>
                             }
                             else
                             {
-                                <span class="status-badge status-overdue">❌ Quá hạn</span>
+                                <span class="status-badge status-overdue">❌ Overdue</span>
                             }
                         </div>
 
                         <div class="assignment-description">
-                            @(assignment.Description ?? "Không có mô tả")
+                            @(assignment.Description ?? "No description")
                         </div>
 
                         <div class="assignment-meta">
                             <div class="meta-item">
                                 <span class="meta-icon">👨‍🏫</span>
                                 <div class="meta-content">
-                                    <div class="meta-label">Giảng viên</div>
+                                    <div class="meta-label">Lecturer</div>
                                     <div class="meta-value">@assignment.Lecturer?.FullName ?? "N/A"</div>
                                 </div>
                             </div>
@@ -453,19 +453,19 @@
                         @if (hasSubmitted && isGraded && submission != null)
                         {
                             <div class="submission-info">
-                                <strong>✅ Đã chấm điểm</strong><br />
-                                Điểm: @submission.Score<br />
+                                <strong>✅ Graded</strong><br />
+                                Score: @submission.Score<br />
                                 @if (!string.IsNullOrEmpty(submission.Feedback))
                                 {
                                     <div style="margin-top: 8px;">
-                                        <strong>Nhận xét:</strong> @submission.Feedback
+                                        <strong>Feedback:</strong> @submission.Feedback
                                     </div>
                                 }
                             </div>
                         }
 
                         <div class="assignment-actions">
-                            <a href="#" class="btn-secondary">📄 Xem chi tiết</a>
+                            <a href="#" class="btn-secondary">📄 View details</a>
                         </div>
                     </div>
                 }
@@ -473,8 +473,8 @@
             else
             {
                 <div class="no-data">
-                    <h3>✅ Không có bài tập quá hạn</h3>
-                    <p>Bạn đã nộp đúng hạn tất cả bài tập!</p>
+                    <h3>✅ No overdue assignments</h3>
+                    <p>You have submitted all assignments on time!</p>
                 </div>
             }
         </div>
@@ -482,8 +482,8 @@
     else
     {
         <div class="no-data">
-            <h3>📝 Chưa có bài tập</h3>
-            <p>Chưa có bài tập nào được giao cho các môn học của bạn.</p>
+            <h3>📝 No assignments</h3>
+            <p>No assignments have been assigned to your courses yet.</p>
         </div>
     }
 </div>

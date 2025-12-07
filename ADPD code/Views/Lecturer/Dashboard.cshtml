@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = null;
     var isPartial = ViewData["IsPartial"] as bool? ?? false;
 }
@@ -20,8 +20,8 @@ else
                    data-partial-url="@Url.Action("Profile", "Lecturer", new { partial = true })">
                 <div class="user-avatar"></div>
                 <div class="user-info">
-                    <h3>@(ViewBag.FullName ?? "Giảng viên")</h3>
-                    <p>Giảng viên</p>
+                    <h3>@(ViewBag.FullName ?? "Lecturer")</h3>
+                    <p>Lecturer</p>
                 </div>
             </a>
         </div>
@@ -32,41 +32,41 @@ else
                    class="active"
                    data-partial-url="@Url.Action("Dashboard", "Lecturer", new { partial = true })">
                     <span class="menu-icon">🏠</span>
-                    <span>Trang chủ</span>
+                    <span>Home</span>
                 </a>
             </li>
             <li class="menu-item">
                 <a href="@Url.Action("Courses", "Lecturer")"
                    data-partial-url="@Url.Action("Courses", "Lecturer", new { partial = true })">
                     <span class="menu-icon">📚</span>
-                    <span>lịch dạy </span>
+                    <span>Teaching schedule</span>
                 </a>
             </li>
             <li class="menu-item">
                 <a href="@Url.Action("Assignments", "Lecturer")"
                    data-partial-url="@Url.Action("Assignments", "Lecturer", new { partial = true })">
                     <span class="menu-icon">📝</span>
-                    <span>Bài tập</span>
+                    <span>Assignments</span>
                 </a>
             </li>
             <li class="menu-item">
                 <a href="@Url.Action("Attendance", "Lecturer")"
                    data-partial-url="@Url.Action("Attendance", "Lecturer", new { partial = true })">
                     <span class="menu-icon">📋</span>
-                    <span>Điểm danh</span>
+                    <span>Attendance</span>
                 </a>
             </li>
             <li class="menu-item">
                     <a href="@Url.Action("Students", "Lecturer")"
                        data-partial-url="@Url.Action("Students", "Lecturer", new { partial = true })">
                     <span class="menu-icon">🎓</span>
-                    <span>Sinh viên</span>
+                    <span>Students</span>
                 </a>
             </li> 
             <li class="menu-item">
                 <a href="@Url.Action("Logout", "Login")">
                     <span class="menu-icon">🔒</span>
-                    <span>Đăng xuất</span>
+                    <span>Logout</span>
                 </a>
             </li>
         </ul>

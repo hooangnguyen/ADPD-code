@@ -9,16 +9,16 @@
         <div class="header">
             <h1>
                 <span style="font-size: 36px;">📋</span>
-                Quản lý Điểm danh
+                Attendance Management
             </h1>
-            <p>Điểm danh sinh viên theo môn học và ngày học</p>
+            <p>Take attendance for students by course and date</p>
         </div>
 
         <div class="toolbar">
             <div class="filter-group">
-                <label for="courseSelect">Chọn môn học:</label>
+                <label for="courseSelect">Select course:</label>
                 <select id="courseSelect" class="filter-select">
-                    <option value="">-- Chọn môn học --</option>
+                    <option value="">-- Select course --</option>
                     @if (ViewBag.Courses != null)
                     {
                         @foreach (var course in ViewBag.Courses)
@@ -30,22 +30,22 @@
             </div>
 
             <div class="filter-group">
-                <label for="dateSelect">Ngày điểm danh:</label>
+                <label for="dateSelect">Attendance date:</label>
                 <input type="date" id="dateSelect" class="filter-select" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
             </div>
 
             <div class="action-buttons">
                 <button class="btn btn-primary" id="loadStudentsBtn" onclick="loadStudents()">
                     <span>📝</span>
-                    <span>Tải danh sách</span>
+                    <span>Load List</span>
                 </button>
                 <button class="btn btn-save" id="saveAttendanceBtn" onclick="saveAttendance()" disabled>
                     <span>💾</span>
-                    <span>Lưu điểm danh</span>
+                    <span>Save Attendance</span>
                 </button>
                 <button class="btn btn-history" onclick="showHistory()">
                     <span>📊</span>
-                    <span>Xem lịch sử</span>
+                    <span>View History</span>
                 </button>
             </div>
         </div>
@@ -55,25 +55,25 @@
                 <span>📚</span>
                 <span id="courseNameDisplay"></span>
             </h3>
-            <p>📅 Ngày: <span id="dateDisplay"></span></p>
+            <p>📅 Date: <span id="dateDisplay"></span></p>
         </div>
 
         <div class="stats-grid" id="statsGrid" style="display: none;">
             <div class="stat-card">
                 <h3 id="totalStudents">0</h3>
-                <p>Tổng số sinh viên</p>
+                <p>Total Students</p>
             </div>
             <div class="stat-card">
                 <h3 id="presentCount">0</h3>
-                <p>Có mặt</p>
+                <p>Present</p>
             </div>
             <div class="stat-card">
                 <h3 id="absentCount">0</h3>
-                <p>Vắng</p>
+                <p>Absent</p>
             </div>
             <div class="stat-card">
                 <h3 id="excusedCount">0</h3>
-                <p>Có phép</p>
+                <p>Excused</p>
             </div>
         </div>
 
@@ -81,12 +81,12 @@
             <table id="attendanceTable">
                 <thead>
                     <tr>
-                        <th>STT</th>
-                        <th>Mã SV</th>
-                        <th>Họ và tên</th>
+                        <th>No.</th>
+                        <th>Student ID</th>
+                        <th>Full Name</th>
                         <th>Email</th>
-                        <th>Trạng thái</th>
-                        <th>Thao tác</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="attendanceTableBody">
@@ -95,27 +95,27 @@
         </div>
 
         <div id="noDataMessage" class="no-data-message" style="display: none;">
-            <p>Vui lòng chọn môn học và nhấn "Tải danh sách" để bắt đầu điểm danh.</p>
+            <p>Please select a course and click "Load List" to start taking attendance.</p>
         </div>
     </div>
 
-    <!-- Modal Lịch sử điểm danh -->
+    <!-- Attendance History Modal -->
     <div id="historyModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>
                     <span>📊</span>
-                    Lịch sử điểm danh
+                    Attendance History
                 </h2>
                 <button class="close-btn" onclick="closeHistoryModal()">×</button>
             </div>
             <div class="modal-body">
                 <div class="filter-group">
-                    <label>Từ ngày:</label>
+                    <label>From date:</label>
                     <input type="date" id="startDate" class="filter-select" />
-                    <label>Đến ngày:</label>
+                    <label>To date:</label>
                     <input type="date" id="endDate" class="filter-select" />
-                    <button class="btn btn-primary" onclick="loadHistory()">Tải lịch sử</button>
+                    <button class="btn btn-primary" onclick="loadHistory()">Load History</button>
                 </div>
                 <div id="historyContent" class="history-content"></div>
             </div>
@@ -152,25 +152,25 @@
             const date = document.getElementById('dateSelect').value;
 
             if (!courseId) {
-                alert('Vui lòng chọn môn học!');
+                alert('Please select a course!');
                 return;
             }
 
             if (!date) {
-                alert('Vui lòng chọn ngày điểm danh!');
+                alert('Please select an attendance date!');
                 return;
             }
 
             currentCourseId = courseId;
             currentDate = date;
 
-            // Hiển thị loading
+            // Show loading
             const loadBtn = document.getElementById('loadStudentsBtn');
             const originalText = loadBtn.innerHTML;
-            loadBtn.innerHTML = '<span class="loading"></span> Đang tải...';
+            loadBtn.innerHTML = '<span class="loading"></span> Loading...';
             loadBtn.disabled = true;
             
-            document.getElementById('attendanceTableBody').innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;"><div class="loading" style="margin: 0 auto;"></div><p style="margin-top: 15px; color: #6c757d;">Đang tải danh sách sinh viên...</p></td></tr>';
+            document.getElementById('attendanceTableBody').innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;"><div class="loading" style="margin: 0 auto;"></div><p style="margin-top: 15px; color: #6c757d;">Loading student list...</p></td></tr>';
 
             fetch(`/Lecturer/GetStudentsForAttendance?courseId=${courseId}&date=${date}`)
                 .then(response => response.json())
@@ -190,14 +190,14 @@
                         document.getElementById('saveAttendanceBtn').disabled = false;
                         updateStats();
                     } else {
-                        alert('Lỗi: ' + data.message);
+                        alert('Error: ' + data.message);
                     }
                 })
                 .catch(error => {
                     loadBtn.innerHTML = originalText;
                     loadBtn.disabled = false;
                     console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi tải danh sách sinh viên!');
+                    alert('An error occurred while loading the student list!');
                 });
         }
 
@@ -219,10 +219,10 @@
                     </td>
                     <td>
                         <select class="status-select" data-student-id="${student.studentId}" onchange="updateStudentStatus(${student.studentId}, this.value)">
-                            <option value="Chưa điểm danh" ${student.status === 'Chưa điểm danh' ? 'selected' : ''}>Chưa điểm danh</option>
-                            <option value="Có mặt" ${student.status === 'Có mặt' ? 'selected' : ''}>Có mặt</option>
-                            <option value="Vắng" ${student.status === 'Vắng' ? 'selected' : ''}>Vắng</option>
-                            <option value="Có phép" ${student.status === 'Có phép' ? 'selected' : ''}>Có phép</option>
+                            <option value="Chưa điểm danh" ${student.status === 'Chưa điểm danh' ? 'selected' : ''}>Not marked</option>
+                            <option value="Có mặt" ${student.status === 'Có mặt' ? 'selected' : ''}>Present</option>
+                            <option value="Vắng" ${student.status === 'Vắng' ? 'selected' : ''}>Absent</option>
+                            <option value="Có phép" ${student.status === 'Có phép' ? 'selected' : ''}>Excused</option>
                         </select>
                     </td>
                 `;
@@ -271,7 +271,7 @@
 
         function saveAttendance() {
             if (!currentCourseId || !currentDate) {
-                alert('Vui lòng tải danh sách sinh viên trước!');
+                alert('Please load the student list first!');
                 return;
             }
 
@@ -297,21 +297,21 @@
                 .then(data => {
                     if (data.success) {
                         alert('✅ ' + data.message);
-                        loadStudents(); // Tải lại để cập nhật
+                        loadStudents(); // Reload to update
                     } else {
                         alert('❌ ' + data.message);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi lưu điểm danh!');
+                    alert('An error occurred while saving attendance!');
                 });
         }
 
         function showHistory() {
             const courseId = document.getElementById('courseSelect').value;
             if (!courseId) {
-                alert('Vui lòng chọn môn học trước!');
+                alert('Please select a course first!');
                 return;
             }
 
@@ -330,7 +330,7 @@
             const endDate = document.getElementById('endDate').value;
 
             if (!courseId) {
-                alert('Vui lòng chọn môn học!');
+                alert('Please select a course!');
                 return;
             }
 
@@ -338,7 +338,7 @@
             if (startDate) url += `&startDate=${startDate}`;
             if (endDate) url += `&endDate=${endDate}`;
 
-            document.getElementById('historyContent').innerHTML = '<p>Đang tải...</p>';
+            document.getElementById('historyContent').innerHTML = '<p>Loading...</p>';
 
             fetch(url)
                 .then(response => response.json())
@@ -346,12 +346,12 @@
                     if (data.success) {
                         displayHistory(data.history, data.courseName);
                     } else {
-                        document.getElementById('historyContent').innerHTML = '<p>Lỗi: ' + data.message + '</p>';
+                        document.getElementById('historyContent').innerHTML = '<p>Error: ' + data.message + '</p>';
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    document.getElementById('historyContent').innerHTML = '<p>Có lỗi xảy ra!</p>';
+                    document.getElementById('historyContent').innerHTML = '<p>An error occurred!</p>';
                 });
         }
 
@@ -359,7 +359,7 @@
             const content = document.getElementById('historyContent');
             
             if (history.length === 0) {
-                content.innerHTML = '<p>Chưa có lịch sử điểm danh.</p>';
+                content.innerHTML = '<p>No attendance history available.</p>';
                 return;
             }
 
@@ -370,9 +370,9 @@
                     <table class="history-table">
                         <thead>
                             <tr>
-                                <th>STT</th>
-                                <th>Tên sinh viên</th>
-                                <th>Trạng thái</th>
+                                <th>No.</th>
+                                <th>Student Name</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>`;

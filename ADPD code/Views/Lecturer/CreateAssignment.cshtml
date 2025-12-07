@@ -6,34 +6,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giao Bài tập Mới</title>
+    <title>Create New Assignment</title>
     <link href="~/css/AssignHomework.css" rel="stylesheet" />
 </head>
 <body>
     <div class="container">
         <div class="form-container">
             <form id="assignmentForm">
-                <!-- Thông tin cơ bản -->
+                <!-- Basic Information -->
                 <div class="form-section">
                     <h2 class="section-title">
                         <span>📋</span>
-                        Thông tin cơ bản
+                        Basic Information
                     </h2>
 
                     <div class="form-group">
                         <label class="form-label">
-                            Tiêu đề bài tập <span class="required">*</span>
+                            Assignment Title <span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input" id="title" placeholder="Ví dụ: Bài tập 1 - Thiết kế website" required>
+                        <input type="text" class="form-input" id="title" placeholder="Example: Assignment 1 - Website Design" required>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">
-                                Môn học <span class="required">*</span>
+                                Course <span class="required">*</span>
                             </label>
                             <select class="form-select" id="subject" name="courseId" required>
-                                <option value="">-- Chọn môn học --</option>
+                                <option value="">-- Select course --</option>
                                 @if (ViewBag.Courses != null)
                                 {
                                     @foreach (var course in ViewBag.Courses as List<ADPD_code.Models.Course>)
@@ -46,10 +46,10 @@
 
                         <div class="form-group">
                             <label class="form-label">
-                                Lớp học <span class="required">*</span>
+                                Class <span class="required">*</span>
                             </label>
                             <select class="form-select" id="class" required>
-                                <option value="">-- Chọn lớp --</option>
+                                <option value="">-- Select class --</option>
                                 <option value="CNTT01-K65">CNTT01-K65</option>
                                 <option value="CNTT02-K65">CNTT02-K65</option>
                                 <option value="CNTT03-K65">CNTT03-K65</option>
@@ -59,30 +59,30 @@
 
                     <div class="form-group">
                         <label class="form-label">
-                            Mô tả bài tập <span class="required">*</span>
+                            Assignment Description <span class="required">*</span>
                         </label>
-                        <textarea class="form-textarea" id="description" placeholder="Mô tả chi tiết về bài tập, yêu cầu, mục tiêu..." required></textarea>
+                        <textarea class="form-textarea" id="description" placeholder="Detailed description of the assignment, requirements, objectives..." required></textarea>
                     </div>
                 </div>
 
-                <!-- Thời gian và điểm số -->
+                <!-- Time and Score -->
                 <div class="form-section">
                     <h2 class="section-title">
                         <span>⏰</span>
-                        Thời gian và điểm số
+                        Time and Score
                     </h2>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">
-                                Ngày giao <span class="required">*</span>
+                                Assigned Date <span class="required">*</span>
                             </label>
                             <input type="datetime-local" class="form-input" id="startDate" required>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">
-                                Hạn nộp <span class="required">*</span>
+                                Due Date <span class="required">*</span>
                             </label>
                             <input type="datetime-local" class="form-input" id="dueDate" required>
                         </div>
@@ -91,74 +91,74 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">
-                                Điểm tối đa <span class="required">*</span>
+                                Maximum Score <span class="required">*</span>
                             </label>
                             <input type="number" class="form-input score-input" id="maxScore" min="0" max="10" step="0.5" value="10" required>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">
-                                Số lần nộp tối đa
+                                Maximum Submissions
                             </label>
                             <select class="form-select" id="submissionLimit">
-                                <option value="unlimited">Không giới hạn</option>
-                                <option value="1">1 lần</option>
-                                <option value="2">2 lần</option>
-                                <option value="3">3 lần</option>
-                                <option value="5">5 lần</option>
+                                <option value="unlimited">Unlimited</option>
+                                <option value="1">1 time</option>
+                                <option value="2">2 times</option>
+                                <option value="3">3 times</option>
+                                <option value="5">5 times</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <!-- Yêu cầu chi tiết -->
+                <!-- Detailed Requirements -->
                 <div class="form-section">
                     <h2 class="section-title">
                         <span>✅</span>
-                        Yêu cầu chi tiết
+                        Detailed Requirements
                     </h2>
 
                     <div class="form-group">
                         <label class="form-label">
-                            Danh sách yêu cầu
+                            Requirements List
                         </label>
-                        <textarea class="form-textarea" id="requirements" placeholder="Nhập từng yêu cầu trên mỗi dòng...&#10;Ví dụ:&#10;- Giao diện responsive&#10;- Sử dụng Entity Framework&#10;- Code có comment"></textarea>
+                        <textarea class="form-textarea" id="requirements" placeholder="Enter each requirement on a new line...&#10;Example:&#10;- Responsive design&#10;- Use Entity Framework&#10;- Code with comments"></textarea>
                     </div>
                 </div>
 
-                <!-- Tài liệu đính kèm -->
+                <!-- Attachments -->
                 <div class="form-section">
                     <h2 class="section-title">
                         <span>📎</span>
-                        Tài liệu đính kèm
+                        Attachments
                     </h2>
 
                     <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
                         <div class="upload-icon">☁️</div>
-                        <h3 style="color: #667eea; margin-bottom: 10px;">Tải tài liệu lên</h3>
-                        <p style="color: #6c757d; margin-bottom: 10px;">Kéo thả file vào đây hoặc nhấn để chọn</p>
-                        <p style="color: #6c757d; font-size: 12px;">Hỗ trợ: PDF, Word, Excel, ZIP, RAR, ảnh (Tối đa 50MB/file)</p>
+                        <h3 style="color: #667eea; margin-bottom: 10px;">Upload Documents</h3>
+                        <p style="color: #6c757d; margin-bottom: 10px;">Drag and drop files here or click to select</p>
+                        <p style="color: #6c757d; font-size: 12px;">Supported: PDF, Word, Excel, ZIP, RAR, images (Max 50MB/file)</p>
                         <input type="file" id="fileInput" multiple onchange="handleFiles(event)">
                     </div>
 
                     <div class="file-list" id="fileList"></div>
 
                     <div class="info-box">
-                        <p>💡 <strong>Gợi ý:</strong> Bạn có thể đính kèm tài liệu hướng dẫn, template, database mẫu, hoặc bất kỳ tài liệu nào cần thiết cho bài tập.</p>
+                        <p>💡 <strong>Tip:</strong> You can attach guide documents, templates, sample databases, or any necessary materials for the assignment.</p>
                     </div>
                 </div>
                
 
-                <!-- Nút hành động -->
+                <!-- Action Buttons -->
                 <div class="action-buttons">
                     <a href="@Url.Action("Assignments", "Lecturer")" class="btn btn-outline">
-                        ← Quay lại Quản lý Bài tập
+                        ← Back to Assignment Management
                     </a>
                     <button type="button" class="btn btn-outline" onclick="saveDraft()">
-                        💾 Lưu nháp
+                        💾 Save Draft
                     </button>
                     <button type="submit" class="btn btn-primary">
-                        📤 Giao bài tập
+                        📤 Assign
                     </button>
                 </div>
             </form>
