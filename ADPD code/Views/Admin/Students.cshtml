@@ -68,8 +68,16 @@
                             </span>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-success" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;" onclick="editStudent(@student.StudentId)">✏️ Edit</button>
-                            <button type="button" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteStudent(@student.StudentId)">🗑️ Delete</button>
+                            <button type="button" class="btn btn-success edit-student-btn"
+                                    style="padding: 6px 12px; font-size: 12px; margin-right: 5px;"
+                                    data-student-id="@student.StudentId">
+                                ✏️ Edit
+                            </button>
+                            <button type="button" class="btn btn-danger delete-student-btn"
+                                    style="padding: 6px 12px; font-size: 12px;"
+                                    data-student-id="@student.StudentId">
+                                🗑️ Delete
+                            </button>
                         </td>
                     </tr>
                     index++;
@@ -79,12 +87,12 @@
     </div>
 </div>
 
-<!-- Modal Add/Edit Student Compact -->
+<!-- Modal Add/Edit Student -->
 <div id="studentModal" class="modal" style="display: none;">
     <div class="modal-content compact-modal">
         <div class="modal-header">
             <h2 id="modalTitle">Edit Student</h2>
-            <button type="button" class="close-btn" onclick="closeModal()">×</button>
+            <button type="button" class="close-btn" onclick="closeStudentModal()">×</button>
         </div>
         <form id="studentForm">
             <div class="modal-body grid-form">
@@ -140,7 +148,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary compact-btn" onclick="closeModal()">Cancel</button>
+                <button type="button" class="btn btn-secondary compact-btn" onclick="closeStudentModal()">Cancel</button>
                 <button type="submit" class="btn btn-primary compact-btn">Save</button>
             </div>
         </form>
@@ -148,7 +156,6 @@
 </div>
 
 <style>
-    /* Compact modal */
     .compact-modal {
         width: 500px;
         max-width: 95%;
@@ -158,7 +165,6 @@
         max-height: 90vh;
     }
 
-    /* Two-column form */
     .grid-form {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -213,3 +219,290 @@
         color: #721c24;
     }
 </style>
+
+<script>
+    (function() {
+        'use strict';
+
+        console.log('🔧 Student Management Script Initialized');
+
+        // ========== GLOBAL FUNCTIONS ==========
+        window.showCreateModal = function() {
+            console.log('📝 Opening Create Modal');
+            const modal = document.getElementById('studentModal');
+            const form = document.getElementById('studentForm');
+            const title = document.getElementById('modalTitle');
+
+            if (!modal || !form || !title) {
+                console.error('❌ Modal elements not found');
+                alert('Error opening form!');
+                return;
+            }
+
+            title.textContent = 'Add Student';
+            form.reset();
+            document.getElementById('studentId').value = '';
+            modal.style.display = 'block';
+            console.log('✅ Create Modal Opened');
+        };
+
+        window.closeStudentModal = function() {
+            console.log('❌ Closing Modal');
+            const modal = document.getElementById('studentModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        // ========== EDIT STUDENT FUNCTION ==========
+        function editStudent(studentId) {
+            console.log('✏️ Editing student:', studentId);
+
+            fetch(`/Admin/EditStudent/${studentId}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                console.log('📡 Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('📦 Received data:', data);
+
+                if (data.success && data.student) {
+                    fillEditForm(data.student);
+                } else {
+                    alert('❌ ' + (data.message || 'Student not found'));
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error:', error);
+                alert('Error loading student info: ' + error.message);
+            });
+        }
+
+        // ========== FILL EDIT FORM ==========
+        function fillEditForm(student) {
+            console.log('📝 Filling form with:', student);
+
+            const modal = document.getElementById('studentModal');
+            const title = document.getElementById('modalTitle');
+
+            if (!modal || !title) {
+                console.error('❌ Modal elements not found');
+                return;
+            }
+
+            title.textContent = 'Edit Student';
+            document.getElementById('studentId').value = student.StudentId || '';
+            document.getElementById('fullName').value = student.FullName || '';
+            document.getElementById('gender').value = student.Gender || '';
+            document.getElementById('dob').value = student.DOB || '';
+            document.getElementById('email').value = student.Email || '';
+            document.getElementById('phone').value = student.Phone || '';
+            document.getElementById('address').value = student.Address || '';
+            document.getElementById('status').value = student.Status || '';
+            document.getElementById('classId').value = student.ClassID || '';
+
+            modal.style.display = 'block';
+            console.log('✅ Edit Modal Opened');
+        }
+
+        // ========== DELETE STUDENT FUNCTION ==========
+        function deleteStudent(studentId) {
+            console.log('🗑️ Deleting student:', studentId);
+
+            if (!confirm('Are you sure you want to delete this student?')) {
+                return;
+            }
+
+            fetch(`/Admin/DeleteStudent/${studentId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP ${response.status}: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('✅ ' + data.message);
+                    location.reload();
+                } else {
+                    alert('❌ ' + (data.message || 'Error occurred'));
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error:', error);
+                alert('Error deleting student: ' + error.message);
+            });
+        }
+
+        // ========== FORM SUBMIT HANDLER ==========
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            console.log('📤 Form Submit Triggered');
+
+            const studentId = document.getElementById('studentId').value.trim();
+            const fullName = document.getElementById('fullName').value.trim();
+            const gender = document.getElementById('gender').value.trim();
+            const dob = document.getElementById('dob').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const status = document.getElementById('status').value.trim();
+            const classId = document.getElementById('classId').value.trim();
+
+            // Validation
+            if (!fullName || !gender || !dob || !email || !phone || !address || !status) {
+                alert('❌ Please fill in all required fields!');
+                return false;
+            }
+
+            const data = {
+                FullName: fullName,
+                Gender: gender,
+                DOB: dob,
+                Email: email,
+                Phone: phone,
+                Address: address,
+                Status: status,
+                ClassID: classId ? parseInt(classId) : null
+            };
+
+            let url = '/Admin/CreateStudent';
+            let mode = 'CREATE';
+
+            if (studentId && studentId !== '0' && studentId !== '') {
+                url = `/Admin/EditStudent/${studentId}`;
+                data.StudentId = parseInt(studentId);
+                mode = 'EDIT';
+            }
+
+            console.log(`📡 ${mode} Mode - URL:`, url);
+            console.log('📦 Data:', data);
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                console.log('📡 Response status:', response.status);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP ${response.status}: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(responseData => {
+                console.log('✅ Success:', responseData);
+                if (responseData.success) {
+                    alert('✅ ' + responseData.message);
+                    closeStudentModal();
+                    setTimeout(() => location.reload(), 500);
+                } else {
+                    alert('❌ ' + (responseData.message || 'Error occurred'));
+                }
+            })
+            .catch(error => {
+                console.error('❌ Fetch error:', error);
+                alert('❌ Error: ' + error.message);
+            });
+
+            return false;
+        }
+
+        // ========== SEARCH FUNCTIONALITY ==========
+        function initSearch() {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('#studentTableBody tr');
+
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(searchTerm) ? '' : 'none';
+                    });
+                });
+                console.log('✅ Search initialized');
+            }
+        }
+
+        // ========== INITIALIZATION ==========
+        function init() {
+            console.log('🚀 Initializing Student Management');
+
+            // Attach form submit handler
+            const form = document.getElementById('studentForm');
+            if (form) {
+                form.removeEventListener('submit', handleFormSubmit); // Remove old listener
+                form.addEventListener('submit', handleFormSubmit);
+                console.log('✅ Form handler attached');
+            }
+
+            // Attach edit button handlers
+            document.querySelectorAll('.edit-student-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const studentId = this.getAttribute('data-student-id');
+                    console.log('🖱️ Edit button clicked:', studentId);
+                    editStudent(studentId);
+                });
+            });
+            console.log('✅ Edit buttons initialized:', document.querySelectorAll('.edit-student-btn').length);
+
+            // Attach delete button handlers
+            document.querySelectorAll('.delete-student-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const studentId = this.getAttribute('data-student-id');
+                    console.log('🖱️ Delete button clicked:', studentId);
+                    deleteStudent(studentId);
+                });
+            });
+            console.log('✅ Delete buttons initialized:', document.querySelectorAll('.delete-student-btn').length);
+
+            // Initialize search
+            initSearch();
+
+            // Close modal when clicking outside
+            window.onclick = function(event) {
+                const modal = document.getElementById('studentModal');
+                if (event.target === modal) {
+                    closeStudentModal();
+                }
+            };
+
+            console.log('✅ Student Management Initialized Successfully');
+        }
+
+        // Run initialization
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+</script>
